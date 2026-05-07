@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchRestaurantBySlug, dietLabel } from "@/lib/osmRestaurants";
+import { fetchRestaurantBySlug, dietLabel } from "@/lib/osmRestaurants.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -25,7 +25,7 @@ function RestaurantDetail() {
 
   const { data: r, isLoading, error } = useQuery({
     queryKey: ["osm-restaurant", slug],
-    queryFn: () => fetchRestaurantBySlug(slug),
+    queryFn: () => fetchRestaurantBySlug({ data: { slug } }),
     staleTime: 1000 * 60 * 30,
   });
 
