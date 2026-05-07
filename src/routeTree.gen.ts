@@ -22,9 +22,12 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CountriesSlugRouteImport } from './routes/countries.$slug'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
+import { Route as AppTripsRouteImport } from './routes/_app/trips'
 import { Route as AppRestaurantsRouteImport } from './routes/_app/restaurants'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCardsRouteImport } from './routes/_app/cards'
+import { Route as AppTripsNewRouteImport } from './routes/_app/trips.new'
+import { Route as AppTripsIdRouteImport } from './routes/_app/trips.$id'
 import { Route as AppRestaurantsSlugRouteImport } from './routes/_app/restaurants.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
@@ -92,6 +95,11 @@ const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   path: '/checkout/success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTripsRoute = AppTripsRouteImport.update({
+  id: '/trips',
+  path: '/trips',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppRestaurantsRoute = AppRestaurantsRouteImport.update({
   id: '/restaurants',
   path: '/restaurants',
@@ -106,6 +114,16 @@ const AppCardsRoute = AppCardsRouteImport.update({
   id: '/cards',
   path: '/cards',
   getParentRoute: () => AppRoute,
+} as any)
+const AppTripsNewRoute = AppTripsNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AppTripsRoute,
+} as any)
+const AppTripsIdRoute = AppTripsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppTripsRoute,
 } as any)
 const AppRestaurantsSlugRoute = AppRestaurantsSlugRouteImport.update({
   id: '/$slug',
@@ -133,9 +151,12 @@ export interface FileRoutesByFullPath {
   '/cards': typeof AppCardsRoute
   '/dashboard': typeof AppDashboardRoute
   '/restaurants': typeof AppRestaurantsRouteWithChildren
+  '/trips': typeof AppTripsRouteWithChildren
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
   '/restaurants/$slug': typeof AppRestaurantsSlugRoute
+  '/trips/$id': typeof AppTripsIdRoute
+  '/trips/new': typeof AppTripsNewRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -152,9 +173,12 @@ export interface FileRoutesByTo {
   '/cards': typeof AppCardsRoute
   '/dashboard': typeof AppDashboardRoute
   '/restaurants': typeof AppRestaurantsRouteWithChildren
+  '/trips': typeof AppTripsRouteWithChildren
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
   '/restaurants/$slug': typeof AppRestaurantsSlugRoute
+  '/trips/$id': typeof AppTripsIdRoute
+  '/trips/new': typeof AppTripsNewRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -173,9 +197,12 @@ export interface FileRoutesById {
   '/_app/cards': typeof AppCardsRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/restaurants': typeof AppRestaurantsRouteWithChildren
+  '/_app/trips': typeof AppTripsRouteWithChildren
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
   '/_app/restaurants/$slug': typeof AppRestaurantsSlugRoute
+  '/_app/trips/$id': typeof AppTripsIdRoute
+  '/_app/trips/new': typeof AppTripsNewRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -194,9 +221,12 @@ export interface FileRouteTypes {
     | '/cards'
     | '/dashboard'
     | '/restaurants'
+    | '/trips'
     | '/checkout/success'
     | '/countries/$slug'
     | '/restaurants/$slug'
+    | '/trips/$id'
+    | '/trips/new'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -213,9 +243,12 @@ export interface FileRouteTypes {
     | '/cards'
     | '/dashboard'
     | '/restaurants'
+    | '/trips'
     | '/checkout/success'
     | '/countries/$slug'
     | '/restaurants/$slug'
+    | '/trips/$id'
+    | '/trips/new'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -233,9 +266,12 @@ export interface FileRouteTypes {
     | '/_app/cards'
     | '/_app/dashboard'
     | '/_app/restaurants'
+    | '/_app/trips'
     | '/checkout/success'
     | '/countries/$slug'
     | '/_app/restaurants/$slug'
+    | '/_app/trips/$id'
+    | '/_app/trips/new'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -348,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/trips': {
+      id: '/_app/trips'
+      path: '/trips'
+      fullPath: '/trips'
+      preLoaderRoute: typeof AppTripsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/restaurants': {
       id: '/_app/restaurants'
       path: '/restaurants'
@@ -368,6 +411,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/cards'
       preLoaderRoute: typeof AppCardsRouteImport
       parentRoute: typeof AppRoute
+    }
+    '/_app/trips/new': {
+      id: '/_app/trips/new'
+      path: '/new'
+      fullPath: '/trips/new'
+      preLoaderRoute: typeof AppTripsNewRouteImport
+      parentRoute: typeof AppTripsRoute
+    }
+    '/_app/trips/$id': {
+      id: '/_app/trips/$id'
+      path: '/$id'
+      fullPath: '/trips/$id'
+      preLoaderRoute: typeof AppTripsIdRouteImport
+      parentRoute: typeof AppTripsRoute
     }
     '/_app/restaurants/$slug': {
       id: '/_app/restaurants/$slug'
@@ -398,16 +455,32 @@ const AppRestaurantsRouteWithChildren = AppRestaurantsRoute._addFileChildren(
   AppRestaurantsRouteChildren,
 )
 
+interface AppTripsRouteChildren {
+  AppTripsIdRoute: typeof AppTripsIdRoute
+  AppTripsNewRoute: typeof AppTripsNewRoute
+}
+
+const AppTripsRouteChildren: AppTripsRouteChildren = {
+  AppTripsIdRoute: AppTripsIdRoute,
+  AppTripsNewRoute: AppTripsNewRoute,
+}
+
+const AppTripsRouteWithChildren = AppTripsRoute._addFileChildren(
+  AppTripsRouteChildren,
+)
+
 interface AppRouteChildren {
   AppCardsRoute: typeof AppCardsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppRestaurantsRoute: typeof AppRestaurantsRouteWithChildren
+  AppTripsRoute: typeof AppTripsRouteWithChildren
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppCardsRoute: AppCardsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppRestaurantsRoute: AppRestaurantsRouteWithChildren,
+  AppTripsRoute: AppTripsRouteWithChildren,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
