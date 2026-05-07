@@ -100,6 +100,31 @@ function Cell({ v }: { v: string | boolean }) {
 
 function PricingPage() {
   const [billing, setBilling] = useState<Billing>("monthly");
+  const { user } = useAuth();
+  const { openCheckout, loading } = usePaddleCheckout();
+  const [pendingPlan, setPendingPlan] = useState<string | null>(null);
+
+  const handleCta = async (plan: typeof PLANS[number]) => {
+    if (plan.id === "free") return;
+    if (!user) {
+      toast.info("Create a free account first to start your subscription.");
+      return;
+    }
+    const priceId = `${plan.id}_${billing === "monthly" ? "monthly" : "yearly"}`;
+    setPendingPlan(plan.id);
+    try {
+      await openCheckout({
+        priceId,
+        customerEmail: user.email,
+        customData: { userId: user.id },
+        successUrl: `${window.location.origin}/?checkout=success`,
+      });
+    } catch (e: any) {
+      toast.error(e?.message || "Could not open checkout. Please try again.");
+    } finally {
+      setPendingPlan(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -133,6 +158,7 @@ function PricingPage() {
         {PLANS.map((p) => {
           const label = priceLabel(p, billing);
           const saving = billing === "yearly" && p.monthly > 0 ? Math.round(p.monthly * 12 - p.yearly) : 0;
+          const isPending = pendingPlan === p.id && loading;
           return (
             <div key={p.id} className={`relative rounded-3xl border p-7 shadow-soft transition ${p.highlight ? "border-primary bg-card shadow-glow scale-[1.02]" : "border-border bg-card"}`}>
               {p.highlight && <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">Most popular</span>}
@@ -145,7 +171,24 @@ function PricingPage() {
               {saving > 0 && (
                 <p className="mt-1 text-xs text-success">Save €{saving} / year vs monthly</p>
               )}
-              <Link to="/auth"><Button className="mt-6 w-full" variant={p.highlight ? "default" : "outline"}>{p.cta}</Button></Link>
+              {p.id === "free" ? (
+                <Link to="/auth"><Button className="mt-6 w-full" variant="outline">{p.cta}</Button></Link>
+              ) : !user ? (
+                <Link to="/auth">
+                  <Button className="mt-6 w-full" variant={p.highlight ? "default" : "outline"}>
+                    Sign in to {p.cta.toLowerCase()}
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  className="mt-6 w-full"
+                  variant={p.highlight ? "default" : "outline"}
+                  onClick={() => handleCta(p)}
+                  disabled={isPending}
+                >
+                  {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : p.cta}
+                </Button>
+              )}
               <ul className="mt-6 space-y-3 text-sm">
                 {p.features.map((f) => (
                   <li key={f} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-success" /> {f}</li>
