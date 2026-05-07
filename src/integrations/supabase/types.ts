@@ -14,7 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          cards_used_this_month: number
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          plan: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          cards_used_this_month?: number
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          plan?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          cards_used_this_month?: number
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          plan?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      translation_cards: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          language: string
+          language_label: string
+          severity: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          language: string
+          language_label: string
+          severity?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          language?: string
+          language_label?: string
+          severity?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trips: {
+        Row: {
+          country_code: string | null
+          created_at: string
+          destination: string
+          end_date: string | null
+          id: string
+          notes: string | null
+          start_date: string | null
+          user_id: string
+        }
+        Insert: {
+          country_code?: string | null
+          created_at?: string
+          destination: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          start_date?: string | null
+          user_id: string
+        }
+        Update: {
+          country_code?: string | null
+          created_at?: string
+          destination?: string
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          start_date?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
