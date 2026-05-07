@@ -186,6 +186,10 @@ function PricingPage() {
                     Sign in to {p.cta.toLowerCase()}
                   </Button>
                 </Link>
+              ) : isActive && planName === p.id ? (
+                <Link to="/dashboard">
+                  <Button className="mt-6 w-full" variant="outline">Current plan</Button>
+                </Link>
               ) : (
                 <Button
                   className="mt-6 w-full"
@@ -193,7 +197,7 @@ function PricingPage() {
                   onClick={() => handleCta(p)}
                   disabled={isPending}
                 >
-                  {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : p.cta}
+                  {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : isActive ? `Switch to ${p.name}` : p.cta}
                 </Button>
               )}
               <ul className="mt-6 space-y-3 text-sm">
