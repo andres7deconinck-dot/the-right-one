@@ -22,8 +22,10 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CountriesSlugRouteImport } from './routes/countries.$slug'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
+import { Route as AppRestaurantsRouteImport } from './routes/_app/restaurants'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCardsRouteImport } from './routes/_app/cards'
+import { Route as AppRestaurantsSlugRouteImport } from './routes/_app/restaurants.$slug'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const TermsRoute = TermsRouteImport.update({
@@ -90,6 +92,11 @@ const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   path: '/checkout/success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRestaurantsRoute = AppRestaurantsRouteImport.update({
+  id: '/restaurants',
+  path: '/restaurants',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -99,6 +106,11 @@ const AppCardsRoute = AppCardsRouteImport.update({
   id: '/cards',
   path: '/cards',
   getParentRoute: () => AppRoute,
+} as any)
+const AppRestaurantsSlugRoute = AppRestaurantsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => AppRestaurantsRoute,
 } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
@@ -120,8 +132,10 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/cards': typeof AppCardsRoute
   '/dashboard': typeof AppDashboardRoute
+  '/restaurants': typeof AppRestaurantsRouteWithChildren
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
+  '/restaurants/$slug': typeof AppRestaurantsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -137,8 +151,10 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/cards': typeof AppCardsRoute
   '/dashboard': typeof AppDashboardRoute
+  '/restaurants': typeof AppRestaurantsRouteWithChildren
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
+  '/restaurants/$slug': typeof AppRestaurantsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -156,8 +172,10 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_app/cards': typeof AppCardsRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/restaurants': typeof AppRestaurantsRouteWithChildren
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
+  '/_app/restaurants/$slug': typeof AppRestaurantsSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -175,8 +193,10 @@ export interface FileRouteTypes {
     | '/terms'
     | '/cards'
     | '/dashboard'
+    | '/restaurants'
     | '/checkout/success'
     | '/countries/$slug'
+    | '/restaurants/$slug'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -192,8 +212,10 @@ export interface FileRouteTypes {
     | '/terms'
     | '/cards'
     | '/dashboard'
+    | '/restaurants'
     | '/checkout/success'
     | '/countries/$slug'
+    | '/restaurants/$slug'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -210,8 +232,10 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_app/cards'
     | '/_app/dashboard'
+    | '/_app/restaurants'
     | '/checkout/success'
     | '/countries/$slug'
+    | '/_app/restaurants/$slug'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -324,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutSuccessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/restaurants': {
+      id: '/_app/restaurants'
+      path: '/restaurants'
+      fullPath: '/restaurants'
+      preLoaderRoute: typeof AppRestaurantsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -338,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCardsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/restaurants/$slug': {
+      id: '/_app/restaurants/$slug'
+      path: '/$slug'
+      fullPath: '/restaurants/$slug'
+      preLoaderRoute: typeof AppRestaurantsSlugRouteImport
+      parentRoute: typeof AppRestaurantsRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -348,14 +386,28 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppRestaurantsRouteChildren {
+  AppRestaurantsSlugRoute: typeof AppRestaurantsSlugRoute
+}
+
+const AppRestaurantsRouteChildren: AppRestaurantsRouteChildren = {
+  AppRestaurantsSlugRoute: AppRestaurantsSlugRoute,
+}
+
+const AppRestaurantsRouteWithChildren = AppRestaurantsRoute._addFileChildren(
+  AppRestaurantsRouteChildren,
+)
+
 interface AppRouteChildren {
   AppCardsRoute: typeof AppCardsRoute
   AppDashboardRoute: typeof AppDashboardRoute
+  AppRestaurantsRoute: typeof AppRestaurantsRouteWithChildren
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppCardsRoute: AppCardsRoute,
   AppDashboardRoute: AppDashboardRoute,
+  AppRestaurantsRoute: AppRestaurantsRouteWithChildren,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
