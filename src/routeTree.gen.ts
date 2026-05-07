@@ -21,6 +21,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CountriesSlugRouteImport } from './routes/countries.$slug'
+import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCardsRouteImport } from './routes/_app/cards'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
@@ -84,6 +85,11 @@ const CountriesSlugRoute = CountriesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CountriesRoute,
 } as any)
+const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
+  id: '/checkout/success',
+  path: '/checkout/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/cards': typeof AppCardsRoute
   '/dashboard': typeof AppDashboardRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/cards': typeof AppCardsRoute
   '/dashboard': typeof AppDashboardRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -148,6 +156,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/_app/cards': typeof AppCardsRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
@@ -166,6 +175,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/cards'
     | '/dashboard'
+    | '/checkout/success'
     | '/countries/$slug'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/cards'
     | '/dashboard'
+    | '/checkout/success'
     | '/countries/$slug'
     | '/api/public/payments/webhook'
   id:
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/_app/cards'
     | '/_app/dashboard'
+    | '/checkout/success'
     | '/countries/$slug'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CountriesSlugRouteImport
       parentRoute: typeof CountriesRoute
     }
+    '/checkout/success': {
+      id: '/checkout/success'
+      path: '/checkout/success'
+      fullPath: '/checkout/success'
+      preLoaderRoute: typeof CheckoutSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -364,8 +384,19 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  CheckoutSuccessRoute: CheckoutSuccessRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
