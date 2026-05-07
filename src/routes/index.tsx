@@ -148,10 +148,14 @@ function Landing() {
         <h2 className="text-center font-display text-4xl md:text-5xl">Questions, answered</h2>
         <Accordion type="single" collapsible className="mt-10">
           {[
-            { q: "Is GlutenGo medical advice?", a: "No. We provide translation tools and curated travel guidance reviewed for accuracy. Always confirm preparation with restaurant staff and consult a doctor for medical decisions." },
-            { q: "Which languages are supported?", a: "English, French, Spanish, Italian, German, Japanese and Thai at launch. More are added every month." },
-            { q: "Does it work offline?", a: "Saved cards and downloaded country guides work offline on the Traveler and Family plans." },
-            { q: "Can I cancel anytime?", a: "Yes. Cancel from your dashboard in two clicks. You keep access until the end of your billing cycle." },
+            { q: "Is GlutenGo medical advice?", a: "No. GlutenGo provides translation tools and travel guides for information only. Always confirm preparation with restaurant staff. When in doubt, don't eat it." },
+            { q: "Which languages are supported for translation cards?", a: "English, French, Spanish, Italian, German, Japanese, Thai, Dutch, Portuguese, Greek, Turkish, Polish, Korean, Chinese (Simplified), Arabic and Hindi. New languages are added regularly." },
+            { q: "Does it work offline?", a: "Yes. On the Traveler and Family plans you can save translation cards and country guides for offline use — perfect when you don't have data abroad." },
+            { q: "Can I cancel anytime?", a: "Yes. Cancel from your account settings whenever you want. You keep access until the end of your paid period." },
+            { q: "How accurate are the translations?", a: "We use a medically-tuned prompt specifically built for celiac disease and gluten intolerance, with phonetic guides for languages like Japanese and Thai. For critical trips we still recommend having a native speaker double-check the card." },
+            { q: "What if I'm intolerant and not celiac?", a: "When you create your account you can specify whether you have celiac disease, intolerance or an allergy. Translation cards and warnings adapt to your severity level." },
+            { q: "Is there a free trial for paid plans?", a: "GlutenGo is free forever with 3 translation cards per month. For the Traveler plan we offer a 30-day money-back guarantee — no questions asked." },
+            { q: "How does the Family plan work?", a: "The Family plan supports up to 5 user profiles. Each person has their own allergy profiles, translation cards and saved restaurants. You can plan trips together and share checklists." },
           ].map((f, i) => (
             <AccordionItem value={`i${i}`} key={i}>
               <AccordionTrigger className="text-left font-medium">{f.q}</AccordionTrigger>
