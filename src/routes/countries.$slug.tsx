@@ -23,7 +23,7 @@ export const Route = createFileRoute("/countries/$slug")({
 });
 
 function CountryDetail() {
-  const c = Route.useLoaderData();
+  const c = Route.useLoaderData() as (typeof COUNTRIES)[number];
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
