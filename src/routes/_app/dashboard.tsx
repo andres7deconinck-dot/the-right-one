@@ -1,9 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Globe2, Map, MessagesSquare, Plus, Sparkles } from "lucide-react";
+import { Globe2, Map, MessagesSquare, Plus, Sparkles, Settings, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { useSubscription } from "@/hooks/useSubscription";
+import { createCustomerPortalUrl } from "@/utils/payments.functions";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard — GlutenGo" }] }),
@@ -12,8 +15,10 @@ export const Route = createFileRoute("/_app/dashboard")({
 
 function Dashboard() {
   const { user } = useAuth();
+  const { isActive, planName, subscription } = useSubscription();
   const [profile, setProfile] = useState<any>(null);
   const [recent, setRecent] = useState<any[]>([]);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -22,7 +27,19 @@ function Dashboard() {
   }, [user]);
 
   const used = profile?.cards_used_this_month ?? 0;
-  const limit = profile?.plan === "free" ? 3 : Infinity;
+  const limit = planName === "free" ? 3 : Infinity;
+
+  const openPortal = async () => {
+    setPortalLoading(true);
+    try {
+      const { url } = await createCustomerPortalUrl();
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (e: any) {
+      toast.error(e?.message || "Could not open billing portal");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10">
@@ -31,9 +48,22 @@ function Dashboard() {
           <p className="text-sm text-muted-foreground">Welcome back</p>
           <h1 className="font-display text-4xl">{profile?.full_name || user?.email?.split("@")[0]}</h1>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm">
-          <Sparkles className="h-4 w-4 text-accent" /> Plan: <span className="font-medium capitalize">{profile?.plan || "free"}</span>
-          <span className="text-muted-foreground">· {used}{limit === Infinity ? "" : `/${limit}`} cards this month</span>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm">
+            <Sparkles className="h-4 w-4 text-accent" /> Plan: <span className="font-medium capitalize">{planName}</span>
+            <span className="text-muted-foreground">· {used}{limit === Infinity ? "" : `/${limit}`} cards this month</span>
+            {subscription?.cancel_at_period_end && (
+              <span className="ml-1 rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-800">Cancels {subscription.current_period_end ? new Date(subscription.current_period_end).toLocaleDateString() : ""}</span>
+            )}
+          </div>
+          {isActive ? (
+            <Button variant="outline" size="sm" onClick={openPortal} disabled={portalLoading}>
+              {portalLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Settings className="mr-2 h-4 w-4" />}
+              Manage billing
+            </Button>
+          ) : (
+            <Link to="/pricing"><Button size="sm"><Sparkles className="mr-2 h-4 w-4" /> Upgrade</Button></Link>
+          )}
         </div>
       </div>
 

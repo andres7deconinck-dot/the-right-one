@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Check, Minus, Sparkles, Shield, CreditCard, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { usePaddleCheckout } from "@/hooks/usePaddleCheckout";
 import { useAuth } from "@/lib/auth";
+import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/pricing")({
@@ -101,13 +102,19 @@ function Cell({ v }: { v: string | boolean }) {
 function PricingPage() {
   const [billing, setBilling] = useState<Billing>("monthly");
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { openCheckout, loading } = usePaddleCheckout();
+  const { isActive, planName } = useSubscription();
   const [pendingPlan, setPendingPlan] = useState<string | null>(null);
 
   const handleCta = async (plan: typeof PLANS[number]) => {
     if (plan.id === "free") return;
     if (!user) {
-      toast.info("Create a free account first to start your subscription.");
+      navigate({ to: "/auth", search: { redirect: "/pricing" } as any });
+      return;
+    }
+    if (isActive && planName === plan.id) {
+      navigate({ to: "/dashboard" });
       return;
     }
     const priceId = `${plan.id}_${billing === "monthly" ? "monthly" : "yearly"}`;
@@ -117,7 +124,7 @@ function PricingPage() {
         priceId,
         customerEmail: user.email,
         customData: { userId: user.id },
-        successUrl: `${window.location.origin}/?checkout=success`,
+        successUrl: `${window.location.origin}/checkout/success`,
       });
     } catch (e: any) {
       toast.error(e?.message || "Could not open checkout. Please try again.");
@@ -179,6 +186,10 @@ function PricingPage() {
                     Sign in to {p.cta.toLowerCase()}
                   </Button>
                 </Link>
+              ) : isActive && planName === p.id ? (
+                <Link to="/dashboard">
+                  <Button className="mt-6 w-full" variant="outline">Current plan</Button>
+                </Link>
               ) : (
                 <Button
                   className="mt-6 w-full"
@@ -186,7 +197,7 @@ function PricingPage() {
                   onClick={() => handleCta(p)}
                   disabled={isPending}
                 >
-                  {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : p.cta}
+                  {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : isActive ? `Switch to ${p.name}` : p.cta}
                 </Button>
               )}
               <ul className="mt-6 space-y-3 text-sm">
