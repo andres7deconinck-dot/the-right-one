@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { searchGlutenFree, dietLabel, type OsmRestaurant } from "@/lib/osmRestaurants";
+import { searchGlutenFree, dietLabel, type OsmRestaurant } from "@/lib/osmRestaurants.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -32,7 +32,7 @@ function RestaurantsPage() {
 
   const { data, isFetching, error } = useQuery({
     queryKey: ["osm-restaurants", place],
-    queryFn: () => searchGlutenFree(place),
+    queryFn: () => searchGlutenFree({ data: { place } }),
     enabled: !!place,
     staleTime: 1000 * 60 * 30,
   });
