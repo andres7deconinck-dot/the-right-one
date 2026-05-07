@@ -1,1 +1,7 @@
 project_id = "efqiowtyxmdbzehfsion"
+
+[functions.generate-card]
+verify_jwt = true
+
+[functions.travel-chat]
+verify_jwt = false
