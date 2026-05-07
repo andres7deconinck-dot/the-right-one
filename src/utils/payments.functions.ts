@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { gatewayFetch, getPaddleClient, type PaddleEnv } from '@/lib/paddle.server';
-import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 import { supabaseAdmin } from '@/integrations/supabase/client.server';
 
 export const resolvePaddlePrice = createServerFn({ method: "GET" })
@@ -13,9 +12,12 @@ export const resolvePaddlePrice = createServerFn({ method: "GET" })
   });
 
 export const createCustomerPortalUrl = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const { userId } = context;
+  .inputValidator((data: { accessToken: string }) => data)
+  .handler(async ({ data }) => {
+    const { data: userRes, error: authErr } = await supabaseAdmin.auth.getUser(data.accessToken);
+    if (authErr || !userRes?.user) throw new Error('Unauthorized');
+    const userId = userRes.user.id;
+
     const { data: sub } = await supabaseAdmin
       .from('subscriptions')
       .select('paddle_customer_id, paddle_subscription_id, environment')
