@@ -139,3 +139,58 @@ export const searchRestaurantsAI = createServerFn({ method: "GET" })
 
     return { place, summary: parsed.summary || "", results };
   });
+
+export const fetchRestaurantDetailAI = createServerFn({ method: "GET" })
+  .inputValidator((data: { slug: string }) => data)
+  .handler(async ({ data }): Promise<AIRestaurant | null> => {
+    const m = data.slug.match(/^ai-(.+)$/);
+    if (!m) return null;
+    let raw: string;
+    try {
+      const b64 = m[1].replace(/-/g, "+").replace(/_/g, "/");
+      const padded = b64 + "=".repeat((4 - b64.length % 4) % 4);
+      raw = decodeURIComponent(escape(atob(padded)));
+    } catch { return null; }
+    const [name, city, country] = raw.split("|");
+    if (!name || !city) return null;
+
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("AI gateway is not configured.");
+
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: SYSTEM },
+          { role: "user", content: `Provide detailed information about the restaurant "${name}" in ${city}${country ? ", " + country : ""}. Include full address, opening hours, phone, website, gluten-free protocol, must-try dishes, and any certifications. Only return if the venue is real.` },
+        ],
+        tools: [{
+          type: "function",
+          function: {
+            name: "return_restaurant",
+            description: "Return the venue details",
+            parameters: {
+              type: "object",
+              properties: SCHEMA.properties.results.items.properties,
+              required: ["name", "glutenFreeLevel", "glutenFreeNotes", "city"],
+              additionalProperties: false,
+            },
+          },
+        }],
+        tool_choice: { type: "function", function: { name: "return_restaurant" } },
+      }),
+    });
+
+    if (res.status === 429) throw new Error("AI rate limit reached — try again in a minute.");
+    if (res.status === 402) throw new Error("AI credits exhausted.");
+    if (!res.ok) throw new Error(`AI error: ${res.status}`);
+    const json = await res.json();
+    const call = json.choices?.[0]?.message?.tool_calls?.[0];
+    if (!call) return null;
+    try {
+      const r = JSON.parse(call.function.arguments);
+      return { ...r, id: data.slug };
+    } catch { return null; }
+  });
