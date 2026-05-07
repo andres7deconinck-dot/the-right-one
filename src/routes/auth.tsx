@@ -11,6 +11,7 @@ import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — GlutenGo" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({ redirect: typeof s.redirect === "string" ? s.redirect : undefined }),
   component: AuthPage,
 });
 
@@ -22,8 +23,10 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const search = Route.useSearch();
+  const dest = (search.redirect && search.redirect.startsWith("/")) ? search.redirect : "/dashboard";
 
-  useEffect(() => { if (user) navigate({ to: "/dashboard" }); }, [user, navigate]);
+  useEffect(() => { if (user) navigate({ to: dest as any }); }, [user, navigate, dest]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +43,7 @@ function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         toast.success("Welcome back!");
-        navigate({ to: "/dashboard" });
+        navigate({ to: dest as any });
       }
     } catch (e: any) {
       toast.error(e.message || "Authentication failed");
@@ -54,7 +57,7 @@ function AuthPage() {
     const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/dashboard" });
     if (result.error) { toast.error("Google sign-in failed"); setLoading(false); return; }
     if (result.redirected) return;
-    navigate({ to: "/dashboard" });
+    navigate({ to: dest as any });
   };
 
   return (
