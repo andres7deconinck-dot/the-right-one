@@ -43,8 +43,8 @@ const PLANS: Array<{
     desc: "Everything you need on the road.",
     cta: "Start Traveler",
     highlight: true,
-    monthly: 9,
-    yearly: 79,
+    monthly: 12.99,
+    yearly: 119,
     features: ["Unlimited translation cards", "16 supported languages", "Unlimited AI assistant", "All country guides", "Offline access", "PDF travel pack"],
   },
   {
@@ -53,8 +53,8 @@ const PLANS: Array<{
     desc: "Up to 5 travelers.",
     cta: "Start Family",
     highlight: false,
-    monthly: 19,
-    yearly: 159,
+    monthly: 24.99,
+    yearly: 229,
     features: ["Everything in Traveler", "Up to 5 user profiles", "Child allergy profiles", "Shared trips & checklists", "Priority support"],
   },
 ];
