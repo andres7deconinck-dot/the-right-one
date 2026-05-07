@@ -10,9 +10,11 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   const links = [
-    { to: "/cards", label: "Translation Cards" },
-    { to: "/countries", label: "Country Guides" },
-    { to: "/assistant", label: "AI Assistant" },
+    { to: "/restaurants", label: "Restaurants" },
+    { to: "/trips", label: "Trips" },
+    { to: "/cards", label: "Cards" },
+    { to: "/countries", label: "Countries" },
+    { to: "/emergency", label: "Emergency" },
     { to: "/pricing", label: "Pricing" },
   ];
 
@@ -105,9 +107,11 @@ export function SiteFooter() {
         <div>
           <h4 className="mb-3 text-sm font-semibold">Product</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
+            <li><Link to="/restaurants" className="hover:text-foreground">Restaurant Finder</Link></li>
+            <li><Link to="/trips" className="hover:text-foreground">Trip Planner</Link></li>
             <li><Link to="/cards" className="hover:text-foreground">Translation Cards</Link></li>
             <li><Link to="/countries" className="hover:text-foreground">Country Guides</Link></li>
-            <li><Link to="/assistant" className="hover:text-foreground">AI Assistant</Link></li>
+            <li><Link to="/emergency" className="hover:text-foreground">Emergency Phrases</Link></li>
             <li><Link to="/pricing" className="hover:text-foreground">Pricing</Link></li>
           </ul>
         </div>
