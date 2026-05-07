@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Heart, Loader2, MapPin, Search } from "lucide-react";
+import { Heart, Loader2, MapPin, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { searchGlutenFree, dietLabel, type OsmRestaurant } from "@/lib/osmRestaurants.functions";
+import { searchRestaurantsAI, type AIRestaurant } from "@/lib/restaurantsAI.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -15,26 +15,43 @@ export const Route = createFileRoute("/_app/restaurants")({
   head: () => ({
     meta: [
       { title: "Restaurant Finder — GlutenGo" },
-      { name: "description", content: "Search any city worldwide for gluten-free restaurants, cafés and bakeries." },
+      { name: "description", content: "AI-curated gluten-free restaurants, cafés and bakeries in any city worldwide." },
     ],
   }),
   component: RestaurantsPage,
 });
 
-type DietFilter = "all" | "only" | "yes";
+type LevelFilter = "all" | "dedicated" | "extensive" | "options" | "limited";
+
+function levelMeta(l: AIRestaurant["glutenFreeLevel"]) {
+  switch (l) {
+    case "dedicated": return { label: "100% gluten-free", className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100" };
+    case "extensive": return { label: "Dedicated GF menu", className: "bg-teal-100 text-teal-700 hover:bg-teal-100" };
+    case "options":   return { label: "GF options", className: "bg-amber-100 text-amber-700 hover:bg-amber-100" };
+    default:          return { label: "Limited GF", className: "bg-muted text-muted-foreground" };
+  }
+}
+
+function encodeSlug(r: AIRestaurant) {
+  // url-safe base64 of "name|city|country"
+  const raw = [r.name, r.city, r.country || ""].join("|");
+  const b64 = btoa(unescape(encodeURIComponent(raw))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return `ai-${b64}`;
+}
 
 function RestaurantsPage() {
   const { user } = useAuth();
   const qc = useQueryClient();
   const [input, setInput] = useState("");
   const [place, setPlace] = useState<string>("");
-  const [diet, setDiet] = useState<DietFilter>("all");
+  const [filter, setFilter] = useState<LevelFilter>("all");
 
   const { data, isFetching, error } = useQuery({
-    queryKey: ["osm-restaurants", place],
-    queryFn: () => searchGlutenFree({ data: { place } }),
+    queryKey: ["ai-restaurants", place],
+    queryFn: () => searchRestaurantsAI({ data: { place } }),
     enabled: !!place,
-    staleTime: 1000 * 60 * 30,
+    staleTime: 1000 * 60 * 60,
+    retry: false,
   });
 
   const { data: savedIds } = useQuery({
@@ -48,13 +65,14 @@ function RestaurantsPage() {
   });
 
   const toggleSave = useMutation({
-    mutationFn: async (r: OsmRestaurant) => {
+    mutationFn: async (r: AIRestaurant) => {
       if (!user) throw new Error("Sign in to save");
-      if (savedIds?.has(r.slug)) {
-        await supabase.from("saved_restaurants").delete().eq("user_id", user.id).eq("restaurant_id", r.slug);
+      const id = encodeSlug(r);
+      if (savedIds?.has(id)) {
+        await supabase.from("saved_restaurants").delete().eq("user_id", user.id).eq("restaurant_id", id);
         return { saved: false };
       }
-      const { error } = await supabase.from("saved_restaurants").insert({ user_id: user.id, restaurant_id: r.slug });
+      const { error } = await supabase.from("saved_restaurants").insert({ user_id: user.id, restaurant_id: id });
       if (error) throw error;
       return { saved: true };
     },
@@ -70,14 +88,14 @@ function RestaurantsPage() {
     setPlace(input.trim());
   };
 
-  const filtered = (data?.results || []).filter((r) => diet === "all" || r.diet === diet);
+  const filtered = (data?.results || []).filter((r) => filter === "all" || r.glutenFreeLevel === filter);
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10">
       <div className="max-w-2xl">
         <h1 className="font-display text-4xl">Find safe restaurants</h1>
         <p className="mt-2 text-muted-foreground">
-          Type any city, town or village to discover gluten-free restaurants, cafés and bakeries from the global OpenStreetMap database.
+          Type any city, town or village. We use AI to research the best gluten-free spots — dedicated bakeries, certified restaurants, and trusted cafés with safe protocols.
         </p>
       </div>
 
@@ -92,21 +110,21 @@ function RestaurantsPage() {
           />
         </div>
         <Button type="submit" size="lg" disabled={!input.trim() || isFetching}>
-          {isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
+          {isFetching ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Researching…</> : <><Sparkles className="mr-2 h-4 w-4" /> Search</>}
         </Button>
       </form>
 
       {place && (
         <div className="mt-4 flex flex-wrap gap-2">
-          {(["all", "only", "yes"] as DietFilter[]).map((k) => (
+          {(["all", "dedicated", "extensive", "options"] as LevelFilter[]).map((k) => (
             <button
               key={k}
-              onClick={() => setDiet(k)}
+              onClick={() => setFilter(k)}
               className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                diet === k ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:bg-muted"
+                filter === k ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:bg-muted"
               }`}
             >
-              {k === "all" ? "All" : k === "only" ? "100% gluten-free" : "GF options"}
+              {k === "all" ? "All" : k === "dedicated" ? "100% GF" : k === "extensive" ? "Dedicated menu" : "GF options"}
             </button>
           ))}
         </div>
@@ -127,27 +145,34 @@ function RestaurantsPage() {
 
       {isFetching && (
         <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-52 rounded-3xl" />)}
+          {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-56 rounded-3xl" />)}
         </div>
       )}
 
       {place && data && !isFetching && (
         <>
-          <p className="mt-6 text-sm text-muted-foreground">
-            {filtered.length} result{filtered.length === 1 ? "" : "s"} near <span className="font-medium text-foreground">{data.place.displayName.split(",").slice(0, 2).join(",")}</span>
+          {data.summary && (
+            <div className="mt-6 rounded-2xl border border-border bg-cream/40 p-4 text-sm">
+              <Sparkles className="inline h-4 w-4 mr-1.5 text-primary" />
+              {data.summary}
+            </div>
+          )}
+          <p className="mt-4 text-sm text-muted-foreground">
+            {filtered.length} curated result{filtered.length === 1 ? "" : "s"} for <span className="font-medium text-foreground">{data.place}</span>
           </p>
 
           {filtered.length === 0 ? (
             <div className="mt-8 rounded-3xl border border-dashed border-border bg-cream/40 p-12 text-center text-muted-foreground">
-              No tagged gluten-free spots found here yet. Try a nearby larger city.
+              No matches for this filter. Try "All".
             </div>
           ) : (
             <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {filtered.map((r) => {
-                const lbl = dietLabel(r.diet);
-                const isSaved = savedIds?.has(r.slug);
+                const meta = levelMeta(r.glutenFreeLevel);
+                const slug = encodeSlug(r);
+                const isSaved = savedIds?.has(slug);
                 return (
-                  <article key={r.slug} className="relative flex flex-col rounded-3xl border border-border bg-card p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-glow">
+                  <article key={slug} className="relative flex flex-col rounded-3xl border border-border bg-card p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-glow">
                     <button
                       onClick={() => toggleSave.mutate(r)}
                       className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-background/90 backdrop-blur transition hover:scale-110"
@@ -157,22 +182,18 @@ function RestaurantsPage() {
                     </button>
 
                     <h3 className="font-display text-lg leading-tight pr-10">{r.name}</h3>
-                    {r.cuisine && <p className="text-xs text-muted-foreground capitalize">{r.cuisine}</p>}
+                    <p className="text-xs text-muted-foreground">
+                      {[r.cuisine, r.priceLevel, r.neighborhood].filter(Boolean).join(" · ")}
+                    </p>
 
                     <div className="mt-3 flex flex-wrap gap-1.5">
-                      <Badge
-                        variant="secondary"
-                        className={
-                          lbl.tone === "emerald" ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-100" :
-                          lbl.tone === "amber" ? "bg-amber-100 text-amber-700 hover:bg-amber-100" :
-                          ""
-                        }
-                      >
-                        {lbl.label}
-                      </Badge>
-                      {r.takeaway === "yes" && <Badge variant="outline" className="text-xs">Takeaway</Badge>}
-                      {r.outdoorSeating === "yes" && <Badge variant="outline" className="text-xs">Outdoor</Badge>}
+                      <Badge className={meta.className}>{meta.label}</Badge>
+                      {r.tags?.slice(0, 2).map((t) => (
+                        <Badge key={t} variant="outline" className="text-xs capitalize">{t}</Badge>
+                      ))}
                     </div>
+
+                    <p className="mt-3 text-sm text-muted-foreground line-clamp-3">{r.glutenFreeNotes}</p>
 
                     {r.address && (
                       <p className="mt-3 flex items-start gap-1.5 text-xs text-muted-foreground">
@@ -180,7 +201,7 @@ function RestaurantsPage() {
                       </p>
                     )}
 
-                    <Link to="/restaurants/$slug" params={{ slug: r.slug }} className="mt-4">
+                    <Link to="/restaurants/$slug" params={{ slug }} className="mt-4">
                       <Button variant="outline" size="sm" className="w-full">View details →</Button>
                     </Link>
                   </article>
