@@ -47,6 +47,38 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_restaurants: {
+        Row: {
+          created_at: string
+          id: string
+          restaurant_id: string
+          trip_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          restaurant_id: string
+          trip_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          restaurant_id?: string
+          trip_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_restaurants_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean | null
@@ -128,35 +160,82 @@ export type Database = {
         }
         Relationships: []
       }
+      trip_checklist_items: {
+        Row: {
+          created_at: string
+          id: string
+          is_completed: boolean
+          label: string
+          sort_order: number
+          trip_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          label: string
+          sort_order?: number
+          trip_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          label?: string
+          sort_order?: number
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_checklist_items_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trips: {
         Row: {
           country_code: string | null
           created_at: string
           destination: string
+          destination_city: string | null
+          destination_country: string | null
           end_date: string | null
           id: string
           notes: string | null
           start_date: string | null
+          status: string
+          title: string | null
           user_id: string
         }
         Insert: {
           country_code?: string | null
           created_at?: string
           destination: string
+          destination_city?: string | null
+          destination_country?: string | null
           end_date?: string | null
           id?: string
           notes?: string | null
           start_date?: string | null
+          status?: string
+          title?: string | null
           user_id: string
         }
         Update: {
           country_code?: string | null
           created_at?: string
           destination?: string
+          destination_city?: string | null
+          destination_country?: string | null
           end_date?: string | null
           id?: string
           notes?: string | null
           start_date?: string | null
+          status?: string
+          title?: string | null
           user_id?: string
         }
         Relationships: []
