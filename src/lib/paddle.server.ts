@@ -1,4 +1,5 @@
-import { Environment, Paddle } from '@paddle/paddle-node-sdk';
+import { Environment, Paddle, EventName } from '@paddle/paddle-node-sdk';
+export { EventName };
 
 const getEnv = (key: string): string => {
   const value = process.env[key];
