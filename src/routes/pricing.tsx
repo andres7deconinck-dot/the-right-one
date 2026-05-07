@@ -129,7 +129,7 @@ function PricingPage() {
       <div className="mx-auto grid max-w-6xl gap-6 px-5 py-12 md:grid-cols-3">
         {PLANS.map((p) => {
           const label = priceLabel(p, billing);
-          const saving = billing === "yearly" && p.monthly > 0 ? p.monthly * 12 - p.yearly : 0;
+          const saving = billing === "yearly" && p.monthly > 0 ? Math.round(p.monthly * 12 - p.yearly) : 0;
           return (
             <div key={p.id} className={`relative rounded-3xl border p-7 shadow-soft transition ${p.highlight ? "border-primary bg-card shadow-glow scale-[1.02]" : "border-border bg-card"}`}>
               {p.highlight && <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">Most popular</span>}
