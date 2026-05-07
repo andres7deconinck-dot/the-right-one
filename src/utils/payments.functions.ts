@@ -1,6 +1,8 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn, createMiddleware } from "@tanstack/react-start";
 import { gatewayFetch, getPaddleClient, type PaddleEnv } from '@/lib/paddle.server';
+import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 import { supabaseAdmin } from '@/integrations/supabase/client.server';
+import { supabase } from '@/integrations/supabase/client';
 
 export const resolvePaddlePrice = createServerFn({ method: "GET" })
   .inputValidator((data: { priceId: string; environment: PaddleEnv }) => data)
@@ -11,13 +13,22 @@ export const resolvePaddlePrice = createServerFn({ method: "GET" })
     return result.data[0].id as string;
   });
 
-export const createCustomerPortalUrl = createServerFn({ method: "POST" })
-  .inputValidator((data: { accessToken: string }) => data)
-  .handler(async ({ data }) => {
-    const { data: userRes, error: authErr } = await supabaseAdmin.auth.getUser(data.accessToken);
-    if (authErr || !userRes?.user) throw new Error('Unauthorized');
-    const userId = userRes.user.id;
+// Attaches the user's Supabase access token as a Bearer header so
+// requireSupabaseAuth can validate the request.
+const withSupabaseBearer = createMiddleware({ type: "function" }).client(
+  async ({ next }) => {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    return next({
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+  },
+);
 
+export const createCustomerPortalUrl = createServerFn({ method: "POST" })
+  .middleware([withSupabaseBearer, requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { userId } = context;
     const { data: sub } = await supabaseAdmin
       .from('subscriptions')
       .select('paddle_customer_id, paddle_subscription_id, environment')

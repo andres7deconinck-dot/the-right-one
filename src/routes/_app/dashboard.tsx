@@ -32,9 +32,7 @@ function Dashboard() {
   const openPortal = async () => {
     setPortalLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) throw new Error("Please sign in again");
-      const { url } = await createCustomerPortalUrl({ data: { accessToken: session.access_token } });
+      const { url } = await createCustomerPortalUrl();
       window.open(url, "_blank", "noopener,noreferrer");
     } catch (e: any) {
       toast.error(e?.message || "Could not open billing portal");
