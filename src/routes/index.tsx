@@ -135,7 +135,7 @@ function Landing() {
         <div className="mx-auto max-w-5xl px-5 py-20 text-center">
           <Wheat className="mx-auto h-10 w-10 opacity-80" />
           <h2 className="mt-4 font-display text-4xl md:text-5xl">Start free. Upgrade when you fly.</h2>
-          <p className="mx-auto mt-4 max-w-xl opacity-80">3 cards/month free, forever. €9/month for unlimited everything.</p>
+          <p className="mx-auto mt-4 max-w-xl opacity-80">3 cards/month free, forever. From €12.99/month for unlimited everything.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/pricing"><Button size="lg" variant="secondary" className="rounded-full px-7">See plans</Button></Link>
             <Link to="/auth"><Button size="lg" className="rounded-full bg-accent px-7 text-accent-foreground hover:opacity-90">Create account</Button></Link>

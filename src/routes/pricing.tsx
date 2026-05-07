@@ -9,7 +9,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — GlutenGo" },
-      { name: "description", content: "Free forever, Traveler from €9/month, Family from €19/month. Cancel anytime, 30-day money-back guarantee." },
+      { name: "description", content: "Free forever, Traveler from €12.99/month, Family from €24.99/month. Cancel anytime, 30-day money-back guarantee." },
     ],
   }),
   component: PricingPage,
@@ -43,8 +43,8 @@ const PLANS: Array<{
     desc: "Everything you need on the road.",
     cta: "Start Traveler",
     highlight: true,
-    monthly: 9,
-    yearly: 79,
+    monthly: 12.99,
+    yearly: 119,
     features: ["Unlimited translation cards", "16 supported languages", "Unlimited AI assistant", "All country guides", "Offline access", "PDF travel pack"],
   },
   {
@@ -53,8 +53,8 @@ const PLANS: Array<{
     desc: "Up to 5 travelers.",
     cta: "Start Family",
     highlight: false,
-    monthly: 19,
-    yearly: 159,
+    monthly: 24.99,
+    yearly: 229,
     features: ["Everything in Traveler", "Up to 5 user profiles", "Child allergy profiles", "Shared trips & checklists", "Priority support"],
   },
 ];
@@ -129,7 +129,7 @@ function PricingPage() {
       <div className="mx-auto grid max-w-6xl gap-6 px-5 py-12 md:grid-cols-3">
         {PLANS.map((p) => {
           const label = priceLabel(p, billing);
-          const saving = billing === "yearly" && p.monthly > 0 ? p.monthly * 12 - p.yearly : 0;
+          const saving = billing === "yearly" && p.monthly > 0 ? Math.round(p.monthly * 12 - p.yearly) : 0;
           return (
             <div key={p.id} className={`relative rounded-3xl border p-7 shadow-soft transition ${p.highlight ? "border-primary bg-card shadow-glow scale-[1.02]" : "border-border bg-card"}`}>
               {p.highlight && <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">Most popular</span>}
