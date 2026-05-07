@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as CountriesRouteImport } from './routes/countries'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BlogRouteImport } from './routes/blog'
@@ -44,6 +45,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmergencyRoute = EmergencyRouteImport.update({
+  id: '/emergency',
+  path: '/emergency',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CountriesRoute = CountriesRouteImport.update({
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/countries': typeof CountriesRouteWithChildren
+  '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -167,6 +174,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/countries': typeof CountriesRouteWithChildren
+  '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -191,6 +199,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/countries': typeof CountriesRouteWithChildren
+  '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -215,6 +224,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/countries'
+    | '/emergency'
     | '/pricing'
     | '/privacy'
     | '/terms'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/countries'
+    | '/emergency'
     | '/pricing'
     | '/privacy'
     | '/terms'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/countries'
+    | '/emergency'
     | '/pricing'
     | '/privacy'
     | '/terms'
@@ -284,6 +296,7 @@ export interface RootRouteChildren {
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
   CountriesRoute: typeof CountriesRouteWithChildren
+  EmergencyRoute: typeof EmergencyRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/emergency': {
+      id: '/emergency'
+      path: '/emergency'
+      fullPath: '/emergency'
+      preLoaderRoute: typeof EmergencyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/countries': {
@@ -506,6 +526,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
   CountriesRoute: CountriesRouteWithChildren,
+  EmergencyRoute: EmergencyRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
@@ -515,3 +536,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
