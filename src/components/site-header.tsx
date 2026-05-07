@@ -87,25 +87,43 @@ export function SiteFooter() {
             <span className="font-display text-lg font-semibold">GlutenGo</span>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">Travel the world gluten-free, without the stress.</p>
+          <div className="mt-4 flex gap-3 text-muted-foreground">
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="hover:text-foreground">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+            </a>
+            <a href="https://x.com" target="_blank" rel="noreferrer" aria-label="X" className="hover:text-foreground">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2H21l-6.52 7.45L22 22h-6.83l-4.78-6.26L4.8 22H2l7-7.99L1.5 2h6.99l4.32 5.71L18.244 2zm-2.39 18h1.86L7.25 4H5.27l10.585 16z"/></svg>
+            </a>
+            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook" className="hover:text-foreground">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 22v-8h3l1-4h-4V7.5C13 6.6 13.5 6 14.7 6H17V2.2C16.6 2.1 15.3 2 14 2c-3 0-5 1.8-5 5v3H6v4h3v8h4z"/></svg>
+            </a>
+            <a href="https://tiktok.com" target="_blank" rel="noreferrer" aria-label="TikTok" className="hover:text-foreground">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.6 6.3a5.7 5.7 0 0 1-3.4-1.1 5.7 5.7 0 0 1-2.2-3.7H10v13.4a2.7 2.7 0 1 1-2.7-2.7c.3 0 .6 0 .9.1V8.6a6.3 6.3 0 1 0 5.8 6.3V9.4a8.7 8.7 0 0 0 5.6 1.9V7.4a5.7 5.7 0 0 1 0-1.1z"/></svg>
+            </a>
+          </div>
         </div>
         <div>
           <h4 className="mb-3 text-sm font-semibold">Product</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/cards">Translation Cards</Link></li>
-            <li><Link to="/countries">Country Guides</Link></li>
-            <li><Link to="/assistant">AI Assistant</Link></li>
-            <li><Link to="/pricing">Pricing</Link></li>
+            <li><Link to="/cards" className="hover:text-foreground">Translation Cards</Link></li>
+            <li><Link to="/countries" className="hover:text-foreground">Country Guides</Link></li>
+            <li><Link to="/assistant" className="hover:text-foreground">AI Assistant</Link></li>
+            <li><Link to="/pricing" className="hover:text-foreground">Pricing</Link></li>
           </ul>
         </div>
         <div>
           <h4 className="mb-3 text-sm font-semibold">Company</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>About</li><li>Contact</li><li>Blog</li>
+            <li><Link to="/about" className="hover:text-foreground">About</Link></li>
+            <li><Link to="/contact" className="hover:text-foreground">Contact</Link></li>
+            <li><Link to="/blog" className="hover:text-foreground">Blog</Link></li>
+            <li><Link to="/privacy" className="hover:text-foreground">Privacy</Link></li>
+            <li><Link to="/terms" className="hover:text-foreground">Terms</Link></li>
           </ul>
         </div>
         <div>
           <h4 className="mb-3 text-sm font-semibold">Safety</h4>
-          <p className="text-sm text-muted-foreground">GlutenGo provides translation tools and guidance. Always confirm preparation with restaurant staff.</p>
+          <p className="text-sm text-muted-foreground">GlutenGo provides translation tools and information. Always confirm preparation with restaurant staff. This is not medical advice.</p>
         </div>
       </div>
       <div className="border-t border-border/60 px-5 py-4 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} GlutenGo. Made with care for celiac travelers.</div>
