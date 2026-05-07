@@ -9,7 +9,7 @@ export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
       { title: "Pricing — GlutenGo" },
-      { name: "description", content: "Free forever, Traveler from €9/month, Family from €19/month. Cancel anytime, 30-day money-back guarantee." },
+      { name: "description", content: "Free forever, Traveler from €12.99/month, Family from €24.99/month. Cancel anytime, 30-day money-back guarantee." },
     ],
   }),
   component: PricingPage,
