@@ -27,10 +27,32 @@ export function getPaddleClient(env: PaddleEnv): Paddle {
   });
 }
 
+async function fetchWithTimeoutAndRetry(url: string, init: RequestInit = {}, retries = 2): Promise<Response> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000);
+    try {
+      const response = await fetch(url, { ...init, signal: controller.signal });
+      clearTimeout(timeout);
+      if (response.ok || response.status < 500 || attempt === retries) {
+        return response;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
+    } catch (error) {
+      clearTimeout(timeout);
+      lastError = error;
+      if (attempt === retries) break;
+      await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("Gateway request failed");
+}
+
 export async function gatewayFetch(env: PaddleEnv, path: string, init?: RequestInit): Promise<Response> {
   const connectionApiKey = getConnectionApiKey(env);
   const lovableApiKey = getEnv('LOVABLE_API_KEY');
-  return fetch(`${GATEWAY_BASE_URL}${path}`, {
+  return fetchWithTimeoutAndRetry(`${GATEWAY_BASE_URL}${path}`, {
     ...init,
     headers: {
       'Content-Type': 'application/json',

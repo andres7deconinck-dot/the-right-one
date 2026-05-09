@@ -130,8 +130,8 @@ function CardsPage() {
       </div>
 
       {fullscreen && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-background p-6 md:p-12" onClick={() => setFullscreen(null)}>
-          <button className="ml-auto" onClick={() => setFullscreen(null)} aria-label="Close"><X className="h-6 w-6" /></button>
+        <div role="dialog" aria-modal="true" aria-label="Fullscreen translation card" className="fixed inset-0 z-50 flex flex-col bg-background p-6 md:p-12" onClick={() => setFullscreen(null)}>
+          <button className="ml-auto" onClick={() => setFullscreen(null)} aria-label="Close fullscreen card"><X className="h-6 w-6" /></button>
           <div className="my-auto mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-destructive/10 px-4 py-2 text-sm font-semibold text-destructive">
               ⚠ {fullscreen.title}

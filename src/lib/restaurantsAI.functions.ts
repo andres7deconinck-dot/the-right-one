@@ -16,6 +16,10 @@ export type AIRestaurant = {
   website?: string;
   openingHours?: string;
   tags?: string[];
+  confidence?: "low" | "medium" | "high";
+  verificationSource?: string;
+  lastVerifiedAt?: string;
+  cautionNote?: string;
 };
 
 export type AISearchResult = {
@@ -59,6 +63,10 @@ const SCHEMA = {
           website: { type: "string" },
           openingHours: { type: "string" },
           tags: { type: "array", items: { type: "string" }, description: "e.g. vegan, bakery, breakfast, certified-AIC" },
+          confidence: { type: "string", enum: ["low", "medium", "high"] },
+          verificationSource: { type: "string", description: "How this information was verified" },
+          lastVerifiedAt: { type: "string", description: "ISO date string when this info was last checked" },
+          cautionNote: { type: "string", description: "Short note about uncertainty or what to confirm on arrival" },
         },
         required: ["name", "glutenFreeLevel", "glutenFreeNotes", "city"],
         additionalProperties: false,
@@ -73,21 +81,42 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80);
 }
 
+async function aiFetchWithRetry(body: unknown): Promise<Response> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15_000);
+    try {
+      const apiKey = process.env.LOVABLE_API_KEY;
+      if (!apiKey) throw new Error("AI gateway is not configured.");
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (res.ok || res.status < 500 || attempt === 2) return res;
+      await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
+    } catch (error) {
+      clearTimeout(timeout);
+      lastError = error;
+      if (attempt === 2) break;
+      await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
+    }
+  }
+  throw lastError instanceof Error ? lastError : new Error("AI request failed");
+}
+
 export const searchRestaurantsAI = createServerFn({ method: "GET" })
   .inputValidator((data: { place: string }) => data)
   .handler(async ({ data }): Promise<AISearchResult | null> => {
     const place = data.place.trim();
     if (!place) return null;
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI gateway is not configured.");
-
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    const res = await aiFetchWithRetry({
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: SYSTEM },
@@ -107,7 +136,6 @@ export const searchRestaurantsAI = createServerFn({ method: "GET" })
           },
         ],
         tool_choice: { type: "function", function: { name: "return_restaurants" } },
-      }),
     });
 
     if (res.status === 429) throw new Error("AI rate limit reached — try again in a minute.");
@@ -134,7 +162,13 @@ export const searchRestaurantsAI = createServerFn({ method: "GET" })
       let n = 2;
       while (seen.has(id)) id = `ai-${slugify(`${r.name}-${r.city || place}`)}-${n++}`;
       seen.add(id);
-      results.push({ ...r, id });
+      results.push({
+        ...r,
+        id,
+        confidence: r.confidence ?? "medium",
+        verificationSource: r.verificationSource ?? "AI research + public web sources",
+        cautionNote: r.cautionNote ?? "Always confirm cross-contamination controls with staff on arrival.",
+      });
     }
 
     return { place, summary: parsed.summary || "", results };
@@ -154,13 +188,7 @@ export const fetchRestaurantDetailAI = createServerFn({ method: "GET" })
     const [name, city, country] = raw.split("|");
     if (!name || !city) return null;
 
-    const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("AI gateway is not configured.");
-
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const res = await aiFetchWithRetry({
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: SYSTEM },
@@ -180,7 +208,6 @@ export const fetchRestaurantDetailAI = createServerFn({ method: "GET" })
           },
         }],
         tool_choice: { type: "function", function: { name: "return_restaurant" } },
-      }),
     });
 
     if (res.status === 429) throw new Error("AI rate limit reached — try again in a minute.");
@@ -191,6 +218,12 @@ export const fetchRestaurantDetailAI = createServerFn({ method: "GET" })
     if (!call) return null;
     try {
       const r = JSON.parse(call.function.arguments);
-      return { ...r, id: data.slug };
+      return {
+        ...r,
+        id: data.slug,
+        confidence: r.confidence ?? "medium",
+        verificationSource: r.verificationSource ?? "AI research + public web sources",
+        cautionNote: r.cautionNote ?? "Always confirm cross-contamination controls with staff on arrival.",
+      };
     } catch { return null; }
   });

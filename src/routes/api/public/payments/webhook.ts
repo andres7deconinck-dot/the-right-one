@@ -11,6 +11,62 @@ function activeForPlan(status: string): boolean {
   return status === 'active' || status === 'trialing' || status === 'past_due';
 }
 
+function eventIdOf(event: any): string | null {
+  return event?.eventId || event?.event_id || event?.id || null;
+}
+
+function occurredAtOf(event: any): string {
+  return event?.occurredAt || event?.occurred_at || new Date().toISOString();
+}
+
+async function registerWebhookEvent(event: any, env: PaddleEnv): Promise<{ duplicate: boolean; stale: boolean }> {
+  const eventId = eventIdOf(event);
+  const occurredAt = occurredAtOf(event);
+  const subscriptionId = event?.data?.id || null;
+
+  if (!eventId) {
+    throw new Error("Webhook event has no event id");
+  }
+
+  const { error: insertError } = await supabaseAdmin.from("paddle_webhook_events").insert({
+    event_id: eventId,
+    environment: env,
+    event_type: event.eventType,
+    subscription_id: subscriptionId,
+    occurred_at: occurredAt,
+  });
+  if (insertError) {
+    if (insertError.code === "23505") {
+      return { duplicate: true, stale: false };
+    }
+    throw insertError;
+  }
+
+  if (!subscriptionId) return { duplicate: false, stale: false };
+
+  const { data: state } = await supabaseAdmin
+    .from("paddle_subscription_event_state")
+    .select("last_event_occurred_at")
+    .eq("paddle_subscription_id", subscriptionId)
+    .eq("environment", env)
+    .maybeSingle();
+
+  const eventTime = new Date(occurredAt).getTime();
+  const lastTime = state?.last_event_occurred_at ? new Date(state.last_event_occurred_at as string).getTime() : 0;
+  if (lastTime && eventTime < lastTime) {
+    return { duplicate: false, stale: true };
+  }
+
+  await supabaseAdmin.from("paddle_subscription_event_state").upsert({
+    paddle_subscription_id: subscriptionId,
+    environment: env,
+    last_event_occurred_at: occurredAt,
+    updated_at: new Date().toISOString(),
+  });
+
+  return { duplicate: false, stale: false };
+}
+
 async function syncProfilePlan(userId: string, env: PaddleEnv) {
   // Pick the highest tier active sub for this user/env. Family > traveler > free.
   const { data: subs } = await supabaseAdmin
@@ -97,6 +153,10 @@ export const Route = createFileRoute('/api/public/payments/webhook')({
         const env = (url.searchParams.get('env') || 'sandbox') as PaddleEnv;
         try {
           const event = await verifyWebhook(request, env);
+          const registration = await registerWebhookEvent(event, env);
+          if (registration.duplicate || registration.stale) {
+            return Response.json({ received: true, skipped: true });
+          }
           switch (event.eventType) {
             case EventName.SubscriptionCreated:
               await handleSubscriptionCreated(event.data, env);

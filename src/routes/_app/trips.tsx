@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Plane, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,21 +21,23 @@ function flagFor(country?: string | null) {
 
 function TripsPage() {
   const { user } = useAuth();
-  const [trips, setTrips] = useState<any[] | null>(null);
-
-  useEffect(() => {
-    if (!user) return;
-    (async () => {
+  const { data: trips, isLoading } = useQuery({
+    queryKey: ["trips", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      if (!user) return [];
       const { data: ts } = await supabase.from("trips").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
       const ids = (ts || []).map((t) => t.id);
       const counts: Record<string, number> = {};
       if (ids.length) {
         const { data: saves } = await supabase.from("saved_restaurants").select("trip_id").in("trip_id", ids);
-        (saves || []).forEach((s: any) => { if (s.trip_id) counts[s.trip_id] = (counts[s.trip_id] || 0) + 1; });
+        (saves || []).forEach((s: any) => {
+          if (s.trip_id) counts[s.trip_id] = (counts[s.trip_id] || 0) + 1;
+        });
       }
-      setTrips((ts || []).map((t) => ({ ...t, savedCount: counts[t.id] || 0 })));
-    })();
-  }, [user]);
+      return (ts || []).map((t) => ({ ...t, savedCount: counts[t.id] || 0 }));
+    },
+  });
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10">
@@ -47,9 +49,9 @@ function TripsPage() {
         <Link to="/trips/new"><Button><Plus className="mr-1.5 h-4 w-4" /> Plan new trip</Button></Link>
       </div>
 
-      {trips === null ? (
+      {isLoading ? (
         <div className="mt-8 grid gap-4 md:grid-cols-3">{[1,2,3].map((i) => <Skeleton key={i} className="h-40 rounded-3xl" />)}</div>
-      ) : trips.length === 0 ? (
+      ) : (trips || []).length === 0 ? (
         <div className="mt-12 rounded-3xl border border-dashed border-border bg-cream/40 p-12 text-center">
           <Plane className="mx-auto h-10 w-10 text-muted-foreground" />
           <p className="mt-3 text-muted-foreground">No trips yet. Where are you headed?</p>
@@ -57,7 +59,7 @@ function TripsPage() {
         </div>
       ) : (
         <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {trips.map((t) => (
+          {(trips || []).map((t) => (
             <Link key={t.id} to="/trips/$id" params={{ id: t.id }} className="rounded-3xl border border-border bg-card p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-glow">
               <div className="flex items-start justify-between">
                 <div>

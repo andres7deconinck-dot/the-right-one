@@ -30,9 +30,11 @@ function NewTrip() {
   const [start, setStart] = useState<Date>();
   const [end, setEnd] = useState<Date>();
   const [saving, setSaving] = useState(false);
+  const [errorText, setErrorText] = useState<string>("");
 
   const submit = async () => {
-    if (!user || !country) { toast.error("Pick a country"); return; }
+    if (!user || !country) { toast.error("Pick a country"); setErrorText("Please pick a destination country."); return; }
+    setErrorText("");
     setSaving(true);
     const { data, error } = await supabase.from("trips").insert({
       user_id: user.id,
@@ -46,7 +48,7 @@ function NewTrip() {
       status: "planning",
     }).select("id").single();
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(error.message); setErrorText(error.message); return; }
     toast.success("Trip created");
     nav({ to: "/trips/$id", params: { id: data.id } });
   };
@@ -58,6 +60,12 @@ function NewTrip() {
       </Link>
       <h1 className="mt-4 font-display text-4xl">Plan a new trip</h1>
       <div className="mt-8 space-y-5 rounded-3xl border border-border bg-card-soft p-6">
+        {errorText && (
+          <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700" role="alert" aria-live="polite">
+            {errorText}
+            <Button variant="outline" size="sm" className="ml-3" onClick={submit}>Retry</Button>
+          </div>
+        )}
         <div>
           <Label>Destination country *</Label>
           <Select value={country} onValueChange={setCountry}>

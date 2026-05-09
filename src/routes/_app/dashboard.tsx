@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Globe2, Map, MessagesSquare, Plus, Sparkles, Settings, Loader2, UtensilsCrossed, Plane, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -31,25 +32,40 @@ function flagFor(country?: string | null) {
 function Dashboard() {
   const { user } = useAuth();
   const { isActive, planName, subscription } = useSubscription();
-  const [profile, setProfile] = useState<any>(null);
-  const [recent, setRecent] = useState<any[]>([]);
-  const [activeTrip, setActiveTrip] = useState<any>(null);
-  const [savedCount, setSavedCount] = useState(0);
   const [portalLoading, setPortalLoading] = useState(false);
 
-  useEffect(() => {
-    if (!user) return;
-    supabase.from("profiles").select("*").eq("id", user.id).single().then(({ data }) => setProfile(data));
-    supabase.from("translation_cards").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(3).then(({ data }) => setRecent(data || []));
-    supabase.from("trips").select("*").eq("user_id", user.id).order("start_date", { ascending: true }).then(async ({ data }) => {
-      const t = (data || []).find((x) => x.status === "active") || (data || [])[0] || null;
-      setActiveTrip(t);
-      if (t) {
-        const { count } = await supabase.from("saved_restaurants").select("*", { count: "exact", head: true }).eq("trip_id", t.id);
-        setSavedCount(count || 0);
-      }
-    });
-  }, [user]);
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      if (!user) return null;
+      const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+      return data;
+    },
+  });
+  const { data: recent } = useQuery({
+    queryKey: ["recent-cards", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      if (!user) return [];
+      const { data } = await supabase.from("translation_cards").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(3);
+      return data || [];
+    },
+  });
+  const { data: tripInfo } = useQuery({
+    queryKey: ["dashboard-active-trip", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      if (!user) return { activeTrip: null, savedCount: 0 };
+      const { data } = await supabase.from("trips").select("*").eq("user_id", user.id).order("start_date", { ascending: true });
+      const activeTrip = (data || []).find((x) => x.status === "active") || (data || [])[0] || null;
+      if (!activeTrip) return { activeTrip: null, savedCount: 0 };
+      const { count } = await supabase.from("saved_restaurants").select("*", { count: "exact", head: true }).eq("trip_id", activeTrip.id);
+      return { activeTrip, savedCount: count || 0 };
+    },
+  });
+  const activeTrip = tripInfo?.activeTrip || null;
+  const savedCount = tripInfo?.savedCount || 0;
 
   const used = profile?.cards_used_this_month ?? 0;
   const cardsLimit = planName === "free" ? 3 : Infinity;
@@ -143,13 +159,13 @@ function Dashboard() {
           <h2 className="font-display text-2xl">Recent cards</h2>
           <Link to="/cards" className="text-sm text-primary hover:underline">All cards →</Link>
         </div>
-        {recent.length === 0 ? (
+        {(recent || []).length === 0 ? (
           <div className="mt-4 rounded-3xl border border-dashed border-border bg-cream/40 p-8 text-center text-muted-foreground">
             No cards yet. <Link to="/cards" className="font-medium text-primary hover:underline">Create your first one →</Link>
           </div>
         ) : (
           <div className="mt-4 grid gap-4 md:grid-cols-3">
-            {recent.map((c) => (
+            {(recent || []).map((c) => (
               <div key={c.id} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-medium text-primary">{c.language_label}</span>

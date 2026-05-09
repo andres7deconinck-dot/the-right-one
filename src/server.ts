@@ -68,13 +68,39 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const requestId = crypto.randomUUID();
+    const startedAt = Date.now();
+    const url = new URL(request.url);
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const normalized = await normalizeCatastrophicSsrResponse(response);
+      const durationMs = Date.now() - startedAt;
+      console.info(JSON.stringify({
+        level: "info",
+        event: "request_completed",
+        requestId,
+        method: request.method,
+        path: url.pathname,
+        status: normalized.status,
+        durationMs,
+      }));
+      normalized.headers.set("x-request-id", requestId);
+      return normalized;
     } catch (error) {
-      console.error(error);
-      return brandedErrorResponse();
+      const durationMs = Date.now() - startedAt;
+      console.error(JSON.stringify({
+        level: "error",
+        event: "request_failed",
+        requestId,
+        method: request.method,
+        path: url.pathname,
+        durationMs,
+        error: error instanceof Error ? error.message : "Unknown error",
+      }));
+      const response = brandedErrorResponse();
+      response.headers.set("x-request-id", requestId);
+      return response;
     }
   },
 };

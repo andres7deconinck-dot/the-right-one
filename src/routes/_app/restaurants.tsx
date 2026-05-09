@@ -32,6 +32,17 @@ function levelMeta(l: AIRestaurant["glutenFreeLevel"]) {
   }
 }
 
+function confidenceMeta(level?: AIRestaurant["confidence"]) {
+  switch (level) {
+    case "high":
+      return { label: "High confidence", className: "bg-emerald-50 text-emerald-700 border-emerald-200" };
+    case "low":
+      return { label: "Low confidence", className: "bg-rose-50 text-rose-700 border-rose-200" };
+    default:
+      return { label: "Medium confidence", className: "bg-amber-50 text-amber-700 border-amber-200" };
+  }
+}
+
 function encodeSlug(r: AIRestaurant) {
   // url-safe base64 of "name|city|country"
   const raw = [r.name, r.city, r.country || ""].join("|");
@@ -140,6 +151,11 @@ function RestaurantsPage() {
       {error && (
         <div className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
           {(error as Error).message}
+          <div className="mt-3">
+            <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["ai-restaurants", place] })}>
+              Retry search
+            </Button>
+          </div>
         </div>
       )}
 
@@ -157,6 +173,9 @@ function RestaurantsPage() {
               {data.summary}
             </div>
           )}
+          <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+            AI research helps you shortlist venues, but it is not a medical guarantee. Always confirm shared fryer, prep area, and contamination protocol before ordering.
+          </div>
           <p className="mt-4 text-sm text-muted-foreground">
             {filtered.length} curated result{filtered.length === 1 ? "" : "s"} for <span className="font-medium text-foreground">{data.place}</span>
           </p>
@@ -169,6 +188,7 @@ function RestaurantsPage() {
             <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {filtered.map((r) => {
                 const meta = levelMeta(r.glutenFreeLevel);
+                const confidence = confidenceMeta(r.confidence);
                 const slug = encodeSlug(r);
                 const isSaved = savedIds?.has(slug);
                 return (
@@ -188,12 +208,14 @@ function RestaurantsPage() {
 
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       <Badge className={meta.className}>{meta.label}</Badge>
+                      <Badge variant="outline" className={confidence.className}>{confidence.label}</Badge>
                       {r.tags?.slice(0, 2).map((t) => (
                         <Badge key={t} variant="outline" className="text-xs capitalize">{t}</Badge>
                       ))}
                     </div>
 
                     <p className="mt-3 text-sm text-muted-foreground line-clamp-3">{r.glutenFreeNotes}</p>
+                    {r.cautionNote && <p className="mt-2 text-xs text-amber-700">{r.cautionNote}</p>}
 
                     {r.address && (
                       <p className="mt-3 flex items-start gap-1.5 text-xs text-muted-foreground">

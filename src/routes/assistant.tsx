@@ -4,6 +4,7 @@ import { Loader2, Send, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/assistant")({
   head: () => ({ meta: [{ title: "AI Travel Assistant — GlutenGo" }] }),
@@ -29,26 +30,39 @@ function Assistant() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
+  const [lastPrompt, setLastPrompt] = useState<string>("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const send = async (text?: string) => {
     const content = (text ?? input).trim();
     if (!content || loading) return;
+    setLastError(null);
+    setLastPrompt(content);
     const next = [...messages, { role: "user" as const, content }];
     setMessages(next);
     setInput("");
     setLoading(true);
 
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      if (!accessToken) {
+        toast.error("Please sign in again.");
+        setLoading(false);
+        return;
+      }
+
       const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/travel-chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
         body: JSON.stringify({ messages: next }),
       });
       if (!res.ok || !res.body) {
         if (res.status === 429) toast.error("Rate limit reached, try again shortly.");
         else if (res.status === 402) toast.error("AI credits exhausted.");
         else toast.error("Assistant unavailable.");
+        setLastError("Assistant request failed. Please retry in a moment.");
         setLoading(false); return;
       }
       const reader = res.body.getReader();
@@ -79,6 +93,7 @@ function Assistant() {
         }
       }
     } catch (e: any) {
+      setLastError(e.message || "Network error");
       toast.error(e.message || "Network error");
     } finally { setLoading(false); }
   };
@@ -90,6 +105,12 @@ function Assistant() {
         <p className="text-sm text-muted-foreground">Calm, structured, safety-first answers.</p>
       </div>
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto rounded-3xl border border-border bg-card-soft p-5">
+        {lastError && (
+          <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700" role="alert" aria-live="polite">
+            {lastError}
+            <Button variant="outline" size="sm" className="ml-3" onClick={() => send(lastPrompt)}>Retry</Button>
+          </div>
+        )}
         {messages.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-center">
             <Sparkles className="h-10 w-10 text-primary/60" />

@@ -25,6 +25,17 @@ function levelMeta(l: AIRestaurant["glutenFreeLevel"]) {
   }
 }
 
+function confidenceMeta(level?: AIRestaurant["confidence"]) {
+  switch (level) {
+    case "high":
+      return { label: "High confidence", className: "bg-emerald-100 text-emerald-700" };
+    case "low":
+      return { label: "Low confidence", className: "bg-rose-100 text-rose-700" };
+    default:
+      return { label: "Medium confidence", className: "bg-amber-100 text-amber-700" };
+  }
+}
+
 function RestaurantDetail() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
@@ -81,6 +92,7 @@ function RestaurantDetail() {
   }
 
   const meta = levelMeta(r.glutenFreeLevel);
+  const confidence = confidenceMeta(r.confidence);
   const mapsQuery = encodeURIComponent([r.name, r.address, r.city, r.country].filter(Boolean).join(", "));
   const mapsUrl = `https://maps.google.com/?q=${mapsQuery}`;
 
@@ -97,6 +109,7 @@ function RestaurantDetail() {
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <Badge className={meta.className}>{meta.label}</Badge>
+          <Badge className={confidence.className}>{confidence.label}</Badge>
           {r.tags?.map((t) => <Badge key={t} variant="outline" className="capitalize">{t}</Badge>)}
         </div>
       </div>
@@ -106,6 +119,10 @@ function RestaurantDetail() {
           <Sparkles className="h-4 w-4 text-primary" /> Gluten-free protocol
         </h2>
         <p className="mt-2 text-sm leading-relaxed">{r.glutenFreeNotes}</p>
+        {r.cautionNote && <p className="mt-2 text-xs text-amber-700">{r.cautionNote}</p>}
+        <p className="mt-2 text-xs text-muted-foreground">
+          Source: {r.verificationSource || "AI research + public web sources"}{r.lastVerifiedAt ? ` · Last checked ${new Date(r.lastVerifiedAt).toLocaleDateString()}` : ""}
+        </p>
       </div>
 
       {r.mustTry && r.mustTry.length > 0 && (
