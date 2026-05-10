@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Globe2, Map, MessagesSquare, Plus, Sparkles, Settings, Loader2, UtensilsCrossed, Plane, Lightbulb } from "lucide-react";
+import { Globe2, Map, MessagesSquare, Plus, Sparkles, Settings, Loader2, UtensilsCrossed, Plane, Lightbulb, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -108,6 +108,7 @@ function Dashboard() {
           { to: "/restaurants", icon: UtensilsCrossed, label: "Find restaurants" },
           { to: "/countries", icon: Map, label: "Country guides" },
           { to: "/assistant", icon: MessagesSquare, label: "Ask the AI" },
+          ...(user?.email === "info.neurixx@gmail.com" ? [{ to: "/admin" as const, icon: Shield, label: "Admin: subscribers" }] : []),
         ].map((a) => (
           <Link key={a.to} to={a.to} className="group flex items-center gap-3 rounded-2xl border border-border bg-card-soft p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-glow">
             <a.icon className="h-6 w-6 text-primary" />
