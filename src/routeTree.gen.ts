@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as EmergencyRouteImport } from './routes/emergency'
@@ -38,6 +39,11 @@ import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/publi
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -172,6 +178,7 @@ export interface FileRoutesByFullPath {
   '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/resources': typeof ResourcesRoute
   '/terms': typeof TermsRoute
   '/cards': typeof AppCardsRoute
   '/dashboard': typeof AppDashboardRoute
@@ -198,6 +205,7 @@ export interface FileRoutesByTo {
   '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/resources': typeof ResourcesRoute
   '/terms': typeof TermsRoute
   '/cards': typeof AppCardsRoute
   '/dashboard': typeof AppDashboardRoute
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
+  '/resources': typeof ResourcesRoute
   '/terms': typeof TermsRoute
   '/_app/cards': typeof AppCardsRoute
   '/_app/dashboard': typeof AppDashboardRoute
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/pricing'
     | '/privacy'
+    | '/resources'
     | '/terms'
     | '/cards'
     | '/dashboard'
@@ -280,6 +290,7 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/pricing'
     | '/privacy'
+    | '/resources'
     | '/terms'
     | '/cards'
     | '/dashboard'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/pricing'
     | '/privacy'
+    | '/resources'
     | '/terms'
     | '/_app/cards'
     | '/_app/dashboard'
@@ -335,6 +347,7 @@ export interface RootRouteChildren {
   EmergencyRoute: typeof EmergencyRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
+  ResourcesRoute: typeof ResourcesRoute
   TermsRoute: typeof TermsRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -347,6 +360,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -592,6 +612,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmergencyRoute: EmergencyRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
+  ResourcesRoute: ResourcesRoute,
   TermsRoute: TermsRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
