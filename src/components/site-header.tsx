@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Wheat, Menu, X, ChevronDown, CreditCard, Sparkles, Smartphone, ScanLine, AlertCircle } from "lucide-react";
+import { Wheat, Menu, X, ChevronDown, CreditCard, Sparkles, Smartphone, Plane, AlertCircle } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
@@ -74,7 +74,7 @@ const TOOL_META = [
   { to: "/cards", icon: CreditCard, desc: "Medical-grade allergy cards in 16 languages" },
   { to: "/assistant", icon: Sparkles, desc: "Ask anything about traveling gluten-free" },
   { to: "/travel-mode", icon: Smartphone, desc: "Fullscreen card to show restaurant staff" },
-  { to: "/ingredient-analyzer", icon: ScanLine, desc: "Scan or paste ingredients for gluten check" },
+  { to: "/trips", icon: Plane, desc: "Plan trips, save restaurants, download travel packs" },
   { to: "/emergency", icon: AlertCircle, desc: "Critical phrases per country & language" },
 ] as const;
 
@@ -87,14 +87,14 @@ export function SiteHeader() {
 
   const mainLinks = [
     { to: "/restaurants", label: t.nav.restaurants },
-    { to: "/trips", label: t.nav.trips },
+    { to: "/ingredient-analyzer", label: t.nav.ingredientAnalyzer },
     { to: "/countries", label: t.nav.countries },
     { to: "/pricing", label: t.nav.pricing },
   ];
 
   const toolLinks = TOOL_META.map((meta, i) => ({
     ...meta,
-    label: [t.nav.translationCards, t.nav.aiAssistant, t.nav.travelMode, t.nav.ingredientAnalyzer, t.nav.emergencyPhrases][i],
+    label: [t.nav.translationCards, t.nav.aiAssistant, t.nav.travelMode, t.nav.trips, t.nav.emergencyPhrases][i],
   }));
 
   return (
