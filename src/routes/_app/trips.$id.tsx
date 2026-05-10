@@ -20,7 +20,8 @@ function decodeAISlug(slug: string): { name: string; city: string; country: stri
   try {
     const b64 = m[1].replace(/-/g, "+").replace(/_/g, "/");
     const padded = b64 + "=".repeat((4 - b64.length % 4) % 4);
-    const raw = decodeURIComponent(escape(atob(padded)));
+    const bytes = Uint8Array.from(atob(padded), (c) => c.charCodeAt(0));
+    const raw = new TextDecoder().decode(bytes);
     const [name, city, country] = raw.split("|");
     if (!name || !city) return null;
     return { name, city, country: country || "" };
@@ -45,6 +46,7 @@ function TripDetail() {
   const { isActive } = useSubscription();
   const nav = useNavigate();
   const [trip, setTrip] = useState<any>(null);
+  const [loadError, setLoadError] = useState(false);
   const [notes, setNotes] = useState("");
   const [savedRest, setSavedRest] = useState<any[]>([]);
   const [cards, setCards] = useState<any[]>([]);
@@ -53,8 +55,8 @@ function TripDetail() {
 
   const load = async () => {
     if (!user) return;
-    const { data: t } = await supabase.from("trips").select("*").eq("id", id).maybeSingle();
-    if (!t) return;
+    const { data: t, error } = await supabase.from("trips").select("*").eq("id", id).maybeSingle();
+    if (error || !t) { setLoadError(true); return; }
     setTrip(t); setNotes(t.notes || "");
     const { data: sr } = await supabase.from("saved_restaurants").select("*").eq("trip_id", id);
     setSavedRest(sr || []);
@@ -121,6 +123,19 @@ function TripDetail() {
     doc.save(`glutengo-${trip.title || trip.destination_country || "trip"}.pdf`);
   };
 
+  if (loadError) {
+    return (
+      <div className="mx-auto max-w-5xl px-5 py-10">
+        <Link to="/trips" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="h-4 w-4" /> Back to trips
+        </Link>
+        <div className="mt-8 rounded-3xl border border-dashed border-border p-12 text-center">
+          <p className="text-muted-foreground">Trip not found or you don't have access to it.</p>
+          <Link to="/trips"><Button className="mt-4">View my trips</Button></Link>
+        </div>
+      </div>
+    );
+  }
   if (!trip) return <div className="mx-auto max-w-5xl px-5 py-10"><Skeleton className="h-40" /></div>;
 
   return (

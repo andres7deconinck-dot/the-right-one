@@ -20,7 +20,7 @@ function flagFor(country?: string | null) {
 }
 
 function TripsPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { data: trips, isLoading } = useQuery({
     queryKey: ["trips", user?.id],
     enabled: !!user,
@@ -38,6 +38,31 @@ function TripsPage() {
       return (ts || []).map((t) => ({ ...t, savedCount: counts[t.id] || 0 }));
     },
   });
+
+  if (authLoading) {
+    return (
+      <div className="mx-auto max-w-7xl px-5 py-10">
+        <div className="h-10 w-48 animate-pulse rounded-lg bg-muted" />
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-40 rounded-3xl" />)}
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="mx-auto max-w-7xl px-5 py-10">
+        <h1 className="font-display text-4xl">My Trips</h1>
+        <div className="mt-12 rounded-3xl border border-dashed border-border bg-cream/40 p-12 text-center">
+          <Plane className="mx-auto h-10 w-10 text-muted-foreground" />
+          <p className="mt-3 text-lg font-display">Sign in to start planning</p>
+          <p className="mt-1 text-sm text-muted-foreground">Create a free account to plan trips, save restaurants and download travel packs.</p>
+          <Link to="/auth" search={{ redirect: "/trips" } as any}><Button className="mt-5"><Plus className="mr-1.5 h-4 w-4" /> Create free account</Button></Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10">

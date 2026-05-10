@@ -1,15 +1,10 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, CalendarIcon, Info } from "lucide-react";
-import { format } from "date-fns";
+import { ArrowLeft, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import { COUNTRIES } from "@/data/countries";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -21,38 +16,59 @@ export const Route = createFileRoute("/_app/trips/new")({
 });
 
 function NewTrip() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const nav = useNavigate();
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
-  const [start, setStart] = useState<Date>();
-  const [end, setEnd] = useState<Date>();
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
   const [saving, setSaving] = useState(false);
-  const [errorText, setErrorText] = useState<string>("");
+  const [errorText, setErrorText] = useState("");
 
   const submit = async () => {
-    if (!user) { toast.error("Sign in to save trips"); setErrorText("You need to be signed in to save a trip. Create a free account to get started."); return; }
-    if (!country) { toast.error("Pick a country"); setErrorText("Please pick a destination country."); return; }
+    if (!user) {
+      toast.error("Sign in to save trips");
+      setErrorText("You need to be signed in to save a trip.");
+      return;
+    }
+    if (!country.trim()) {
+      toast.error("Pick a destination");
+      setErrorText("Please enter a destination country.");
+      return;
+    }
     setErrorText("");
     setSaving(true);
     const { data, error } = await supabase.from("trips").insert({
       user_id: user.id,
-      title: title || null,
-      destination: country,
-      destination_country: country,
-      destination_city: city || null,
-      start_date: start ? start.toISOString().slice(0, 10) : null,
-      end_date: end ? end.toISOString().slice(0, 10) : null,
-      notes: notes || null,
+      title: title.trim() || null,
+      destination: country.trim(),
+      destination_country: country.trim(),
+      destination_city: city.trim() || null,
+      start_date: start || null,
+      end_date: end || null,
+      notes: notes.trim() || null,
       status: "planning",
     }).select("id").single();
     setSaving(false);
-    if (error) { toast.error(error.message); setErrorText(error.message); return; }
-    toast.success("Trip created");
+    if (error) {
+      toast.error(error.message);
+      setErrorText(error.message);
+      return;
+    }
+    toast.success("Trip created!");
     nav({ to: "/trips/$id", params: { id: data.id } });
   };
+
+  if (authLoading) {
+    return (
+      <div className="mx-auto max-w-2xl px-5 py-10">
+        <div className="h-8 w-32 animate-pulse rounded-lg bg-muted" />
+        <div className="mt-8 h-64 animate-pulse rounded-3xl bg-muted" />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-10">
@@ -60,64 +76,105 @@ function NewTrip() {
         <ArrowLeft className="h-4 w-4" /> Back to trips
       </Link>
       <h1 className="mt-4 font-display text-4xl">Plan a new trip</h1>
+
       {!user && (
         <div className="mt-4 flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
           <Info className="mt-0.5 h-4 w-4 shrink-0" />
           <div>
             <p className="font-semibold">Sign in to save trips</p>
-            <p className="mt-0.5 opacity-80">You can fill in the form below, but saving requires a free account.</p>
-            <Link to="/auth" search={{} as any} className="mt-2 inline-block font-semibold underline">Create free account →</Link>
+            <p className="mt-0.5 opacity-80">Fill out the form below, then sign in to save your trip.</p>
+            <Link to="/auth" search={{ redirect: "/trips/new" } as any} className="mt-2 inline-block font-semibold underline">
+              Create free account →
+            </Link>
           </div>
         </div>
       )}
+
       <div className="mt-8 space-y-5 rounded-3xl border border-border bg-card-soft p-6">
         {errorText && (
-          <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700" role="alert" aria-live="polite">
+          <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700" role="alert">
             {errorText}
-            <Button variant="outline" size="sm" className="ml-3" onClick={submit}>Retry</Button>
           </div>
         )}
+
         <div>
-          <Label>Destination country *</Label>
-          <Select value={country} onValueChange={setCountry}>
-            <SelectTrigger className="mt-1.5"><SelectValue placeholder="Choose a country" /></SelectTrigger>
-            <SelectContent>{COUNTRIES.map((c) => <SelectItem key={c.slug} value={c.name}>{c.flag} {c.name}</SelectItem>)}</SelectContent>
-          </Select>
+          <Label htmlFor="country">Destination country *</Label>
+          <Input
+            id="country"
+            list="countries-list"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            placeholder="e.g. Italy, Japan, Thailand…"
+            className="mt-1.5"
+            autoComplete="off"
+          />
+          <datalist id="countries-list">
+            {COUNTRIES.map((c) => (
+              <option key={c.slug} value={c.name} />
+            ))}
+          </datalist>
         </div>
+
         <div>
-          <Label>City</Label>
-          <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Tokyo" className="mt-1.5" />
+          <Label htmlFor="city">City</Label>
+          <Input
+            id="city"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="e.g. Tokyo"
+            className="mt-1.5"
+          />
         </div>
+
         <div className="grid gap-4 md:grid-cols-2">
-          {[
-            { label: "Departure date", value: start, set: setStart },
-            { label: "Return date", value: end, set: setEnd },
-          ].map((d) => (
-            <div key={d.label}>
-              <Label>{d.label}</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn("mt-1.5 w-full justify-start text-left font-normal", !d.value && "text-muted-foreground")}>
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {d.value ? format(d.value, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={d.value} onSelect={(x) => d.set(x as Date)} initialFocus className={cn("p-3 pointer-events-auto")} />
-                </PopoverContent>
-              </Popover>
-            </div>
-          ))}
+          <div>
+            <Label htmlFor="start">Departure date</Label>
+            <Input
+              id="start"
+              type="date"
+              value={start}
+              onChange={(e) => setStart(e.target.value)}
+              className="mt-1.5"
+            />
+          </div>
+          <div>
+            <Label htmlFor="end">Return date</Label>
+            <Input
+              id="end"
+              type="date"
+              value={end}
+              onChange={(e) => setEnd(e.target.value)}
+              className="mt-1.5"
+            />
+          </div>
         </div>
+
         <div>
-          <Label>Trip name (optional)</Label>
-          <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Tokyo April 2026" className="mt-1.5" />
+          <Label htmlFor="trip-name">Trip name (optional)</Label>
+          <Input
+            id="trip-name"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. Tokyo April 2026"
+            className="mt-1.5"
+          />
         </div>
+
         <div>
-          <Label>Notes (optional)</Label>
-          <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className="mt-1.5" />
+          <Label htmlFor="notes">Notes (optional)</Label>
+          <Textarea
+            id="notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={3}
+            placeholder="Dietary notes, hotel, must-see spots…"
+            className="mt-1.5"
+          />
         </div>
-        <Button onClick={submit} disabled={saving} className="w-full">{saving ? "Creating..." : "Create trip"}</Button>
+
+        <Button onClick={submit} disabled={saving} className="w-full">
+          {saving ? "Creating trip…" : "Create trip"}
+        </Button>
       </div>
     </div>
   );
