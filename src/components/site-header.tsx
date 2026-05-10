@@ -1,22 +1,101 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Wheat, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { Wheat, Menu, X, ChevronDown, CreditCard, Sparkles, Smartphone, ScanLine, AlertCircle } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
+import { useLanguage } from "@/lib/i18n";
+import type { LangCode } from "@/lib/translations";
+
+const SITE_LANGUAGES = [
+  { code: "en", flag: "🇬🇧", name: "English" },
+  { code: "nl", flag: "🇳🇱", name: "Nederlands" },
+  { code: "fr", flag: "🇫🇷", name: "Français" },
+  { code: "de", flag: "🇩🇪", name: "Deutsch" },
+  { code: "it", flag: "🇮🇹", name: "Italiano" },
+  { code: "es", flag: "🇪🇸", name: "Español" },
+  { code: "pt", flag: "🇵🇹", name: "Português" },
+  { code: "ja", flag: "🇯🇵", name: "日本語" },
+  { code: "th", flag: "🇹🇭", name: "ภาษาไทย" },
+  { code: "pl", flag: "🇵🇱", name: "Polski" },
+  { code: "ar", flag: "🇸🇦", name: "العربية" },
+  { code: "zh", flag: "🇨🇳", name: "中文" },
+];
+
+function LanguageSelector() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const { lang, setLang } = useLanguage();
+  const selected = SITE_LANGUAGES.find(l => l.code === lang) ?? SITE_LANGUAGES[0];
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const select = (l: typeof SITE_LANGUAGES[0]) => {
+    setLang(l.code as LangCode);
+    setOpen(false);
+  };
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-1.5 rounded-lg border border-border bg-card px-2.5 py-1.5 text-sm transition-colors hover:bg-muted"
+        aria-label="Select language"
+      >
+        <span className="text-base leading-none">{selected.flag}</span>
+        <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full z-50 mt-2 w-48 overflow-hidden rounded-2xl border border-border bg-card shadow-glow">
+          <div className="grid grid-cols-1 divide-y divide-border/50 max-h-80 overflow-y-auto">
+            {SITE_LANGUAGES.map(l => (
+              <button
+                key={l.code}
+                onClick={() => select(l)}
+                className={`flex w-full items-center gap-3 px-3 py-2.5 text-sm transition-colors hover:bg-muted ${selected.code === l.code ? "text-primary font-medium bg-primary/5" : "text-foreground"}`}
+              >
+                <span className="text-xl">{l.flag}</span>
+                <span>{l.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const TOOL_META = [
+  { to: "/cards", icon: CreditCard, desc: "Medical-grade allergy cards in 16 languages" },
+  { to: "/assistant", icon: Sparkles, desc: "Ask anything about traveling gluten-free" },
+  { to: "/travel-mode", icon: Smartphone, desc: "Fullscreen card to show restaurant staff" },
+  { to: "/ingredient-analyzer", icon: ScanLine, desc: "Scan or paste ingredients for gluten check" },
+  { to: "/emergency", icon: AlertCircle, desc: "Critical phrases per country & language" },
+] as const;
 
 export function SiteHeader() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
 
-  const links = [
-    { to: "/restaurants", label: "Restaurants" },
-    { to: "/trips", label: "Trips" },
-    { to: "/cards", label: "Cards" },
-    { to: "/countries", label: "Countries" },
-    { to: "/emergency", label: "Emergency" },
-    { to: "/pricing", label: "Pricing" },
+  const mainLinks = [
+    { to: "/restaurants", label: t.nav.restaurants },
+    { to: "/trips", label: t.nav.trips },
+    { to: "/countries", label: t.nav.countries },
+    { to: "/pricing", label: t.nav.pricing },
   ];
+
+  const toolLinks = TOOL_META.map((meta, i) => ({
+    ...meta,
+    label: [t.nav.translationCards, t.nav.aiAssistant, t.nav.travelMode, t.nav.ingredientAnalyzer, t.nav.emergencyPhrases][i],
+  }));
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
@@ -28,22 +107,52 @@ export function SiteHeader() {
           <span className="font-display text-xl font-semibold tracking-tight">GlutenGo</span>
         </Link>
         <nav className="hidden items-center gap-7 md:flex">
-          {links.map((l) => (
+          {mainLinks.map((l) => (
             <Link key={l.to} to={l.to} className="text-sm text-muted-foreground transition-colors hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>
               {l.label}
             </Link>
           ))}
+          {/* Tools dropdown */}
+          <div className="relative" onMouseEnter={() => setToolsOpen(true)} onMouseLeave={() => setToolsOpen(false)}>
+            <button className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground" aria-haspopup="true" aria-expanded={toolsOpen}>
+              {t.nav.tools} <ChevronDown className={`h-3.5 w-3.5 transition-transform ${toolsOpen ? "rotate-180" : ""}`} />
+            </button>
+            {toolsOpen && (
+              /* pt-2 bridges the gap between button and panel so mouse doesn't leave the hover zone */
+              <div className="absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-2">
+                <div className="rounded-2xl border border-border bg-card p-2 shadow-glow">
+                  {toolLinks.map((tl) => (
+                    <Link
+                      key={tl.to}
+                      to={tl.to}
+                      className="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-muted"
+                      onClick={() => setToolsOpen(false)}
+                    >
+                      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                        <tl.icon className="h-4 w-4" />
+                      </span>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{tl.label}</p>
+                        <p className="text-xs text-muted-foreground">{tl.desc}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </nav>
         <div className="hidden items-center gap-2 md:flex">
+          <LanguageSelector />
           {user ? (
             <>
-              <Button variant="ghost" onClick={() => navigate({ to: "/dashboard" })}>Dashboard</Button>
-              <Button variant="outline" onClick={() => signOut()}>Sign out</Button>
+              <Button variant="ghost" onClick={() => navigate({ to: "/dashboard" })}>{t.nav.dashboard}</Button>
+              <Button variant="outline" onClick={() => signOut()}>{t.nav.signOut}</Button>
             </>
           ) : (
             <>
-              <Button variant="ghost" onClick={() => navigate({ to: "/auth" })}>Sign in</Button>
-              <Button onClick={() => navigate({ to: "/auth", search: { mode: "signup" } as any })}>Start free</Button>
+              <Button variant="ghost" onClick={() => navigate({ to: "/auth", search: {} as any })}>{t.nav.signIn}</Button>
+              <Button onClick={() => navigate({ to: "/auth", search: { mode: "signup" } as any })}>{t.nav.startFree}</Button>
             </>
           )}
         </div>
@@ -54,23 +163,33 @@ export function SiteHeader() {
       {open && (
         <div className="border-t border-border bg-background md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-1 p-4">
-            {links.map((l) => (
+            {mainLinks.map((l) => (
               <Link key={l.to} to={l.to} className="rounded-lg px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
                 {l.label}
               </Link>
             ))}
-            <div className="mt-2 flex gap-2">
-              {user ? (
-                <>
-                  <Button className="flex-1" onClick={() => { setOpen(false); navigate({ to: "/dashboard" }); }}>Dashboard</Button>
-                  <Button variant="outline" className="flex-1" onClick={() => signOut()}>Sign out</Button>
-                </>
-              ) : (
-                <>
-                  <Button variant="outline" className="flex-1" onClick={() => { setOpen(false); navigate({ to: "/auth" }); }}>Sign in</Button>
-                  <Button className="flex-1" onClick={() => { setOpen(false); navigate({ to: "/auth" }); }}>Start free</Button>
-                </>
-              )}
+            <p className="mt-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t.nav.tools}</p>
+            {toolLinks.map((tl) => (
+              <Link key={tl.to} to={tl.to} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
+                <tl.icon className="h-4 w-4 text-primary" />
+                {tl.label}
+              </Link>
+            ))}
+            <div className="mt-2 flex items-center gap-2">
+              <LanguageSelector />
+              <div className="flex flex-1 gap-2">
+                {user ? (
+                  <>
+                    <Button className="flex-1" onClick={() => { setOpen(false); navigate({ to: "/dashboard" }); }}>{t.nav.dashboard}</Button>
+                    <Button variant="outline" className="flex-1" onClick={() => signOut()}>{t.nav.signOut}</Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" className="flex-1" onClick={() => { setOpen(false); navigate({ to: "/auth", search: {} as any }); }}>{t.nav.signIn}</Button>
+                    <Button className="flex-1" onClick={() => { setOpen(false); navigate({ to: "/auth", search: {} as any }); }}>{t.nav.startFree}</Button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -80,6 +199,7 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
+  const { t } = useLanguage();
   return (
     <footer className="border-t border-border/60 bg-cream/40">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-12 md:grid-cols-4">
@@ -88,7 +208,7 @@ export function SiteFooter() {
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-foreground"><Wheat className="h-4 w-4" /></span>
             <span className="font-display text-lg font-semibold">GlutenGo</span>
           </div>
-          <p className="mt-3 text-sm text-muted-foreground">Travel the world gluten-free, without the stress.</p>
+          <p className="mt-3 text-sm text-muted-foreground">{t.footer.tagline}</p>
           <div className="mt-4 flex gap-3 text-muted-foreground">
             <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram" className="hover:text-foreground">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
@@ -105,18 +225,21 @@ export function SiteFooter() {
           </div>
         </div>
         <div>
-          <h4 className="mb-3 text-sm font-semibold">Product</h4>
+          <h4 className="mb-3 text-sm font-semibold">{t.footer.product}</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link to="/restaurants" className="hover:text-foreground">Restaurant Finder</Link></li>
             <li><Link to="/trips" className="hover:text-foreground">Trip Planner</Link></li>
             <li><Link to="/cards" className="hover:text-foreground">Translation Cards</Link></li>
             <li><Link to="/countries" className="hover:text-foreground">Country Guides</Link></li>
+            <li><Link to="/assistant" className="hover:text-foreground">AI Assistant</Link></li>
+            <li><Link to="/travel-mode" className="hover:text-foreground">Travel Mode</Link></li>
+            <li><Link to="/ingredient-analyzer" className="hover:text-foreground">Ingredient Analyzer</Link></li>
             <li><Link to="/emergency" className="hover:text-foreground">Emergency Phrases</Link></li>
             <li><Link to="/pricing" className="hover:text-foreground">Pricing</Link></li>
           </ul>
         </div>
         <div>
-          <h4 className="mb-3 text-sm font-semibold">Company</h4>
+          <h4 className="mb-3 text-sm font-semibold">{t.footer.company}</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link to="/about" className="hover:text-foreground">About</Link></li>
             <li><Link to="/contact" className="hover:text-foreground">Contact</Link></li>
@@ -126,11 +249,11 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <h4 className="mb-3 text-sm font-semibold">Safety</h4>
-          <p className="text-sm text-muted-foreground">GlutenGo provides translation tools and information. Always confirm preparation with restaurant staff. This is not medical advice.</p>
+          <h4 className="mb-3 text-sm font-semibold">{t.footer.safety}</h4>
+          <p className="text-sm text-muted-foreground">{t.footer.safetyText}</p>
         </div>
       </div>
-      <div className="border-t border-border/60 px-5 py-4 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} GlutenGo. Made with care for celiac travelers.</div>
+      <div className="border-t border-border/60 px-5 py-4 text-center text-xs text-muted-foreground">© {new Date().getFullYear()} GlutenGo. {t.footer.copyright}</div>
     </footer>
   );
 }

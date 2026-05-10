@@ -1,6 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, Maximize2, Sparkles, Trash2, X } from "lucide-react";
+import { Loader2, Maximize2, Sparkles, Trash2, X, Info } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -67,6 +67,16 @@ function CardsPage() {
       <div className="max-w-2xl">
         <h1 className="font-display text-4xl">Translation Cards</h1>
         <p className="mt-2 text-muted-foreground">Generate medical-grade gluten allergy cards in 7 languages. Tap any card for fullscreen restaurant mode.</p>
+        {!user && (
+          <div className="mt-4 flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+            <Info className="mt-0.5 h-4 w-4 shrink-0" />
+            <div>
+              <p className="font-semibold">Sign in to generate & save cards</p>
+              <p className="mt-0.5 opacity-80">Card generation requires a free account and an active Supabase connection.</p>
+              <Link to="/auth" search={{} as any} className="mt-2 inline-block font-semibold underline">Create free account →</Link>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_2fr]">

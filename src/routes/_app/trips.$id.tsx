@@ -1,9 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Download, FileText, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, BookOpen, Download, FileText, MapPin, Plus, Trash2 } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -13,8 +12,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { COUNTRIES } from "@/data/countries";
-import { RESTAURANTS, getRestaurant } from "@/data/restaurants";
 import { toast } from "sonner";
+
+function decodeAISlug(slug: string): { name: string; city: string; country: string } | null {
+  const m = slug.match(/^ai-(.+)$/);
+  if (!m) return null;
+  try {
+    const b64 = m[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = b64 + "=".repeat((4 - b64.length % 4) % 4);
+    const raw = decodeURIComponent(escape(atob(padded)));
+    const [name, city, country] = raw.split("|");
+    if (!name || !city) return null;
+    return { name, city, country: country || "" };
+  } catch {
+    return null;
+  }
+}
 
 export const Route = createFileRoute("/_app/trips/$id")({
   head: () => ({ meta: [{ title: "Trip — GlutenGo" }] }),
@@ -57,6 +70,13 @@ function TripDetail() {
     toast.success("Saved");
   };
 
+  const cycleStatus = async () => {
+    const next = trip.status === "planning" ? "active" : trip.status === "active" ? "completed" : "planning";
+    await supabase.from("trips").update({ status: next }).eq("id", id);
+    setTrip((prev: any) => ({ ...prev, status: next }));
+    toast.success(`Status → ${next}`);
+  };
+
   const toggleItem = async (item: any) => {
     await supabase.from("trip_checklist_items").update({ is_completed: !item.is_completed }).eq("id", item.id);
     setItems((prev) => prev.map((x) => x.id === item.id ? { ...x, is_completed: !x.is_completed } : x));
@@ -91,9 +111,9 @@ function TripDetail() {
     doc.setTextColor(0); doc.setFontSize(14); doc.text("Restaurants", 20, y); y += 7;
     doc.setFontSize(10);
     savedRest.forEach((s) => {
-      const r = getRestaurant(s.restaurant_id);
-      if (!r) return;
-      doc.text(`• ${r.name} (GF ${r.gfScore}) — ${r.address}`, 22, y, { maxWidth: 170 }); y += 6;
+      const info = decodeAISlug(s.restaurant_id);
+      if (!info) return;
+      doc.text(`• ${info.name} — ${info.city}${info.country ? ", " + info.country : ""}`, 22, y, { maxWidth: 170 }); y += 6;
     });
     y += 6; doc.setFontSize(14); doc.text("Checklist", 20, y); y += 7; doc.setFontSize(10);
     items.forEach((i) => { doc.text(`${i.is_completed ? "[x]" : "[ ]"} ${i.label}`, 22, y); y += 6; });
@@ -117,7 +137,16 @@ function TripDetail() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant="secondary" className="capitalize">{trip.status}</Badge>
+          <button
+            onClick={cycleStatus}
+            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium capitalize transition ${
+              trip.status === "planning" ? "bg-amber-100 text-amber-700 hover:bg-amber-200" :
+              trip.status === "active" ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" :
+              "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            {trip.status} ↻
+          </button>
           <Button variant="outline" size="sm" onClick={deleteTrip}><Trash2 className="mr-1.5 h-3.5 w-3.5" /> Delete</Button>
         </div>
       </div>
@@ -132,36 +161,75 @@ function TripDetail() {
         </TabsList>
 
         <TabsContent value="overview" className="mt-6 space-y-4">
+          <div className="grid gap-3 md:grid-cols-3">
+            <Stat label="Saved venues" value={savedRest.length} />
+            <Stat label="Translation cards" value={cards.length} />
+            <Stat label="Checklist done" value={`${items.filter(i => i.is_completed).length}/${items.length}`} />
+          </div>
+
+          {/* Quick actions */}
+          <div className="flex flex-wrap gap-2">
+            {trip.destination_city && (
+              <Link to="/restaurants">
+                <Button variant="outline" size="sm" className="gap-1.5">
+                  <MapPin className="h-3.5 w-3.5" /> Find restaurants in {trip.destination_city}
+                </Button>
+              </Link>
+            )}
+            {(() => {
+              const countryGuide = COUNTRIES.find(
+                (x) => x.name.toLowerCase() === (trip.destination_country || "").toLowerCase()
+              );
+              return countryGuide ? (
+                <Link to="/countries/$slug" params={{ slug: countryGuide.slug }}>
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <BookOpen className="h-3.5 w-3.5" /> {countryGuide.flag} Country guide
+                  </Button>
+                </Link>
+              ) : null;
+            })()}
+            <Link to="/cards">
+              <Button variant="outline" size="sm" className="gap-1.5">+ Translation card</Button>
+            </Link>
+          </div>
+
           <div className="rounded-2xl border border-border bg-card p-5">
             <h3 className="font-display text-lg">Notes</h3>
             <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={6} className="mt-2" />
             <Button size="sm" onClick={saveNotes} className="mt-2">Save</Button>
           </div>
-          <div className="grid gap-3 md:grid-cols-3">
-            <Stat label="Restaurants" value={savedRest.length} />
-            <Stat label="Cards" value={cards.length} />
-            <Stat label="Checklist done" value={`${items.filter(i => i.is_completed).length}/${items.length}`} />
-          </div>
         </TabsContent>
 
         <TabsContent value="restaurants" className="mt-6">
           {savedRest.length === 0 ? (
-            <Empty msg="No restaurants saved to this trip yet." cta={<Link to="/restaurants"><Button size="sm">Browse restaurants</Button></Link>} />
+            <Empty
+              msg="No restaurants saved to this trip yet."
+              cta={
+                <Link to="/restaurants">
+                  <Button size="sm">Find restaurants{trip?.destination_city ? ` in ${trip.destination_city}` : ""}</Button>
+                </Link>
+              }
+            />
           ) : (
             <div className="space-y-2">
               {savedRest.map((s) => {
-                const r = getRestaurant(s.restaurant_id);
-                if (!r) return null;
+                const info = decodeAISlug(s.restaurant_id);
+                if (!info) return null;
                 return (
                   <div key={s.id} className="flex items-center justify-between rounded-2xl border border-border bg-card p-4">
                     <div>
-                      <Link to="/restaurants/$slug" params={{ slug: r.slug }} className="font-medium hover:underline">{r.name}</Link>
-                      <p className="text-xs text-muted-foreground">{r.address} · GF {r.gfScore}</p>
+                      <Link to="/restaurants/$slug" params={{ slug: s.restaurant_id }} className="font-medium hover:underline">{info.name}</Link>
+                      <p className="text-xs text-muted-foreground">{info.city}{info.country ? `, ${info.country}` : ""}</p>
                     </div>
                     <Button variant="ghost" size="sm" onClick={() => removeRest(s.id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 );
               })}
+              <div className="mt-4">
+                <Link to="/restaurants">
+                  <Button variant="outline" size="sm"><Plus className="mr-1.5 h-3.5 w-3.5" /> Add more venues</Button>
+                </Link>
+              </div>
             </div>
           )}
         </TabsContent>

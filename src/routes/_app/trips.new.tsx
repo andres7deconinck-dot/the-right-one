@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, CalendarIcon } from "lucide-react";
+import { ArrowLeft, CalendarIcon, Info } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +33,8 @@ function NewTrip() {
   const [errorText, setErrorText] = useState<string>("");
 
   const submit = async () => {
-    if (!user || !country) { toast.error("Pick a country"); setErrorText("Please pick a destination country."); return; }
+    if (!user) { toast.error("Sign in to save trips"); setErrorText("You need to be signed in to save a trip. Create a free account to get started."); return; }
+    if (!country) { toast.error("Pick a country"); setErrorText("Please pick a destination country."); return; }
     setErrorText("");
     setSaving(true);
     const { data, error } = await supabase.from("trips").insert({
@@ -59,6 +60,16 @@ function NewTrip() {
         <ArrowLeft className="h-4 w-4" /> Back to trips
       </Link>
       <h1 className="mt-4 font-display text-4xl">Plan a new trip</h1>
+      {!user && (
+        <div className="mt-4 flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
+          <Info className="mt-0.5 h-4 w-4 shrink-0" />
+          <div>
+            <p className="font-semibold">Sign in to save trips</p>
+            <p className="mt-0.5 opacity-80">You can fill in the form below, but saving requires a free account.</p>
+            <Link to="/auth" search={{} as any} className="mt-2 inline-block font-semibold underline">Create free account →</Link>
+          </div>
+        </div>
+      )}
       <div className="mt-8 space-y-5 rounded-3xl border border-border bg-card-soft p-6">
         {errorText && (
           <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700" role="alert" aria-live="polite">
