@@ -1,11 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Coffee, Heart, Loader2, MapPin, Pill, Search, ShoppingCart, Sparkles, UtensilsCrossed } from "lucide-react";
+import { Clock, Coffee, ExternalLink, Globe, Heart, Loader2, MapPin, Pill, Phone, Search, ShoppingCart, Sparkles, UtensilsCrossed, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import {
   searchRestaurantsAI,
   searchCoffeeBarsAI,
@@ -22,10 +23,10 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_app/restaurants")({
   head: () => ({
     meta: [
-      { title: "Gluten-Free Restaurant Finder — AI-Curated Venues Worldwide" },
+      { title: "Gluten-Free Restaurant Finder: AI-Curated Venues Worldwide" },
       { name: "description", content: "Find gluten-free restaurants, coffee bars, supermarkets and pharmacies in any city worldwide. AI-researched, celiac-safe venues with cross-contamination notes." },
       { name: "keywords", content: "gluten-free restaurants near me, celiac safe restaurants, gluten-free coffee bar, gluten-free supermarket, celiac pharmacy, gluten-free venues worldwide" },
-      { property: "og:title", content: "Gluten-Free Restaurant Finder — Any City, Worldwide" },
+      { property: "og:title", content: "Gluten-Free Restaurant Finder: Any City, Worldwide" },
       { property: "og:description", content: "AI-researched gluten-free restaurants, coffee bars, supermarkets and pharmacies in any city. Celiac-safe with cross-contamination notes." },
       { property: "og:url", content: "https://glutengo.app/restaurants" },
       { property: "og:type", content: "website" },
@@ -87,11 +88,196 @@ const CATEGORY_SEARCH_FN: Record<VenueCategory, (args: { data: { place: string }
 };
 
 const CATEGORY_EMPTY: Record<VenueCategory, string> = {
-  restaurant:  "No restaurants found for this filter — try 'All'.",
+  restaurant:  "No restaurants found for this filter. Try 'All'.",
   coffeebar:   "No coffee bars found. Try searching without a filter.",
   supermarket: "No supermarkets found. Try 'All'.",
   pharmacy:    "No pharmacies found. Try without a filter.",
 };
+
+// ─── Detail sheet ─────────────────────────────────────────────────────────────
+
+function venueIcon(type?: AIRestaurant["venueType"]) {
+  switch (type) {
+    case "coffeebar":   return Coffee;
+    case "supermarket": return ShoppingCart;
+    case "pharmacy":    return Pill;
+    default:            return UtensilsCrossed;
+  }
+}
+
+function riskMeta(l: AIRestaurant["glutenFreeLevel"]) {
+  switch (l) {
+    case "dedicated": return { label: "Zeer veilig", sub: "100% glutenvrij restaurant", color: "bg-emerald-50 border-emerald-200", badge: "bg-emerald-100 text-emerald-700", bar: "bg-emerald-500", risk: "Laag risico" };
+    case "extensive": return { label: "Veilig", sub: "Uitgebreid glutenvrij menu", color: "bg-teal-50 border-teal-200", badge: "bg-teal-100 text-teal-700", bar: "bg-teal-500", risk: "Laag risico" };
+    case "options":   return { label: "Voorzichtig", sub: "Glutenvrije opties beschikbaar", color: "bg-amber-50 border-amber-200", badge: "bg-amber-100 text-amber-700", bar: "bg-amber-400", risk: "Matig risico" };
+    default:          return { label: "Beperkt", sub: "Beperkte glutenvrije opties", color: "bg-rose-50 border-rose-200", badge: "bg-rose-100 text-rose-700", bar: "bg-rose-400", risk: "Hoog risico" };
+  }
+}
+
+function RestaurantSheet({ r, open, onClose }: { r: AIRestaurant | null; open: boolean; onClose: () => void }) {
+  if (!r) return null;
+  const meta = riskMeta(r.glutenFreeLevel);
+  const conf = confidenceMeta(r.confidence);
+  const VenueIcon = venueIcon(r.venueType);
+  const mapsQuery = encodeURIComponent([r.name, r.address, r.city, r.country].filter(Boolean).join(", "));
+  const mapsUrl = `https://maps.google.com/?q=${mapsQuery}`;
+  const mapsEmbed = `https://maps.google.com/maps?q=${mapsQuery}&output=embed&z=16`;
+  const hasAddress = !!(r.address || r.city);
+
+  return (
+    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
+      <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col overflow-hidden">
+        {/* Color bar + header */}
+        <div className={`border-b ${meta.color} px-5 pt-5 pb-4`}>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/70 text-foreground shadow-sm">
+                <VenueIcon className="h-5 w-5" />
+              </span>
+              <div>
+                <h2 className="font-display text-xl leading-tight">{r.name}</h2>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  {[r.cuisine, r.priceLevel, r.city, r.country].filter(Boolean).join(" · ")}
+                </p>
+              </div>
+            </div>
+            <button onClick={onClose} className="shrink-0 rounded-full p-1.5 hover:bg-black/10 transition-colors">
+              <X className="h-4 w-4 text-muted-foreground" />
+            </button>
+          </div>
+
+          {/* Safety level */}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Badge className={`${meta.badge} text-xs font-semibold`}>{meta.label}</Badge>
+            <span className="text-xs text-muted-foreground">{meta.sub}</span>
+            <span className="ml-auto flex items-center gap-1 text-[11px] text-muted-foreground">
+              <span className={`inline-block h-2 w-2 rounded-full ${conf.dot}`} />
+              {conf.label}
+            </span>
+          </div>
+
+          {/* Risk bar */}
+          <div className="mt-3">
+            <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
+              <span>Veiligheidsniveau</span>
+              <span className="font-medium">{meta.risk}</span>
+            </div>
+            <div className="h-1.5 w-full rounded-full bg-black/10">
+              <div className={`h-1.5 rounded-full ${meta.bar} transition-all`}
+                style={{ width: r.glutenFreeLevel === "dedicated" ? "100%" : r.glutenFreeLevel === "extensive" ? "75%" : r.glutenFreeLevel === "options" ? "50%" : "25%" }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+
+          {/* Tags */}
+          {r.tags && r.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {r.tags.map((t) => <Badge key={t} variant="outline" className="text-[11px] capitalize">{t}</Badge>)}
+            </div>
+          )}
+
+          {/* GF protocol */}
+          <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Glutenvrij protocol</p>
+            <p className="text-sm leading-relaxed text-foreground">{r.glutenFreeNotes}</p>
+            {r.cautionNote && (
+              <div className="mt-3 flex gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+                <span className="text-base leading-none mt-0.5">⚠</span>
+                <p className="text-xs text-amber-800">{r.cautionNote}</p>
+              </div>
+            )}
+            <p className="mt-2.5 text-[10px] text-muted-foreground">
+              Bron: {r.verificationSource || "AI onderzoek + publieke bronnen"}
+            </p>
+          </div>
+
+          {/* Map */}
+          {hasAddress && (
+            <div className="rounded-2xl overflow-hidden border border-border">
+              <iframe
+                src={mapsEmbed}
+                className="h-44 w-full border-0"
+                loading="lazy"
+                title={`Kaart: ${r.name}`}
+              />
+              <div className="flex items-center justify-between border-t border-border bg-card px-3 py-2">
+                <div className="flex items-start gap-1.5 min-w-0">
+                  <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground truncate">
+                    {[r.address, r.neighborhood, r.city].filter(Boolean).join(", ")}
+                  </span>
+                </div>
+                <a href={mapsUrl} target="_blank" rel="noreferrer" className="shrink-0 ml-2">
+                  <Button variant="outline" size="sm" className="text-xs h-7 gap-1 px-2">
+                    <ExternalLink className="h-3 w-3" /> Maps
+                  </Button>
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Must-try */}
+          {r.mustTry && r.mustTry.length > 0 && (
+            <div className="rounded-2xl border border-border bg-card p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">Glutenvrij aanbevolen</p>
+              <ul className="grid gap-1.5">
+                {r.mustTry.map((d) => (
+                  <li key={d} className="flex items-center gap-2 rounded-xl bg-muted/50 px-3 py-1.5 text-sm">
+                    <span>🍽</span> {d}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Contact & hours */}
+          {(r.phone || r.website || r.openingHours) && (
+            <div className="rounded-2xl border border-border bg-card p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Contact & openingsuren</p>
+              {r.openingHours && (
+                <p className="whitespace-pre-line rounded-xl bg-muted/50 px-3 py-2 text-xs mb-2">{r.openingHours}</p>
+              )}
+              <div className="space-y-2">
+                {r.phone && (
+                  <a href={`tel:${r.phone}`} className="flex items-center gap-2 text-sm hover:text-primary transition-colors">
+                    <Phone className="h-3.5 w-3.5 text-muted-foreground" /> {r.phone}
+                  </a>
+                )}
+                {r.website && (
+                  <a href={r.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-sm hover:text-primary transition-colors break-all">
+                    <Globe className="h-3.5 w-3.5 shrink-0 text-muted-foreground" /> {r.website}
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
+          <p className="text-[10px] text-muted-foreground pb-2">
+            AI-onderzoek. Toon altijd je vertaalkaart en bevestig het glutenvrije protocol bij aankomst.
+          </p>
+        </div>
+
+        {/* Footer action */}
+        <div className="border-t border-border bg-card px-5 py-3 flex gap-2">
+          <Link to="/restaurants/$slug" params={{ slug: encodeSlug(r) }} className="flex-1">
+            <Button variant="outline" className="w-full text-sm">Volledige pagina</Button>
+          </Link>
+          {hasAddress && (
+            <a href={mapsUrl} target="_blank" rel="noreferrer">
+              <Button variant="ghost" size="icon" className="shrink-0">
+                <MapPin className="h-4 w-4" />
+              </Button>
+            </a>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -102,6 +288,7 @@ function RestaurantsPage() {
   const [place, setPlace] = useState<string>("");
   const [category, setCategory] = useState<VenueCategory>("restaurant");
   const [filter, setFilter] = useState<LevelFilter>("all");
+  const [selected, setSelected] = useState<AIRestaurant | null>(null);
 
   const activeCat = CATEGORIES.find(c => c.id === category)!;
 
@@ -160,7 +347,7 @@ function RestaurantsPage() {
       <div className="max-w-2xl">
         <h1 className="font-display text-4xl">Find gluten-free spots</h1>
         <p className="mt-2 text-muted-foreground">
-          AI-researched restaurants, coffee bars, supermarkets and pharmacies — all gluten-free friendly, in any city worldwide.
+          AI-researched restaurants, coffee bars, supermarkets and pharmacies, all gluten-free friendly, in any city worldwide.
         </p>
       </div>
 
@@ -275,7 +462,7 @@ function RestaurantsPage() {
           )}
 
           <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-            AI research helps shortlist venues — not a medical guarantee. Always confirm protocols before ordering.
+            AI research helps shortlist venues. Not a medical guarantee. Always confirm protocols before ordering.
           </div>
 
           <p className="mt-4 text-sm text-muted-foreground">
@@ -346,9 +533,14 @@ function RestaurantsPage() {
 
                       {/* Actions */}
                       <div className="mt-4 flex gap-2">
-                        <Link to="/restaurants/$slug" params={{ slug }} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full text-xs">Details & map →</Button>
-                        </Link>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex-1 text-xs"
+                          onClick={() => setSelected(r)}
+                        >
+                          Details tonen →
+                        </Button>
                         {r.address && (
                           <a
                             href={`https://maps.google.com/?q=${encodeURIComponent([r.name, r.address, r.city].filter(Boolean).join(", "))}`}
@@ -370,6 +562,8 @@ function RestaurantsPage() {
           )}
         </>
       )}
+
+      <RestaurantSheet r={selected} open={!!selected} onClose={() => setSelected(null)} />
     </div>
   );
 }
