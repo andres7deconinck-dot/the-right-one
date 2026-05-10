@@ -31,6 +31,7 @@ import { Route as AppRestaurantDetailRouteImport } from './routes/_app/restauran
 import { Route as AppIngredientAnalyzerRouteImport } from './routes/_app/ingredient-analyzer'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCardsRouteImport } from './routes/_app/cards'
+import { Route as AppAdminRouteImport } from './routes/_app/admin'
 import { Route as AppTripsNewRouteImport } from './routes/_app/trips.new'
 import { Route as AppTripsIdRouteImport } from './routes/_app/trips.$id'
 import { Route as AppRestaurantsSlugRouteImport } from './routes/_app/restaurants.$slug'
@@ -145,6 +146,11 @@ const AppCardsRoute = AppCardsRouteImport.update({
   path: '/cards',
   getParentRoute: () => AppRoute,
 } as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppTripsNewRoute = AppTripsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -180,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/terms': typeof TermsRoute
+  '/admin': typeof AppAdminRoute
   '/cards': typeof AppCardsRoute
   '/dashboard': typeof AppDashboardRoute
   '/ingredient-analyzer': typeof AppIngredientAnalyzerRoute
@@ -207,6 +214,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/terms': typeof TermsRoute
+  '/admin': typeof AppAdminRoute
   '/cards': typeof AppCardsRoute
   '/dashboard': typeof AppDashboardRoute
   '/ingredient-analyzer': typeof AppIngredientAnalyzerRoute
@@ -236,6 +244,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
   '/terms': typeof TermsRoute
+  '/_app/admin': typeof AppAdminRoute
   '/_app/cards': typeof AppCardsRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/ingredient-analyzer': typeof AppIngredientAnalyzerRoute
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/resources'
     | '/terms'
+    | '/admin'
     | '/cards'
     | '/dashboard'
     | '/ingredient-analyzer'
@@ -292,6 +302,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/resources'
     | '/terms'
+    | '/admin'
     | '/cards'
     | '/dashboard'
     | '/ingredient-analyzer'
@@ -320,6 +331,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/resources'
     | '/terms'
+    | '/_app/admin'
     | '/_app/cards'
     | '/_app/dashboard'
     | '/_app/ingredient-analyzer'
@@ -509,6 +521,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCardsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/trips/new': {
       id: '/_app/trips/new'
       path: '/new'
@@ -567,6 +586,7 @@ const AppTripsRouteWithChildren = AppTripsRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRoute
   AppCardsRoute: typeof AppCardsRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppIngredientAnalyzerRoute: typeof AppIngredientAnalyzerRoute
@@ -577,6 +597,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRoute,
   AppCardsRoute: AppCardsRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppIngredientAnalyzerRoute: AppIngredientAnalyzerRoute,

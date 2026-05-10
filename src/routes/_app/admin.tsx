@@ -17,15 +17,12 @@ export const Route = createFileRoute("/_app/admin")({
 function AdminPage() {
   const { user, loading: authLoading } = useRequireAuth();
 
-  const { data: subscribers, isLoading } = useQuery({
+  const { data: subscribers, isLoading, error: fetchError } = useQuery({
     queryKey: ["admin-subscribers"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, email, full_name, plan, created_at")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.functions.invoke("admin-subscribers");
       if (error) throw error;
-      return data || [];
+      return (data?.data || []) as { id: string; email: string | null; full_name: string | null; plan: string | null; created_at: string }[];
     },
     enabled: !!user && user.email === ADMIN_EMAIL,
   });
@@ -130,7 +127,11 @@ function AdminPage() {
           <span className="text-xs text-muted-foreground">{total} totaal</span>
         </div>
 
-        {isLoading ? (
+        {fetchError ? (
+          <div className="px-5 py-8 text-center text-sm text-rose-600">
+            Fout bij laden: {(fetchError as Error).message}
+          </div>
+        ) : isLoading ? (
           <div className="divide-y divide-border">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="flex items-center gap-4 px-5 py-3.5">
