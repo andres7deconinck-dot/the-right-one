@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
-      { title: "Handige Tips & Links voor Coeliakiepatiënten — GlutenGo" },
+      { title: "Handige Tips & Links voor Coeliakiepatiënten | GlutenGo" },
       { name: "description", content: "Alles wat je moet weten als coeliakiepatiënt op reis: extra bagage rechten, belastingvoordelen, handige websites, verzekeringen en reisTips." },
       { name: "keywords", content: "coeliakie reistips, extra bagage coeliakie, auto-immuunziekte vergoeding, glutenvrij reizen tips, coeliakie rechten vliegtuig" },
       { property: "og:title", content: "Handige Tips & Links voor Coeliakiepatiënten" },
@@ -23,8 +23,8 @@ const USEFUL_SITES = [
     icon: Heart,
     color: "bg-rose-50 text-rose-600 border-rose-200",
     sites: [
-      { name: "Coeliakie België", url: "https://www.coeliakie.be", desc: "Officiële Belgische coeliakie organisatie — productenlijsten, recepten en nieuws." },
-      { name: "Nederlandse Coeliakie Vereniging", url: "https://www.glutenvrij.nl", desc: "NCV — erkenning, vergoedingen en reisinfo voor Nederland." },
+      { name: "Coeliakie België", url: "https://www.coeliakie.be", desc: "Officiële Belgische coeliakie organisatie, productenlijsten, recepten en nieuws." },
+      { name: "Nederlandse Coeliakie Vereniging", url: "https://www.glutenvrij.nl", desc: "NCV: erkenning, vergoedingen en reisinfo voor Nederland." },
       { name: "Coeliac UK", url: "https://www.coeliac.org.uk", desc: "Grootste coeliakie organisatie ter wereld. Gratis reiskaarten downloadbaar." },
       { name: "Celiac Disease Foundation", url: "https://celiac.org", desc: "Wetenschappelijke updates, dieetadvies en reisbronnen." },
       { name: "Association of European Coeliac Societies", url: "https://aoecs.eu", desc: "AOECS coördineert het Europese licentiesysteem voor glutenvrije producten." },
@@ -37,7 +37,7 @@ const USEFUL_SITES = [
     sites: [
       { name: "Find Me Gluten Free", url: "https://www.findmeglutenfree.com", desc: "Gebruikersreviews van glutenvrije restaurants wereldwijd." },
       { name: "Gluten Free Passport", url: "https://glutenfreepassport.com", desc: "Reiskaarten en fiches per land in meerdere talen." },
-      { name: "Triumph Dining", url: "https://www.triumphdining.com", desc: "Glutenvrije reiskaarten voor 80+ landen — betaald, maar kwalitatief." },
+      { name: "Triumph Dining", url: "https://www.triumphdining.com", desc: "Glutenvrije reiskaarten voor 80+ landen, betaald maar kwalitatief." },
       { name: "iEatOut Gluten Free", url: "https://www.ieatout.com.au", desc: "App en website voor restaurants met glutenvrije opties." },
       { name: "AllergyEats", url: "https://www.allergyeats.com", desc: "VS-gerichte allergiefriendly restaurant zoeker met gebruikersbeoordelingen." },
     ],
@@ -49,7 +49,7 @@ const USEFUL_SITES = [
     sites: [
       { name: "Beyond Celiac", url: "https://www.beyondceliac.org", desc: "Wetenschappelijk onderzoek, klinische studies en patiëntenadvocacy." },
       { name: "University of Chicago Celiac Center", url: "https://www.cureceliacdisease.org", desc: "Medisch kenniscentrum met gratis patiëntenbrochures." },
-      { name: "Celiac.com", url: "https://www.celiac.com", desc: "Forum, nieuws en productupdates — een van de oudste bronnen online." },
+      { name: "Celiac.com", url: "https://www.celiac.com", desc: "Forum, nieuws en productupdates. Een van de oudste bronnen online." },
     ],
   },
 ];
@@ -61,9 +61,9 @@ const BAGGAGE_TIPS = [
     color: "border-emerald-200 bg-emerald-50",
     badge: "Luchtvaart",
     badgeColor: "bg-emerald-100 text-emerald-700",
-    content: `Veel luchtvaartmaatschappijen staan toe dat je glutenvrij voedsel meeneemt als medische noodzaak — boven de normale bagagelimieten. Dit moet je aanvragen bij inchecken of via klantenservice.
+    content: `Veel luchtvaartmaatschappijen staan toe dat je glutenvrij voedsel meeneemt als medische noodzaak, bovenop de normale bagagelimieten. Vraag dit aan bij het inchecken of via de klantenservice van de luchtvaartmaatschappij.
 
-Bewijs dat helpt: doktersattest of diagnosebrief van je arts (Engelstalig is beter), plus de AOECS glutenvrij licentienummers van je producten.`,
+Bewijs dat helpt: een doktersattest of diagnosebrief van je arts (bij voorkeur in het Engels), samen met de AOECS glutenvrij licentienummers van je producten.`,
     airlines: [
       { name: "Brussels Airlines", note: "Vraag 'medical meal' bij boeking + melding bij check-in." },
       { name: "Lufthansa", note: "Glutenvrije maaltijd gratis bestellen, extra medisch voedsel in handbagage toegestaan met attest." },
@@ -77,13 +77,13 @@ Bewijs dat helpt: doktersattest of diagnosebrief van je arts (Engelstalig is bet
     color: "border-blue-200 bg-blue-50",
     badge: "Financieel",
     badgeColor: "bg-blue-100 text-blue-700",
-    content: `In België en Nederland kun je een deel van de meerkosten van glutenvrije producten recupereren via de belastingen als je een officiële coeliakie diagnose hebt.
+    content: `In België en Nederland kun je een deel van de meerkosten van glutenvrije producten recupereren via de belastingen, op voorwaarde dat je een officiële coeliakie-diagnose hebt.
 
-België: Via de FOD Financiën als buitengewone beroepskosten of ziekte-uitgaven (Formulier 325 / aangifte personenbelasting).
+In België gaat dit via de FOD Financiën als buitengewone beroepskosten of ziekte-uitgaven, via de aangifte personenbelasting.
 
-Nederland: Specifieke zorgkosten-aftrek via de belastingaangifte. De NCV publiceert jaarlijks de geldende meerkosten-bedragen.`,
+In Nederland is er een specifieke zorgkosten-aftrek via de belastingaangifte. De NCV publiceert jaarlijks de geldende meerkosten-bedragen.`,
     links: [
-      { name: "NCV — Belastinginfo", url: "https://www.glutenvrij.nl/belasting" },
+      { name: "NCV: Belastinginfo", url: "https://www.glutenvrij.nl/belasting" },
       { name: "FOD Financiën België", url: "https://financien.belgium.be" },
     ],
   },
@@ -93,29 +93,20 @@ Nederland: Specifieke zorgkosten-aftrek via de belastingaangifte. De NCV publice
     color: "border-amber-200 bg-amber-50",
     badge: "Verzekering",
     badgeColor: "bg-amber-100 text-amber-700",
-    content: `Standaard reisverzekeringen dekken soms geen coeliakie-gerelateerde incidenten. Vraag altijd expliciet of je gedekt bent bij:
+    content: `Standaard reisverzekeringen dekken niet altijd coeliakie-gerelateerde incidenten. Vraag altijd expliciet of je gedekt bent voor ziekenhuisopname door glutenbesmetting in het buitenland, annulering door medische complicaties en repatriëring.
 
-• Ziekenhuisopname door glutenbesmetting in het buitenland
-• Annulering door medische complicaties
-• Repatriëring
-
-Zeg coeliakie altijd op bij het afsluiten. Verzekeraars die hier goed mee omgaan: Europ Assistance, Allianz Travel, AXA Travel.`,
+Meld coeliakie altijd bij het afsluiten van een verzekering. Verzekeraars die hier goed mee omgaan zijn onder meer Europ Assistance, Allianz Travel en AXA Travel.`,
     links: [],
   },
   {
-    title: "Medisch attest — altijd meenemen",
+    title: "Medisch attest: altijd meenemen",
     icon: FileText,
     color: "border-purple-200 bg-purple-50",
     badge: "Document",
     badgeColor: "bg-purple-100 text-purple-700",
-    content: `Een doktersattest in het Engels (en liefst ook de lokale taal) is je beste reisdocument. Het helpt bij:
+    content: `Een doktersattest in het Engels (en liefst ook in de lokale taal) is je beste reisdocument. Het helpt bij toegang tot speciale vliegtuigmaaltijden, extra bagageruimte voor medisch voedsel, douane bij grote hoeveelheden glutenvrij voedsel en medische hulp in het buitenland.
 
-• Toegang tot vliegtuig-speciale maaltijden
-• Extra bagage voor medisch voedsel
-• Douane bij grote hoeveelheden glutenvrij voedsel
-• Ziekenhuis in het buitenland
-
-Vraag je huisarts om een brief met: diagnose, datum, ernst (coeliakie = auto-immuunziekte), en dat glutenvrij dieet medisch noodzakelijk is.`,
+Vraag je huisarts om een brief met je diagnose, de datum, de ernst van de aandoening (coeliakie is een auto-immuunziekte) en een bevestiging dat een glutenvrij dieet medisch noodzakelijk is.`,
     links: [],
   },
 ];
@@ -129,7 +120,7 @@ const QUICK_TIPS = [
   {
     emoji: "🏨",
     title: "Bel je hotel altijd op voorhand",
-    text: "Niet mailen — bellen. Vraag expliciet of het ontbijt glutenvrij kan, en of er een aparte broodrooster of werkoppervlak is. Bevestig de dag voor aankomst.",
+    text: "Bel liever dan mail. Vraag expliciet of het ontbijt glutenvrij kan, en of er een aparte broodrooster of werkoppervlak is. Bevestig de dag voor aankomst.",
   },
   {
     emoji: "🛒",
@@ -139,12 +130,12 @@ const QUICK_TIPS = [
   {
     emoji: "📱",
     title: "Download offline kaarten",
-    text: "Download Google Maps offline voor je bestemming. Zoek op 'gluten free' of 'coeliac' in de stad — veel restaurants taggen zichzelf. Geen wifi nodig.",
+    text: "Download Google Maps offline voor je bestemming. Zoek op 'gluten free' of 'coeliac' in de stad, veel restaurants taggen zichzelf. Geen wifi nodig.",
   },
   {
     emoji: "🌿",
     title: "Landen met van nature glutenvrije keukens",
-    text: "Japan (rijst, vis), Mexico (maïs-tortillas), India (rijst, linzen, dal), Thailand (rijst, noodles met tamari) en Ethiopië (teff-injera) zijn van nature veelal glutenvrij — vraag wél altijd naar sojasaus en marinades.",
+    text: "Japan (rijst, vis), Mexico (maïstortillas), India (rijst, linzen, dal), Thailand (rijst, noodles met tamari) en Ethiopië (teff-injera) zijn van nature veelal glutenvrij. Vraag wel altijd naar sojasaus en marinades.",
   },
   {
     emoji: "🚨",
@@ -169,18 +160,18 @@ const QUICK_TIPS = [
   {
     emoji: "📋",
     title: "Eetdagboek bijhouden op reis",
-    text: "Noteer wat je gegeten hebt en waar. Bij een reactie kun je zo veel sneller achterhalen wat de oorzaak was — handig voor jezelf en voor je arts.",
+    text: "Noteer wat je gegeten hebt en waar. Bij een reactie kun je zo veel sneller achterhalen wat de oorzaak was, handig voor jezelf en voor je arts.",
   },
 ];
 
 const DID_YOU_KNOW = [
   { fact: "1 op 100 mensen heeft coeliakie, maar slechts 1 op 4 is officieel gediagnosticeerd.", source: "Beyond Celiac" },
-  { fact: "Het glutenvrije markt was in 2023 wereldwijd meer dan €6 miljard waard — en groeit jaarlijks 9%.", source: "Statista" },
+  { fact: "Het glutenvrije markt was in 2023 wereldwijd meer dan €6 miljard waard, en groeit jaarlijks 9%.", source: "Statista" },
   { fact: "Finse en Italiaanse kinderen hebben de hoogste coeliakie-prevalentie ter wereld.", source: "European Journal of Gastroenterology" },
-  { fact: "Een glutenvrij dieet moet levenslang gevolgd worden — ook bij geen symptomen herstelt de darmvlokken pas na 1-2 jaar.", source: "Celiac Disease Foundation" },
+  { fact: "Een glutenvrij dieet moet levenslang gevolgd worden. Ook bij geen symptomen herstelt de darmvlokken pas na 1-2 jaar.", source: "Celiac Disease Foundation" },
   { fact: "Havermout is van nature glutenvrij, maar wordt bijna altijd besmet tijdens de oogst of verwerking. Kies altijd gecertificeerde GF-haver.", source: "Coeliakie België" },
   { fact: "In Italië krijgt elke officieel gediagnosticeerde coeliakiepatiënt een maandelijkse vergoeding van de staat voor glutenvrije voedingsproducten.", source: "Italian Ministry of Health" },
-  { fact: "Veel vliegmaatschappijen beginnen de glutenvrije speciale maaltijden vóór andere passagiers te serveren — zodat je er zeker van bent dat het juiste bord bij jou terechtkomt.", source: "Coeliac UK" },
+  { fact: "Veel vliegmaatschappijen serveren glutenvrije speciale maaltijden vóór andere passagiers, zodat je er zeker van bent dat het juiste bord bij jou terechtkomt.", source: "Coeliac UK" },
   { fact: "Coeliakie is de enige auto-immuunziekte waarbij de omgevingstrigger (gluten) volledig bekend én vermijdbaar is.", source: "NIH" },
 ];
 
@@ -359,7 +350,7 @@ function ResourcesPage() {
           <Plane className="mx-auto h-10 w-10 text-primary" />
           <h2 className="mt-4 font-display text-3xl">Klaar voor je reis?</h2>
           <p className="mt-3 text-muted-foreground max-w-md mx-auto">
-            Genereer je glutenvrij vertaalkaart, zoek restaurants en bekijk onze landengidsen — alles in één app.
+            Genereer je glutenvrij vertaalkaart, zoek restaurants en bekijk onze landengidsen, alles in één app.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link to="/cards">

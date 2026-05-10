@@ -11,10 +11,10 @@ import { useLanguage } from "@/lib/i18n";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GlutenGo — Gluten-Free Travel App for Celiac Travelers" },
+      { title: "GlutenGo: Gluten-Free Travel App for Celiac Travelers" },
       { name: "description", content: "Find gluten-free restaurants in any city, generate celiac translation cards in 30+ languages, and explore country guides. The #1 travel app for celiacs." },
       { name: "keywords", content: "gluten-free travel app, celiac disease travel, gluten-free restaurants worldwide, celiac translation card, coeliac travel toolkit" },
-      { property: "og:title", content: "GlutenGo — Gluten-Free Travel App for Celiac Travelers" },
+      { property: "og:title", content: "GlutenGo: Gluten-Free Travel App for Celiac Travelers" },
       { property: "og:description", content: "Find gluten-free restaurants in any city, generate celiac translation cards in 30+ languages, and explore country guides. Free to start." },
       { property: "og:url", content: "https://glutengo.app/" },
       { property: "og:type", content: "website" },
@@ -75,7 +75,7 @@ function Landing() {
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-success/15 text-success"><Shield className="h-5 w-5" /></span>
                 <div>
                   <p className="text-xs text-muted-foreground">Allergy Card · Italian</p>
-                  <p className="text-sm font-medium">Sono celiaco/a — preparare separatamente</p>
+                  <p className="text-sm font-medium">Sono celiaco/a, preparare separatamente</p>
                 </div>
               </div>
             </div>
@@ -131,14 +131,17 @@ function Landing() {
       {/* Interactive Teasers */}
       <FeatureTeasers />
 
+      {/* Resources highlight */}
+      <ResourcesHighlight />
+
       {/* Testimonials */}
       <section className="mx-auto max-w-7xl px-5 py-20">
         <h2 className="text-center font-display text-4xl md:text-5xl">{t.testimonials.title}</h2>
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {[
-            { q: "Tokyo without GlutenGo would've been impossible. The Japanese card actually got me a separate kitchen.", a: "Sara · Diagnosed celiac" },
-            { q: "Italy felt easy — but I used the assistant in Naples and it caught a hidden risk in fritto misto.", a: "Marco · Celiac since 12" },
-            { q: "Finally one app that takes us seriously. The tone is calm, not gimmicky.", a: "Lena · Family of 4" },
+            { q: "Tokyo without GlutenGo would have been impossible. The Japanese card got me a completely separate kitchen.", a: "Sara, diagnosed celiac" },
+            { q: "Italy felt manageable for the first time. I used the AI assistant in Naples and it flagged a hidden risk I never would have noticed.", a: "Marco, celiac since age 12" },
+            { q: "Finally an app that takes this seriously. The tone is calm, clear and never condescending.", a: "Lena, family of 4" },
           ].map((t) => (
             <figure key={t.a} className="rounded-3xl border border-border/60 bg-card p-6 shadow-soft">
               <div className="flex gap-1 text-accent">{Array.from({length:5}).map((_,i)=><Star key={i} className="h-4 w-4 fill-current" />)}</div>
@@ -167,14 +170,14 @@ function Landing() {
         <h2 className="text-center font-display text-4xl md:text-5xl">{t.faq.title}</h2>
         <Accordion type="single" collapsible className="mt-10">
           {[
-            { q: "Is GlutenGo medical advice?", a: "No. GlutenGo provides translation tools and travel guides for information only. Always confirm preparation with restaurant staff. When in doubt, don't eat it." },
+            { q: "Is GlutenGo medical advice?", a: "No. GlutenGo provides translation tools and travel guides for information purposes only. Always confirm preparation with restaurant staff. When in doubt, do not eat it." },
             { q: "Which languages are supported for translation cards?", a: "English, French, Spanish, Italian, German, Japanese, Thai, Dutch, Portuguese, Greek, Turkish, Polish, Korean, Chinese (Simplified), Arabic and Hindi. New languages are added regularly." },
-            { q: "Does it work offline?", a: "Yes. On the Traveler and Family plans you can save translation cards and country guides for offline use — perfect when you don't have data abroad." },
-            { q: "Can I cancel anytime?", a: "Yes. Cancel from your account settings whenever you want. You keep access until the end of your paid period." },
-            { q: "How accurate are the translations?", a: "We use a medically-tuned prompt specifically built for celiac disease and gluten intolerance, with phonetic guides for languages like Japanese and Thai. For critical trips we still recommend having a native speaker double-check the card." },
-            { q: "What if I'm intolerant and not celiac?", a: "When you create your account you can specify whether you have celiac disease, intolerance or an allergy. Translation cards and warnings adapt to your severity level." },
-            { q: "Is there a free trial for paid plans?", a: "GlutenGo is free forever with 3 translation cards per month. For the Traveler plan we offer a 30-day money-back guarantee — no questions asked." },
-            { q: "How does the Family plan work?", a: "The Family plan supports up to 5 user profiles. Each person has their own allergy profiles, translation cards and saved restaurants. You can plan trips together and share checklists." },
+            { q: "Does it work offline?", a: "Yes. On the Traveler and Family plans you can save translation cards and country guides for offline use. Perfect for destinations with limited connectivity." },
+            { q: "Can I cancel anytime?", a: "Yes. Cancel from your account settings at any time. You keep full access until the end of your paid period." },
+            { q: "How accurate are the translations?", a: "We use a medically tuned system specifically built for celiac disease and gluten intolerance, with phonetic guides for languages like Japanese and Thai. For critical trips we recommend having a native speaker review the card as well." },
+            { q: "What if I am intolerant and not celiac?", a: "When you create your account you can specify whether you have celiac disease, intolerance or an allergy. Translation cards and warnings adapt to your severity level." },
+            { q: "Is there a free plan?", a: "GlutenGo is free forever with 3 translation cards per month. The Traveler plan includes a 30-day money-back guarantee." },
+            { q: "How does the Family plan work?", a: "The Family plan supports up to 5 user profiles. Each person has their own allergy profile, translation cards and saved restaurants. You can plan trips together and share checklists." },
           ].map((f, i) => (
             <AccordionItem value={`i${i}`} key={i}>
               <AccordionTrigger className="text-left font-medium">{f.q}</AccordionTrigger>
@@ -186,6 +189,100 @@ function Landing() {
 
       <SiteFooter />
     </div>
+  );
+}
+
+// ─── Resources Highlight ─────────────────────────────────────────────────────
+
+function ResourcesHighlight() {
+  const rights = [
+    {
+      emoji: "🧳",
+      title: "Gratis extra bagage",
+      text: "Bij de meeste Europese luchtvaartmaatschappijen heb je als coeliakiepatiënt recht op extra bagage voor medisch voedsel. Vraag dit aan bij het inchecken met een doktersattest.",
+      tag: "Luchtvaart",
+      tagColor: "bg-blue-100 text-blue-700",
+    },
+    {
+      emoji: "💶",
+      title: "Belastingvoordeel",
+      text: "In België en Nederland kun je de meerkosten van glutenvrije producten gedeeltelijk recupereren via de belastingen. Houd je aankoopbonnen bij en vraag je arts om een diagnosebevestiging.",
+      tag: "Financieel",
+      tagColor: "bg-emerald-100 text-emerald-700",
+    },
+    {
+      emoji: "✈️",
+      title: "Medische maaltijd aan boord",
+      text: "Bestel gratis een GFML (Gluten Free Meal) bij je vluchtboeking. Dit is beschikbaar bij Brussels Airlines, KLM, Lufthansa en vele anderen, zonder extra kost.",
+      tag: "Maaltijden",
+      tagColor: "bg-amber-100 text-amber-700",
+    },
+    {
+      emoji: "📄",
+      title: "Medisch attest",
+      text: "Een Engelstalig doktersattest opent deuren: extra bagageruimte, speciale maaltijden, en begrip bij douane wanneer je grote hoeveelheden glutenvrij voedsel meeneemt.",
+      tag: "Document",
+      tagColor: "bg-purple-100 text-purple-700",
+    },
+  ];
+
+  const facts = [
+    { number: "1 op 100", label: "mensen heeft coeliakie, maar slechts 1 op 4 is officieel gediagnosticeerd" },
+    { number: "30+", label: "landen waar GlutenGo noodformuleringen beschikbaar heeft, volledig offline" },
+    { number: "€6 mrd", label: "groot is de glutenvrije markt wereldwijd en groeit nog steeds jaarlijks" },
+  ];
+
+  return (
+    <section className="bg-cream/50 py-24">
+      <div className="mx-auto max-w-7xl px-5">
+        {/* Header */}
+        <div className="mx-auto max-w-2xl text-center">
+          <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+            <Shield className="h-3.5 w-3.5" /> Rechten en tips
+          </span>
+          <h2 className="mt-4 font-display text-4xl tracking-tight md:text-5xl">
+            Rechten die je waarschijnlijk nog niet kent
+          </h2>
+          <p className="mt-4 text-muted-foreground text-lg">
+            Als coeliakiepatiënt heb je meer mogelijkheden dan je denkt. Van gratis extra bagage tot belastingvoordelen.
+          </p>
+        </div>
+
+        {/* Stats strip */}
+        <div className="mt-12 grid gap-4 sm:grid-cols-3">
+          {facts.map((f) => (
+            <div key={f.number} className="rounded-2xl border border-border bg-card p-5 text-center shadow-soft">
+              <p className="font-display text-4xl text-primary">{f.number}</p>
+              <p className="mt-2 text-sm text-muted-foreground">{f.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Rights cards */}
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {rights.map((r) => (
+            <div key={r.title} className="rounded-3xl border border-border bg-card p-6 shadow-soft">
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-3xl">{r.emoji}</span>
+                <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${r.tagColor}`}>{r.tag}</span>
+              </div>
+              <h3 className="mt-4 font-display text-lg">{r.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{r.text}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <div className="mt-10 text-center">
+          <Link to="/resources">
+            <Button size="lg" variant="outline" className="rounded-full px-8">
+              Bekijk alle tips, rechten en handige links
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -218,7 +315,7 @@ const INGREDIENT_RESULTS = [
   { name: "Wheat flour", status: "danger" as const, reason: "Direct gluten source" },
   { name: "Barley malt extract", status: "danger" as const, reason: "Contains gluten (barley)" },
   { name: "Oat bran", status: "warning" as const, reason: "Often cross-contaminated" },
-  { name: "Modified starch", status: "warning" as const, reason: "Source unclear — may be wheat" },
+  { name: "Modified starch", status: "warning" as const, reason: "Source unclear, may be wheat" },
   { name: "Water", status: "safe" as const, reason: "Safe" },
   { name: "Salt", status: "safe" as const, reason: "Safe" },
   { name: "Yeast", status: "safe" as const, reason: "Safe (check if malt-based)" },
@@ -320,7 +417,7 @@ function TranslationCardTeaser() {
             <span className="text-2xl">{card.flag}</span>
             <div>
               <p className="text-xs font-medium text-primary-foreground/70">Medical Allergy Card · {card.name}</p>
-              <p className="text-sm font-semibold text-primary-foreground">Celiac Disease — Gluten-Free Required</p>
+              <p className="text-sm font-semibold text-primary-foreground">Celiac Disease: Gluten-Free Required</p>
             </div>
           </div>
         </div>
@@ -480,7 +577,7 @@ function CountryGuideTeaser() {
   const country = TEASER_COUNTRIES[idx];
 
   const awarenessColor = country.awareness === "high" ? "text-success bg-success/10" : country.awareness === "medium" ? "text-warning bg-warning/10" : "text-destructive bg-destructive/10";
-  const awarenessLabel = country.awareness === "high" ? "High celiac awareness" : country.awareness === "medium" ? "Medium awareness" : "Low awareness — extra care needed";
+  const awarenessLabel = country.awareness === "high" ? "High celiac awareness" : country.awareness === "medium" ? "Medium awareness" : "Low awareness, extra care needed";
 
   return (
     <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
