@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/auth";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { createCustomerPortalUrl } from "@/utils/payments.functions";
 import { tipOfTheDay } from "@/data/tips";
@@ -30,7 +30,7 @@ function flagFor(country?: string | null) {
 }
 
 function Dashboard() {
-  const { user } = useAuth();
+  const { user, loading } = useRequireAuth();
   const { isActive, planName, subscription } = useSubscription();
   const [portalLoading, setPortalLoading] = useState(false);
 
@@ -78,6 +78,17 @@ function Dashboard() {
     } catch (e: any) { toast.error(e?.message || "Could not open billing portal"); }
     finally { setPortalLoading(false); }
   };
+
+  if (loading || !user) {
+    return (
+      <div className="mx-auto max-w-7xl px-5 py-10">
+        <div className="h-10 w-64 animate-pulse rounded-xl bg-muted" />
+        <div className="mt-8 grid gap-4 md:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => <div key={i} className="h-24 animate-pulse rounded-2xl bg-muted" />)}
+        </div>
+      </div>
+    );
+  }
 
   const tip = tipOfTheDay();
   const recommendedGuide = activeTrip ? COUNTRIES.find((c) => c.name.toLowerCase() === (activeTrip.destination_country || "").toLowerCase()) : null;

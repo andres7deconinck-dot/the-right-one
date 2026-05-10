@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { COUNTRIES } from "@/data/countries";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/auth";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/trips/new")({
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_app/trips/new")({
 });
 
 function NewTrip() {
-  const { user } = useAuth();
+  const { user, loading } = useRequireAuth();
   const nav = useNavigate();
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
@@ -26,6 +26,15 @@ function NewTrip() {
   const [end, setEnd] = useState("");
   const [saving, setSaving] = useState(false);
   const [errorText, setErrorText] = useState("");
+
+  if (loading || !user) {
+    return (
+      <div className="mx-auto max-w-2xl px-5 py-10">
+        <div className="h-8 w-32 animate-pulse rounded-lg bg-muted" />
+        <div className="mt-8 h-96 animate-pulse rounded-3xl bg-muted" />
+      </div>
+    );
+  }
 
   const submit = async () => {
     if (!country.trim()) {

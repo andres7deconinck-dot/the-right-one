@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/lib/auth";
+import { useRequireAuth } from "@/hooks/useRequireAuth";
 import { COUNTRIES } from "@/data/countries";
 
 export const Route = createFileRoute("/_app/trips")({
@@ -20,7 +20,7 @@ function flagFor(country?: string | null) {
 }
 
 function TripsPage() {
-  const { user } = useAuth();
+  const { user, loading } = useRequireAuth();
   const { data: trips, isLoading } = useQuery({
     queryKey: ["trips", user?.id],
     enabled: !!user,
@@ -45,6 +45,17 @@ function TripsPage() {
       return (ts || []).map((t) => ({ ...t, savedCount: counts[t.id] || 0 }));
     },
   });
+
+  if (loading || !user) {
+    return (
+      <div className="mx-auto max-w-7xl px-5 py-10">
+        <div className="h-10 w-48 animate-pulse rounded-lg bg-muted" />
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-40 rounded-3xl" />)}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-5 py-10">
