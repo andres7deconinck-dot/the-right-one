@@ -12,7 +12,13 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/restaurants/$slug")({
-  head: () => ({ meta: [{ title: "Venue details — GlutenGo" }] }),
+  head: () => ({
+    meta: [
+      { title: "Gluten-Free Venue Details — GlutenGo" },
+      { name: "description", content: "Full gluten-free protocol, map, opening hours, contact and must-try dishes for this celiac-friendly venue." },
+      { name: "robots", content: "index, follow" },
+    ],
+  }),
   component: RestaurantDetail,
 });
 

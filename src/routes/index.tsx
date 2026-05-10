@@ -11,8 +11,13 @@ import { useLanguage } from "@/lib/i18n";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GlutenGo — Travel gluten-free without the stress" },
-      { name: "description", content: "AI translation cards, safe restaurants, country guides and a travel assistant for celiac and gluten-intolerant travelers." },
+      { title: "GlutenGo — Gluten-Free Travel App for Celiac Travelers" },
+      { name: "description", content: "Find gluten-free restaurants in any city, generate celiac translation cards in 30+ languages, and explore country guides. The #1 travel app for celiacs." },
+      { name: "keywords", content: "gluten-free travel app, celiac disease travel, gluten-free restaurants worldwide, celiac translation card, coeliac travel toolkit" },
+      { property: "og:title", content: "GlutenGo — Gluten-Free Travel App for Celiac Travelers" },
+      { property: "og:description", content: "Find gluten-free restaurants in any city, generate celiac translation cards in 30+ languages, and explore country guides. Free to start." },
+      { property: "og:url", content: "https://glutengo.app/" },
+      { property: "og:type", content: "website" },
     ],
   }),
   component: Landing,

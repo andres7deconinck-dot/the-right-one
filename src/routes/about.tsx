@@ -6,8 +6,12 @@ import { Heart, Globe2, Shield, Users } from "lucide-react";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — GlutenGo" },
-      { name: "description", content: "Built by celiac travelers, for celiac travelers. Our mission is calm, accurate gluten-free travel." },
+      { title: "About GlutenGo — Built by Celiacs, for Celiacs" },
+      { name: "description", content: "GlutenGo is built by celiac travelers, for celiac travelers. Our mission: make gluten-free travel calm, safe and stress-free worldwide." },
+      { name: "keywords", content: "about GlutenGo, celiac travel app, gluten-free travel mission, coeliac travel team" },
+      { property: "og:title", content: "About GlutenGo — Built by Celiacs, for Celiacs" },
+      { property: "og:description", content: "Our mission is calm, accurate gluten-free travel. Built by celiacs who got tired of the guesswork." },
+      { property: "og:url", content: "https://glutengo.app/about" },
     ],
   }),
   component: AboutPage,

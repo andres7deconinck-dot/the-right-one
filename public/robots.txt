@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Block private app routes from indexing
+Disallow: /dashboard
+Disallow: /trips
+Disallow: /cards
+Disallow: /auth
+Disallow: /checkout
+Disallow: /travel-mode
+
+# Allow all public content
+Allow: /countries
+Allow: /restaurants
+Allow: /assistant
+Allow: /emergency
+Allow: /about
+Allow: /pricing
+Allow: /blog
+
+Sitemap: https://glutengo.app/sitemap.xml

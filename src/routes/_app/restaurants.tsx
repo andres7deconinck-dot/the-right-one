@@ -22,8 +22,13 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_app/restaurants")({
   head: () => ({
     meta: [
-      { title: "Restaurant Finder — GlutenGo" },
-      { name: "description", content: "AI-curated gluten-free restaurants, coffee bars, supermarkets and pharmacies in any city worldwide." },
+      { title: "Gluten-Free Restaurant Finder — AI-Curated Venues Worldwide" },
+      { name: "description", content: "Find gluten-free restaurants, coffee bars, supermarkets and pharmacies in any city worldwide. AI-researched, celiac-safe venues with cross-contamination notes." },
+      { name: "keywords", content: "gluten-free restaurants near me, celiac safe restaurants, gluten-free coffee bar, gluten-free supermarket, celiac pharmacy, gluten-free venues worldwide" },
+      { property: "og:title", content: "Gluten-Free Restaurant Finder — Any City, Worldwide" },
+      { property: "og:description", content: "AI-researched gluten-free restaurants, coffee bars, supermarkets and pharmacies in any city. Celiac-safe with cross-contamination notes." },
+      { property: "og:url", content: "https://glutengo.app/restaurants" },
+      { property: "og:type", content: "website" },
     ],
   }),
   component: RestaurantsPage,

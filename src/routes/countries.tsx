@@ -8,8 +8,13 @@ import { SiteHeader, SiteFooter } from "@/components/site-header";
 export const Route = createFileRoute("/countries")({
   head: () => ({
     meta: [
-      { title: "Country Guides — GlutenGo" },
-      { name: "description", content: "Curated gluten-free travel guides for celiac travelers: safe foods, dishes to avoid, supermarket brands and emergency phrases." },
+      { title: "Gluten-Free Country Guides — Celiac Travel Tips for 19 Countries" },
+      { name: "description", content: "Celiac-safe country guides for Italy, Japan, Belgium, Spain and 15+ more. Safe foods, dishes to avoid, supermarket brands and emergency phrases in the local language." },
+      { name: "keywords", content: "gluten-free country guide, celiac travel Italy, coeliac travel Japan, gluten-free Spain, celiac travel tips, safe foods abroad, gluten-free emergency phrase" },
+      { property: "og:title", content: "Gluten-Free Country Guides — Celiac Travel Tips Worldwide" },
+      { property: "og:description", content: "Honest, celiac-first travel guides for 19 countries. Safe foods, real risks, supermarket brands and emergency phrases." },
+      { property: "og:url", content: "https://glutengo.app/countries" },
+      { property: "og:type", content: "website" },
     ],
   }),
   component: () => (

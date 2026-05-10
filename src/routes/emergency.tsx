@@ -9,8 +9,12 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/emergency")({
   head: () => ({
     meta: [
-      { title: "Emergency Phrases — GlutenGo" },
-      { name: "description", content: "Quick emergency phrases for celiac travelers — works offline." },
+      { title: "Celiac Emergency Phrases in 30+ Languages — GlutenGo" },
+      { name: "description", content: "Gluten-free emergency phrases for celiac travelers in Japanese, Thai, Italian, Spanish, French and 25+ more languages. Works offline. Show to waiters instantly." },
+      { name: "keywords", content: "celiac emergency phrase, gluten-free phrase foreign language, I have celiac disease translation, coeliac phrase Japanese, gluten-free waiter card" },
+      { property: "og:title", content: "Celiac Emergency Phrases in 30+ Languages" },
+      { property: "og:description", content: "Show your waiter exactly what you cannot eat — in their language. Works offline. 30+ languages covered." },
+      { property: "og:url", content: "https://glutengo.app/emergency" },
     ],
   }),
   component: EmergencyPage,

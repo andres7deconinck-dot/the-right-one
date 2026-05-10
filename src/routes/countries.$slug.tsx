@@ -11,12 +11,32 @@ export const Route = createFileRoute("/countries/$slug")({
     if (!country) throw notFound();
     return country;
   },
-  head: ({ loaderData }) => ({
+  head: ({ loaderData: c }) => ({
     meta: [
-      { title: `${loaderData?.name ?? "Country"} Gluten-Free Travel Guide — GlutenGo` },
-      { name: "description", content: loaderData?.intro ?? "" },
-      { property: "og:title", content: `${loaderData?.name} Gluten-Free Guide` },
-      { property: "og:description", content: loaderData?.intro ?? "" },
+      { title: `${c?.name ?? "Country"} Gluten-Free Travel Guide — Safe Foods, Brands & Phrases` },
+      { name: "description", content: `Celiac travel guide for ${c?.name}: safe dishes, foods to avoid, trusted GF supermarket brands and an emergency phrase in ${c?.emergencyPhrase?.lang ?? "local language"}. ${c?.certBody ? `Certified by ${c.certBody}.` : ""}` },
+      { name: "keywords", content: `gluten-free ${c?.name}, celiac travel ${c?.name}, coeliac ${c?.name}, gluten-free food ${c?.name}, ${c?.name} celiac guide, gluten-free restaurants ${c?.capital}` },
+      { property: "og:title", content: `${c?.name} Gluten-Free Guide — Celiac Travel Tips` },
+      { property: "og:description", content: `Safe foods, brands and emergency phrases for celiac travelers in ${c?.name}. ${c?.certBody ? `Certified by ${c.certBody}.` : ""}` },
+      { property: "og:url", content: `https://glutengo.app/countries/${c?.slug}` },
+      { property: "og:type", content: "article" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: `${c?.name} Gluten-Free Travel Guide` },
+      { name: "twitter:description", content: `Safe foods, brands and emergency phrases for celiacs in ${c?.name}.` },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": `${c?.name} Gluten-Free Travel Guide`,
+          "description": c?.intro,
+          "url": `https://glutengo.app/countries/${c?.slug}`,
+          "publisher": { "@type": "Organization", "name": "GlutenGo", "url": "https://glutengo.app" },
+          "about": { "@type": "Country", "name": c?.name },
+        }),
+      },
     ],
   }),
   notFoundComponent: () => <div className="p-10 text-center">Country not found.</div>,

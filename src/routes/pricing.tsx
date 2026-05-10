@@ -12,8 +12,12 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing — GlutenGo" },
-      { name: "description", content: "Free forever, Traveler from €12.99/month, Family from €24.99/month. Cancel anytime, 30-day money-back guarantee." },
+      { title: "Pricing — GlutenGo Gluten-Free Travel App | Free to Start" },
+      { name: "description", content: "GlutenGo is free forever. Upgrade to Traveler (€12.99/mo) or Family (€24.99/mo) for unlimited cards, AI assistant and travel packs. 30-day money-back guarantee." },
+      { name: "keywords", content: "GlutenGo pricing, gluten-free travel app price, celiac app subscription, gluten-free travel toolkit cost" },
+      { property: "og:title", content: "GlutenGo Pricing — Free to Start, Upgrade Anytime" },
+      { property: "og:description", content: "Free forever plan. Traveler from €12.99/month. Family from €24.99/month. Cancel anytime, 30-day money-back guarantee." },
+      { property: "og:url", content: "https://glutengo.app/pricing" },
     ],
   }),
   component: PricingPage,

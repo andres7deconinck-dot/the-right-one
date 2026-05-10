@@ -7,7 +7,16 @@ import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/assistant")({
-  head: () => ({ meta: [{ title: "AI Travel Assistant — GlutenGo" }] }),
+  head: () => ({
+    meta: [
+      { title: "AI Gluten-Free Travel Assistant — Ask Anything | GlutenGo" },
+      { name: "description", content: "Ask our AI assistant anything about gluten-free travel: safe dishes, hidden gluten, restaurant tips, country-specific advice. Powered by AI, trained on celiac knowledge." },
+      { name: "keywords", content: "AI gluten-free travel assistant, celiac AI chat, gluten-free food questions, coeliac travel advice AI" },
+      { property: "og:title", content: "AI Gluten-Free Travel Assistant — GlutenGo" },
+      { property: "og:description", content: "Ask anything about gluten-free travel. Safe dishes, hidden gluten, restaurant tips and country-specific celiac advice." },
+      { property: "og:url", content: "https://glutengo.app/assistant" },
+    ],
+  }),
   component: () => (
     <div className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
