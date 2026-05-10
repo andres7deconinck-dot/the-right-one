@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Info } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/_app/trips/new")({
 });
 
 function NewTrip() {
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const nav = useNavigate();
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
@@ -28,67 +28,54 @@ function NewTrip() {
   const [errorText, setErrorText] = useState("");
 
   const submit = async () => {
-    if (!user) {
-      toast.error("Sign in to save trips");
-      setErrorText("You need to be signed in to save a trip.");
-      return;
-    }
     if (!country.trim()) {
-      toast.error("Pick a destination");
-      setErrorText("Please enter a destination country.");
+      toast.error("Vul een bestemming in");
+      setErrorText("Vul een bestemmingsland in.");
       return;
     }
     setErrorText("");
     setSaving(true);
-    const { data, error } = await supabase.from("trips").insert({
-      user_id: user.id,
-      title: title.trim() || null,
-      destination: country.trim(),
-      destination_country: country.trim(),
-      destination_city: city.trim() || null,
-      start_date: start || null,
-      end_date: end || null,
-      notes: notes.trim() || null,
-      status: "planning",
-    }).select("id").single();
-    setSaving(false);
-    if (error) {
-      toast.error(error.message);
-      setErrorText(error.message);
-      return;
-    }
-    toast.success("Trip created!");
-    nav({ to: "/trips/$id", params: { id: data.id } });
-  };
+    try {
+      const { data, error } = await supabase
+        .from("trips")
+        .insert({
+          user_id: user!.id,
+          title: title.trim() || null,
+          destination: country.trim(),
+          destination_country: country.trim(),
+          destination_city: city.trim() || null,
+          start_date: start || null,
+          end_date: end || null,
+          notes: notes.trim() || null,
+          status: "planning",
+        })
+        .select("id")
+        .single();
 
-  if (authLoading) {
-    return (
-      <div className="mx-auto max-w-2xl px-5 py-10">
-        <div className="h-8 w-32 animate-pulse rounded-lg bg-muted" />
-        <div className="mt-8 h-64 animate-pulse rounded-3xl bg-muted" />
-      </div>
-    );
-  }
+      if (error) {
+        toast.error(error.message);
+        setErrorText(error.message);
+        return;
+      }
+      toast.success("Reis aangemaakt!");
+      nav({ to: "/trips/$id", params: { id: data.id } });
+    } catch (e: any) {
+      toast.error(e.message || "Er ging iets mis");
+      setErrorText(e.message || "Er ging iets mis");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-10">
-      <Link to="/trips" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft className="h-4 w-4" /> Back to trips
+      <Link
+        to="/trips"
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" /> Terug naar reizen
       </Link>
-      <h1 className="mt-4 font-display text-4xl">Plan a new trip</h1>
-
-      {!user && (
-        <div className="mt-4 flex items-start gap-3 rounded-2xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-800">
-          <Info className="mt-0.5 h-4 w-4 shrink-0" />
-          <div>
-            <p className="font-semibold">Sign in to save trips</p>
-            <p className="mt-0.5 opacity-80">Fill out the form below, then sign in to save your trip.</p>
-            <Link to="/auth" search={{ redirect: "/trips/new" } as any} className="mt-2 inline-block font-semibold underline">
-              Create free account →
-            </Link>
-          </div>
-        </div>
-      )}
+      <h1 className="mt-4 font-display text-4xl">Plan een nieuwe reis</h1>
 
       <div className="mt-8 space-y-5 rounded-3xl border border-border bg-card-soft p-6">
         {errorText && (
@@ -98,13 +85,13 @@ function NewTrip() {
         )}
 
         <div>
-          <Label htmlFor="country">Destination country *</Label>
+          <Label htmlFor="country">Bestemmingsland *</Label>
           <Input
             id="country"
             list="countries-list"
             value={country}
             onChange={(e) => setCountry(e.target.value)}
-            placeholder="e.g. Italy, Japan, Thailand…"
+            placeholder="bv. Italië, Japan, Thailand…"
             className="mt-1.5"
             autoComplete="off"
           />
@@ -116,19 +103,19 @@ function NewTrip() {
         </div>
 
         <div>
-          <Label htmlFor="city">City</Label>
+          <Label htmlFor="city">Stad</Label>
           <Input
             id="city"
             value={city}
             onChange={(e) => setCity(e.target.value)}
-            placeholder="e.g. Tokyo"
+            placeholder="bv. Tokio"
             className="mt-1.5"
           />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <Label htmlFor="start">Departure date</Label>
+            <Label htmlFor="start">Vertrekdatum</Label>
             <Input
               id="start"
               type="date"
@@ -138,7 +125,7 @@ function NewTrip() {
             />
           </div>
           <div>
-            <Label htmlFor="end">Return date</Label>
+            <Label htmlFor="end">Terugkeerdatum</Label>
             <Input
               id="end"
               type="date"
@@ -150,30 +137,30 @@ function NewTrip() {
         </div>
 
         <div>
-          <Label htmlFor="trip-name">Trip name (optional)</Label>
+          <Label htmlFor="trip-name">Naam van de reis (optioneel)</Label>
           <Input
             id="trip-name"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g. Tokyo April 2026"
+            placeholder="bv. Japan april 2026"
             className="mt-1.5"
           />
         </div>
 
         <div>
-          <Label htmlFor="notes">Notes (optional)</Label>
+          <Label htmlFor="notes">Notities (optioneel)</Label>
           <Textarea
             id="notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
-            placeholder="Dietary notes, hotel, must-see spots…"
+            placeholder="Dieetwensen, hotel, must-see plekken…"
             className="mt-1.5"
           />
         </div>
 
-        <Button onClick={submit} disabled={saving} className="w-full">
-          {saving ? "Creating trip…" : "Create trip"}
+        <Button onClick={submit} disabled={saving} className="w-full" size="lg">
+          {saving ? "Reis aanmaken…" : "Reis aanmaken"}
         </Button>
       </div>
     </div>
