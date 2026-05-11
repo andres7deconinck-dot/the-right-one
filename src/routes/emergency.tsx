@@ -54,13 +54,26 @@ function EmergencyPage() {
             <div className="mt-8">
               <button onClick={() => setCountry(null)} className="text-sm text-muted-foreground hover:text-foreground">← Choose another country</button>
               <h2 className="mt-3 font-display text-2xl">{country.flag} {country.name}</h2>
+
+              {country.scriptNote && (
+                <div className="mt-4 flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4">
+                  <span className="text-lg leading-none mt-0.5">💡</span>
+                  <p className="text-sm text-amber-900 leading-relaxed">{country.scriptNote}</p>
+                </div>
+              )}
+
               <div className="mt-5 space-y-3">
                 {country.phrases.map((p, i) => (
                   <div key={i} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
                     <p className="text-xs font-semibold uppercase tracking-wider text-primary">{p.category}</p>
                     <p className="mt-2 text-sm text-muted-foreground">{p.english}</p>
-                    <p className="mt-2 font-display text-xl" lang={country.code}>{p.translation}</p>
-                    {p.phonetic && <p className="mt-1 text-sm italic text-muted-foreground">{p.phonetic}</p>}
+                    <p className="mt-2 font-display text-xl leading-relaxed" lang={country.code}>{p.translation}</p>
+                    {p.phonetic && (
+                      <div className="mt-2 flex items-baseline gap-2">
+                        <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Say it:</span>
+                        <p className="text-sm italic text-muted-foreground">{p.phonetic}</p>
+                      </div>
+                    )}
                     <div className="mt-3 flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => copy(p.translation)}><Copy className="mr-1.5 h-3.5 w-3.5" /> Copy</Button>
                       <Button variant="outline" size="sm" onClick={() => setFullscreen(p)}><Maximize2 className="mr-1.5 h-3.5 w-3.5" /> Show fullscreen</Button>
@@ -92,8 +105,13 @@ function EmergencyPage() {
           <div className="my-auto mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-destructive/10 px-4 py-2 text-sm font-semibold text-destructive">{fullscreen.category}</div>
             <p className="font-display text-3xl leading-relaxed text-foreground md:text-5xl">{fullscreen.translation}</p>
-            {fullscreen.phonetic && <p className="mt-4 text-lg italic text-muted-foreground">{fullscreen.phonetic}</p>}
-            <p className="mt-8 text-sm text-muted-foreground">Tap anywhere to close</p>
+            {fullscreen.phonetic && (
+              <div className="mt-5">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/50 mb-1">Pronunciation</p>
+                <p className="text-xl italic text-muted-foreground">{fullscreen.phonetic}</p>
+              </div>
+            )}
+            <p className="mt-10 text-sm text-muted-foreground">Tap anywhere to close</p>
           </div>
         </div>
       )}

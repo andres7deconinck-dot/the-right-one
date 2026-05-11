@@ -12,6 +12,7 @@ export type EmergencyCountry = {
   language: string;
   emergencyNumber: string;
   ambulance: string;
+  scriptNote?: string;
   phrases: Phrase[];
 };
 
@@ -36,6 +37,7 @@ export const EMERGENCY_COUNTRIES: EmergencyCountry[] = [
   {
     code: "jp", name: "Japan", flag: "🇯🇵", language: "Japanese",
     emergencyNumber: "119", ambulance: "119",
+    scriptNote: "Japanese is written in a mix of kanji and katakana (the script used for foreign words like グルテン gluten and アレルギー allergy). A Japanese person can read this card instantly — show it rather than trying to say it. If you do need to speak, use the romanized pronunciation guide shown beneath each phrase.",
     phrases: phrasesFor(
       "病院に今すぐ行く必要があります。",
       "私はセリアック病で、グルテンを食べてしまいました。",
@@ -49,6 +51,7 @@ export const EMERGENCY_COUNTRIES: EmergencyCountry[] = [
   {
     code: "th", name: "Thailand", flag: "🇹🇭", language: "Thai",
     emergencyNumber: "1669", ambulance: "1669",
+    scriptNote: "Thai uses its own alphabet, which most visitors cannot read aloud. Show the card directly to a Thai person. The romanized pronunciation guide beneath each phrase is there if you need to attempt it verbally.",
     phrases: phrasesFor(
       "ฉันต้องไปโรงพยาบาลทันที",
       "ฉันเป็นโรคเซลิแอคและฉันกินกลูเตนเข้าไป",
