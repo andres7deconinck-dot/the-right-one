@@ -23,6 +23,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CountriesSlugRouteImport } from './routes/countries.$slug'
+import { Route as CountriesIndexRouteImport } from './routes/countries.index'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as AppTripsRouteImport } from './routes/_app/trips'
 import { Route as AppTravelModeRouteImport } from './routes/_app/travel-mode'
@@ -106,6 +107,11 @@ const CountriesSlugRoute = CountriesSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => CountriesRoute,
 } as any)
+const CountriesIndexRoute = CountriesIndexRouteImport.update({
+  id: '/countries/',
+  path: '/',
+  getParentRoute: () => CountriesRoute,
+} as any)
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   id: '/checkout/success',
   path: '/checkout/success',
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/countries': typeof CountriesRouteWithChildren
+  '/countries/': typeof CountriesIndexRoute
   '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -209,6 +216,7 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/countries': typeof CountriesRouteWithChildren
+  '/countries/': typeof CountriesIndexRoute
   '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
   '/countries': typeof CountriesRouteWithChildren
+  '/countries/': typeof CountriesIndexRoute
   '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -269,6 +278,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/countries'
+    | '/countries/'
     | '/emergency'
     | '/pricing'
     | '/privacy'
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/countries'
+    | '/countries/'
     | '/emergency'
     | '/pricing'
     | '/privacy'
@@ -326,6 +337,7 @@ export interface FileRouteTypes {
     | '/blog'
     | '/contact'
     | '/countries'
+    | '/countries/'
     | '/emergency'
     | '/pricing'
     | '/privacy'
@@ -457,6 +469,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/countries/': {
+      id: '/countries/'
+      path: '/'
+      fullPath: '/countries/'
+      preLoaderRoute: typeof CountriesIndexRouteImport
+      parentRoute: typeof CountriesRoute
     }
     '/countries/$slug': {
       id: '/countries/$slug'
@@ -611,10 +630,12 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface CountriesRouteChildren {
   CountriesSlugRoute: typeof CountriesSlugRoute
+  CountriesIndexRoute: typeof CountriesIndexRoute
 }
 
 const CountriesRouteChildren: CountriesRouteChildren = {
   CountriesSlugRoute: CountriesSlugRoute,
+  CountriesIndexRoute: CountriesIndexRoute,
 }
 
 const CountriesRouteWithChildren = CountriesRoute._addFileChildren(
