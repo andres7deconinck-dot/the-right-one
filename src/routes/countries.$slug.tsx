@@ -3,7 +3,6 @@ import { Check, ChevronLeft, ExternalLink, Lightbulb, MapPin, Search, ShieldChec
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { COUNTRIES } from "@/data/countries";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
 
 export const Route = createFileRoute("/countries/$slug")({
   loader: ({ params }) => {
@@ -55,9 +54,7 @@ function CountryDetail() {
   const awareness = AWARENESS_META[c.awareness];
 
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
-
+    <div>
       {/* Hero */}
       <div className={`bg-gradient-to-br ${c.hero}`}>
         <div className="mx-auto max-w-5xl px-5 py-16">
@@ -197,7 +194,6 @@ function CountryDetail() {
         </div>
       </div>
 
-      <SiteFooter />
     </div>
   );
 }
