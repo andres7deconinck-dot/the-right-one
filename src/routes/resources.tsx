@@ -159,6 +159,69 @@ const QUICK_TIPS = [
   },
 ];
 
+const COUNTRY_RIGHTS = [
+  {
+    flag: "🇧🇪", country: "België",
+    benefit: "Belastingaftrek meerkosten GF-voeding als ziekte-uitgaven via FOD Financiën. Coeliakie België publiceert jaarlijks de forfaitaire bedragen.",
+    legal: "Allergeneninformatie verplicht in horeca (EU 1169/2011).",
+    link: { name: "Coeliakie België", url: "https://www.coeliakie.be" },
+  },
+  {
+    flag: "🇳🇱", country: "Nederland",
+    benefit: "Specifieke zorgkosten-aftrek (dieetkosten) via Belastingdienst, jaarlijks vast bedrag (~€900) bij officiële diagnose.",
+    legal: "Verplichte allergenenetikettering in restaurants (EU-wet).",
+    link: { name: "NCV Belastinginfo", url: "https://www.glutenvrij.nl/belasting" },
+  },
+  {
+    flag: "🇮🇹", country: "Italië",
+    benefit: "Maandelijkse staatsvergoeding (€56-140 afhankelijk van leeftijd/geslacht) via Servizio Sanitario Nazionale voor gecertificeerde GF-producten in apotheek.",
+    legal: "Coeliakie wettelijk erkend als sociale ziekte (Wet 123/2005). Schoolkantines & ziekenhuizen moeten GF-maaltijden aanbieden.",
+    link: { name: "AIC Italië", url: "https://www.celiachia.it" },
+  },
+  {
+    flag: "🇬🇧", country: "Verenigd Koninkrijk",
+    benefit: "GF-brood en mix op NHS-voorschrift (varieert per regio — Engeland beperkt, Schotland/Wales/NI ruimer).",
+    legal: "Allergenenwet (Natasha's Law 2021): álle voorverpakt eten in winkels moet alle ingrediënten tonen. Strenge horeca-verplichtingen.",
+    link: { name: "Coeliac UK", url: "https://www.coeliac.org.uk" },
+  },
+  {
+    flag: "🇩🇪", country: "Duitsland",
+    benefit: "Geen directe vergoeding, maar GF-meerkosten aftrekbaar als 'außergewöhnliche Belastungen' bij Finanzamt met dokterscertificaat.",
+    legal: "Schwerbehindertenausweis (gehandicaptenkaart, GdB 20) mogelijk bij coeliakie — geeft fiscale voordelen.",
+    link: { name: "DZG Duitsland", url: "https://www.dzg-online.de" },
+  },
+  {
+    flag: "🇫🇷", country: "Frankrijk",
+    benefit: "Gedeeltelijke terugbetaling GF-producten via Sécurité Sociale (~€33-46/maand) op voorschrift, alleen voor producten met ACS-code.",
+    legal: "Allergenen verplicht op restaurantmenu's (decreet 2015).",
+    link: { name: "AFDIAG Frankrijk", url: "https://www.afdiag.fr" },
+  },
+  {
+    flag: "🇪🇸", country: "Spanje",
+    benefit: "Geen nationale vergoeding, maar enkele autonome regio's (Navarra, Castilla-La Mancha, Extremadura) geven jaarlijkse subsidie €600-1500.",
+    legal: "Allergeneninformatie verplicht in horeca.",
+    link: { name: "FACE Spanje", url: "https://celiacos.org" },
+  },
+  {
+    flag: "🇺🇸", country: "Verenigde Staten",
+    benefit: "Meerkosten GF-voedsel aftrekbaar als 'medical expense' op IRS Form 1040 Schedule A (alleen het verschil met regulier eten, > 7,5% AGI).",
+    legal: "ADA (Americans with Disabilities Act): coeliakie erkend als handicap. Scholen/universiteiten/werkgevers moeten GF-accommodaties bieden. FDA-regel: 'gluten-free' = <20 ppm.",
+    link: { name: "Celiac Disease Foundation", url: "https://celiac.org/gluten-free-living/federal-benefits/tax-deduction-guide-for-gluten-free-diet" },
+  },
+  {
+    flag: "🇨🇦", country: "Canada",
+    benefit: "Meerkosten GF-voeding aftrekbaar als 'Medical Expense Tax Credit' (METC) op federale belastingaangifte met dokterscertificaat.",
+    legal: "Health Canada: 'gluten-free' label = <20 ppm. Federale allergenenwet verplicht.",
+    link: { name: "Canadian Celiac Association", url: "https://www.celiac.ca" },
+  },
+  {
+    flag: "🇦🇺", country: "Australië",
+    benefit: "Geen directe vergoeding, maar GF-meerkosten kunnen onder NDIS vallen bij ernstige bijkomende beperkingen.",
+    legal: "Strengste GF-norm ter wereld: <3 ppm voor 'gluten free' label (FSANZ). Allergenenwet verplicht.",
+    link: { name: "Coeliac Australia", url: "https://www.coeliac.org.au" },
+  },
+];
+
 const DID_YOU_KNOW = [
   { fact: "1 op 100 mensen heeft coeliakie, maar slechts 1 op 4 is officieel gediagnosticeerd.", source: "Beyond Celiac" },
   { fact: "Het glutenvrije markt was in 2023 wereldwijd meer dan €6 miljard waard, en groeit jaarlijks 9%.", source: "Statista" },
