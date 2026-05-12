@@ -338,6 +338,48 @@ function ResourcesPage() {
           </div>
         </section>
 
+        {/* Rechten per land */}
+        <section>
+          <div className="flex items-center gap-3 mb-8">
+            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-rose-100 text-rose-700"><Globe2 className="h-5 w-5" /></span>
+            <div>
+              <h2 className="font-display text-3xl">Rechten & vergoedingen per land</h2>
+              <p className="text-sm text-muted-foreground">Wat krijg je waar? Vergoedingen, fiscale aftrek en wettelijke bescherming wereldwijd</p>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {COUNTRY_RIGHTS.map((c) => (
+              <div key={c.country} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-3xl">{c.flag}</span>
+                  <h3 className="font-display text-xl">{c.country}</h3>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700 mb-1">💰 Financieel</p>
+                    <p className="text-sm text-foreground/80 leading-relaxed">{c.benefit}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-blue-700 mb-1">⚖️ Wettelijk</p>
+                    <p className="text-sm text-foreground/80 leading-relaxed">{c.legal}</p>
+                  </div>
+                </div>
+                <a
+                  href={c.link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                >
+                  {c.link.name} <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-xs text-muted-foreground italic">
+            ⚠️ Regelgeving verandert regelmatig. Bevestig altijd via de officiële bron of de coeliakie-vereniging van je land.
+          </p>
+        </section>
+
         {/* Handige websites */}
         <section>
           <div className="flex items-center gap-3 mb-8">
