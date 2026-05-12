@@ -25,7 +25,7 @@ import { COUNTRIES } from "@/data/countries";
 import { getLanguageInfo } from "@/data/languageInfo";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 
-export const Route = createFileRoute("/countries/$slug")({
+export const Route = createFileRoute("/countries_/$slug")({
   loader: ({ params }) => {
     const country = COUNTRIES.find((c) => c.slug === params.slug);
     if (!country) throw notFound();
