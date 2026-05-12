@@ -72,19 +72,14 @@ Bewijs dat helpt: een doktersattest of diagnosebrief van je arts (bij voorkeur i
     ],
   },
   {
-    title: "Belastingvoordeel op glutenvrije producten",
+    title: "Financiële tegemoetkoming wereldwijd",
     icon: CreditCard,
     color: "border-blue-200 bg-blue-50",
     badge: "Financieel",
     badgeColor: "bg-blue-100 text-blue-700",
-    content: `In België en Nederland kun je een deel van de meerkosten van glutenvrije producten recupereren via de belastingen, op voorwaarde dat je een officiële coeliakie-diagnose hebt.
-
-In België gaat dit via de FOD Financiën als buitengewone beroepskosten of ziekte-uitgaven, via de aangifte personenbelasting.
-
-In Nederland is er een specifieke zorgkosten-aftrek via de belastingaangifte. De NCV publiceert jaarlijks de geldende meerkosten-bedragen.`,
+    content: `Veel landen voorzien een financiële compensatie voor de meerkosten van glutenvrij eten — de regeling verschilt per land en je hebt overal een officiële diagnose nodig. Zie de tabel hieronder voor een overzicht per land.`,
     links: [
-      { name: "NCV: Belastinginfo", url: "https://www.glutenvrij.nl/belasting" },
-      { name: "FOD Financiën België", url: "https://financien.belgium.be" },
+      { name: "AOECS — overzicht per land", url: "https://aoecs.eu" },
     ],
   },
   {
