@@ -6,6 +6,9 @@ export const Route = createFileRoute("/privacy")({
     meta: [
       { title: "Privacy Policy — GlutenGo" },
       { name: "description", content: "How GlutenGo collects, uses and protects your data. GDPR-compliant." },
+      { property: "og:title", content: "Privacy Policy — GlutenGo" },
+      { property: "og:description", content: "How GlutenGo collects, uses and protects your data. GDPR-compliant, no ads, no data selling." },
+      { property: "og:url", content: "https://glutengo.app/privacy" },
     ],
   }),
   component: PrivacyPage,
