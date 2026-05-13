@@ -6,6 +6,9 @@ export const Route = createFileRoute("/terms")({
     meta: [
       { title: "Terms of Service — GlutenGo" },
       { name: "description", content: "The terms that govern your use of GlutenGo." },
+      { property: "og:title", content: "Terms of Service — GlutenGo" },
+      { property: "og:description", content: "The terms that govern your use of the GlutenGo gluten-free travel app." },
+      { property: "og:url", content: "https://glutengo.app/terms" },
     ],
   }),
   component: TermsPage,

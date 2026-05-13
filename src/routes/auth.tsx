@@ -10,7 +10,15 @@ import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — GlutenGo" }] }),
+  head: () => ({
+    meta: [
+      { title: "Sign in — GlutenGo" },
+      { name: "description", content: "Sign in or create your free GlutenGo account to save trips, generate celiac translation cards and access the AI travel assistant." },
+      { property: "og:title", content: "Sign in to GlutenGo" },
+      { property: "og:description", content: "Sign in or create your free GlutenGo account — save trips, generate translation cards and use the AI travel assistant." },
+      { property: "og:url", content: "https://glutengo.app/auth" },
+    ],
+  }),
   validateSearch: (s: Record<string, unknown>) => ({ redirect: typeof s.redirect === "string" ? s.redirect : undefined }),
   component: AuthPage,
 });

@@ -14,6 +14,9 @@ export const Route = createFileRoute("/contact")({
     meta: [
       { title: "Contact — GlutenGo" },
       { name: "description", content: "Get in touch with the GlutenGo team. We typically reply within 24 hours." },
+      { property: "og:title", content: "Contact GlutenGo — We Reply Within 24 Hours" },
+      { property: "og:description", content: "Questions, feedback, partnerships? Reach the GlutenGo team — most replies within 24 hours." },
+      { property: "og:url", content: "https://glutengo.app/contact" },
     ],
   }),
   component: ContactPage,

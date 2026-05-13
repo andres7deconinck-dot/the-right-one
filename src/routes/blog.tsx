@@ -5,8 +5,11 @@ import { Sparkles } from "lucide-react";
 export const Route = createFileRoute("/blog")({
   head: () => ({
     meta: [
-      { title: "Blog — GlutenGo" },
+      { title: "Blog — Celiac Travel Stories & Country Deep-Dives | GlutenGo" },
       { name: "description", content: "Travel stories, country deep-dives and tips for celiac travelers — coming soon." },
+      { property: "og:title", content: "GlutenGo Blog — Celiac Travel Stories & Country Deep-Dives" },
+      { property: "og:description", content: "Travel stories, country-by-country safety guides and reader tips for celiac travelers. Coming soon." },
+      { property: "og:url", content: "https://glutengo.app/blog" },
     ],
   }),
   component: BlogPage,
