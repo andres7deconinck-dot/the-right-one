@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell($env:PATH += \";C:\\\\Program Files\\\\Git\\\\cmd\"; Set-Location \"c:\\\\Users\\\\andre\\\\OneDrive\\\\Documenten\\\\GitHub\\\\gluten-free-wander\"; git add src/routes/countries.tsx src/routes/countries.index.tsx \"src/routes/countries.`$slug.tsx\"; git status)",
+      "PowerShell(cmd /c \"where git 2>&1\")",
+      "PowerShell(cmd /c \"dir C:\\\\\")",
+      "PowerShell(cmd /c \"dir \"\"C:\\\\Program Files\"\" | findstr /i git\")",
+      "PowerShell(cmd /c \"dir \"\"C:\\\\Users\\\\andre\\\\AppData\\\\Local\"\" | findstr /i git\")",
+      "PowerShell(cmd /c \"dir \"\"C:\\\\Users\\\\andre\\\\AppData\\\\Local\\\\GitHubDesktop\"\"\")",
+      "PowerShell(cmd /c \"dir \"\"C:\\\\Users\\\\andre\\\\AppData\\\\Local\\\\GitHubDesktop\\\\app-3.5.8\"\" | findstr /i git\")",
+      "PowerShell(Get-ChildItem \"C:\\\\Users\\\\andre\\\\Downloads\" | Where-Object { $_.Name -match \"favicon\" } | Sort-Object LastWriteTime -Descending | Select-Object Name, LastWriteTime, Length)",
+      "PowerShell(cmd /c \"dir C:\\\\Users\\\\andre\\\\Downloads /O-D /B\" 2>&1)",
+      "PowerShell(cmd /c \"dir C:\\\\Users\\\\andre\\\\Downloads\\\\favicon_io /B\")",
+      "PowerShell(cmd /c \"type C:\\\\Windows\\\\System32\\\\drivers\\\\etc\\\\hosts\")",
+      "PowerShell(cmd /c \"dir C:\\\\Users\\\\andre\\\\OneDrive\\\\Documenten\\\\GitHub\\\\gluten-free-wander\\\\public /B\")",
+      "PowerShell(cmd /c \"find /c /v \"\"\"\" \"\"C:\\\\Users\\\\andre\\\\OneDrive\\\\Documenten\\\\GitHub\\\\gluten-free-wander\\\\src\\\\lib\\\\translations.ts\"\"\")"
+    ]
+  }
+}
