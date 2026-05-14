@@ -66,8 +66,9 @@ function EmergencyPage() {
                 {country.phrases.map((p, i) => (
                   <div key={i} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
                     <p className="text-xs font-semibold uppercase tracking-wider text-primary">{p.category}</p>
-                    <p className="mt-2 text-sm text-muted-foreground">{p.english}</p>
-                    <p className="mt-2 font-display text-xl leading-relaxed" lang={country.code}>{p.translation}</p>
+                    <p className="mt-2 text-sm font-medium text-foreground">🇧🇪 {p.dutch}</p>
+                    <p className="mt-1 text-xs text-muted-foreground italic">🇬🇧 {p.english}</p>
+                    <p className="mt-3 font-display text-xl leading-relaxed" lang={country.code}>{p.translation}</p>
                     {p.phonetic && (
                       <div className="mt-2 flex items-baseline gap-2">
                         <span className="shrink-0 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Say it:</span>
@@ -104,6 +105,7 @@ function EmergencyPage() {
           <button className="ml-auto" aria-label="Close"><X className="h-6 w-6" /></button>
           <div className="my-auto mx-auto max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-destructive/10 px-4 py-2 text-sm font-semibold text-destructive">{fullscreen.category}</div>
+            <p className="text-base text-muted-foreground mb-4">{fullscreen.dutch}</p>
             <p className="font-display text-3xl leading-relaxed text-foreground md:text-5xl">{fullscreen.translation}</p>
             {fullscreen.phonetic && (
               <div className="mt-5">

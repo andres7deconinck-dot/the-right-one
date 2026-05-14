@@ -14,6 +14,84 @@ export type Database = {
   }
   public: {
     Tables: {
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          source?: string
+        }
+        Relationships: []
+      }
+      paddle_subscription_event_state: {
+        Row: {
+          created_at: string
+          environment: string
+          id: string
+          last_event_occurred_at: string
+          paddle_subscription_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          environment: string
+          id?: string
+          last_event_occurred_at: string
+          paddle_subscription_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          environment?: string
+          id?: string
+          last_event_occurred_at?: string
+          paddle_subscription_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      paddle_webhook_events: {
+        Row: {
+          created_at: string
+          environment: string
+          event_id: string
+          event_type: string
+          id: string
+          occurred_at: string
+          subscription_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          environment: string
+          event_id: string
+          event_type: string
+          id?: string
+          occurred_at?: string
+          subscription_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          environment?: string
+          event_id?: string
+          event_type?: string
+          id?: string
+          occurred_at?: string
+          subscription_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -208,6 +286,7 @@ export type Database = {
           start_date: string | null
           status: string
           title: string | null
+          travelers: number
           user_id: string
         }
         Insert: {
@@ -222,6 +301,7 @@ export type Database = {
           start_date?: string | null
           status?: string
           title?: string | null
+          travelers?: number
           user_id: string
         }
         Update: {
@@ -236,6 +316,7 @@ export type Database = {
           start_date?: string | null
           status?: string
           title?: string | null
+          travelers?: number
           user_id?: string
         }
         Relationships: []

@@ -72,19 +72,14 @@ Bewijs dat helpt: een doktersattest of diagnosebrief van je arts (bij voorkeur i
     ],
   },
   {
-    title: "Belastingvoordeel op glutenvrije producten",
+    title: "Financiële tegemoetkoming wereldwijd",
     icon: CreditCard,
     color: "border-blue-200 bg-blue-50",
     badge: "Financieel",
     badgeColor: "bg-blue-100 text-blue-700",
-    content: `In België en Nederland kun je een deel van de meerkosten van glutenvrije producten recupereren via de belastingen, op voorwaarde dat je een officiële coeliakie-diagnose hebt.
-
-In België gaat dit via de FOD Financiën als buitengewone beroepskosten of ziekte-uitgaven, via de aangifte personenbelasting.
-
-In Nederland is er een specifieke zorgkosten-aftrek via de belastingaangifte. De NCV publiceert jaarlijks de geldende meerkosten-bedragen.`,
+    content: `Veel landen voorzien een financiële compensatie voor de meerkosten van glutenvrij eten — de regeling verschilt per land en je hebt overal een officiële diagnose nodig. Zie de tabel hieronder voor een overzicht per land.`,
     links: [
-      { name: "NCV: Belastinginfo", url: "https://www.glutenvrij.nl/belasting" },
-      { name: "FOD Financiën België", url: "https://financien.belgium.be" },
+      { name: "AOECS — overzicht per land", url: "https://aoecs.eu" },
     ],
   },
   {
@@ -161,6 +156,69 @@ const QUICK_TIPS = [
     emoji: "📋",
     title: "Eetdagboek bijhouden op reis",
     text: "Noteer wat je gegeten hebt en waar. Bij een reactie kun je zo veel sneller achterhalen wat de oorzaak was, handig voor jezelf en voor je arts.",
+  },
+];
+
+const COUNTRY_RIGHTS = [
+  {
+    flag: "🇧🇪", country: "België",
+    benefit: "Belastingaftrek meerkosten GF-voeding als ziekte-uitgaven via FOD Financiën. Coeliakie België publiceert jaarlijks de forfaitaire bedragen.",
+    legal: "Allergeneninformatie verplicht in horeca (EU 1169/2011).",
+    link: { name: "Coeliakie België", url: "https://www.coeliakie.be" },
+  },
+  {
+    flag: "🇳🇱", country: "Nederland",
+    benefit: "Specifieke zorgkosten-aftrek (dieetkosten) via Belastingdienst, jaarlijks vast bedrag (~€900) bij officiële diagnose.",
+    legal: "Verplichte allergenenetikettering in restaurants (EU-wet).",
+    link: { name: "NCV Belastinginfo", url: "https://www.glutenvrij.nl/belasting" },
+  },
+  {
+    flag: "🇮🇹", country: "Italië",
+    benefit: "Maandelijkse staatsvergoeding (€56-140 afhankelijk van leeftijd/geslacht) via Servizio Sanitario Nazionale voor gecertificeerde GF-producten in apotheek.",
+    legal: "Coeliakie wettelijk erkend als sociale ziekte (Wet 123/2005). Schoolkantines & ziekenhuizen moeten GF-maaltijden aanbieden.",
+    link: { name: "AIC Italië", url: "https://www.celiachia.it" },
+  },
+  {
+    flag: "🇬🇧", country: "Verenigd Koninkrijk",
+    benefit: "GF-brood en mix op NHS-voorschrift (varieert per regio — Engeland beperkt, Schotland/Wales/NI ruimer).",
+    legal: "Allergenenwet (Natasha's Law 2021): álle voorverpakt eten in winkels moet alle ingrediënten tonen. Strenge horeca-verplichtingen.",
+    link: { name: "Coeliac UK", url: "https://www.coeliac.org.uk" },
+  },
+  {
+    flag: "🇩🇪", country: "Duitsland",
+    benefit: "Geen directe vergoeding, maar GF-meerkosten aftrekbaar als 'außergewöhnliche Belastungen' bij Finanzamt met dokterscertificaat.",
+    legal: "Schwerbehindertenausweis (gehandicaptenkaart, GdB 20) mogelijk bij coeliakie — geeft fiscale voordelen.",
+    link: { name: "DZG Duitsland", url: "https://www.dzg-online.de" },
+  },
+  {
+    flag: "🇫🇷", country: "Frankrijk",
+    benefit: "Gedeeltelijke terugbetaling GF-producten via Sécurité Sociale (~€33-46/maand) op voorschrift, alleen voor producten met ACS-code.",
+    legal: "Allergenen verplicht op restaurantmenu's (decreet 2015).",
+    link: { name: "AFDIAG Frankrijk", url: "https://www.afdiag.fr" },
+  },
+  {
+    flag: "🇪🇸", country: "Spanje",
+    benefit: "Geen nationale vergoeding, maar enkele autonome regio's (Navarra, Castilla-La Mancha, Extremadura) geven jaarlijkse subsidie €600-1500.",
+    legal: "Allergeneninformatie verplicht in horeca.",
+    link: { name: "FACE Spanje", url: "https://celiacos.org" },
+  },
+  {
+    flag: "🇺🇸", country: "Verenigde Staten",
+    benefit: "Meerkosten GF-voedsel aftrekbaar als 'medical expense' op IRS Form 1040 Schedule A (alleen het verschil met regulier eten, > 7,5% AGI).",
+    legal: "ADA (Americans with Disabilities Act): coeliakie erkend als handicap. Scholen/universiteiten/werkgevers moeten GF-accommodaties bieden. FDA-regel: 'gluten-free' = <20 ppm.",
+    link: { name: "Celiac Disease Foundation", url: "https://celiac.org/gluten-free-living/federal-benefits/tax-deduction-guide-for-gluten-free-diet" },
+  },
+  {
+    flag: "🇨🇦", country: "Canada",
+    benefit: "Meerkosten GF-voeding aftrekbaar als 'Medical Expense Tax Credit' (METC) op federale belastingaangifte met dokterscertificaat.",
+    legal: "Health Canada: 'gluten-free' label = <20 ppm. Federale allergenenwet verplicht.",
+    link: { name: "Canadian Celiac Association", url: "https://www.celiac.ca" },
+  },
+  {
+    flag: "🇦🇺", country: "Australië",
+    benefit: "Geen directe vergoeding, maar GF-meerkosten kunnen onder NDIS vallen bij ernstige bijkomende beperkingen.",
+    legal: "Strengste GF-norm ter wereld: <3 ppm voor 'gluten free' label (FSANZ). Allergenenwet verplicht.",
+    link: { name: "Coeliac Australia", url: "https://www.coeliac.org.au" },
   },
 ];
 
@@ -278,6 +336,48 @@ function ResourcesPage() {
               );
             })}
           </div>
+        </section>
+
+        {/* Rechten per land */}
+        <section>
+          <div className="flex items-center gap-3 mb-8">
+            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-rose-100 text-rose-700"><Globe2 className="h-5 w-5" /></span>
+            <div>
+              <h2 className="font-display text-3xl">Rechten & vergoedingen per land</h2>
+              <p className="text-sm text-muted-foreground">Wat krijg je waar? Vergoedingen, fiscale aftrek en wettelijke bescherming wereldwijd</p>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {COUNTRY_RIGHTS.map((c) => (
+              <div key={c.country} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-3xl">{c.flag}</span>
+                  <h3 className="font-display text-xl">{c.country}</h3>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700 mb-1">💰 Financieel</p>
+                    <p className="text-sm text-foreground/80 leading-relaxed">{c.benefit}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-blue-700 mb-1">⚖️ Wettelijk</p>
+                    <p className="text-sm text-foreground/80 leading-relaxed">{c.legal}</p>
+                  </div>
+                </div>
+                <a
+                  href={c.link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+                >
+                  {c.link.name} <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-xs text-muted-foreground italic">
+            ⚠️ Regelgeving verandert regelmatig. Bevestig altijd via de officiële bron of de coeliakie-vereniging van je land.
+          </p>
         </section>
 
         {/* Handige websites */}

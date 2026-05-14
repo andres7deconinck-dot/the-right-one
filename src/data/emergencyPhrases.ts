@@ -1,9 +1,19 @@
 export type Phrase = {
   category: string;
   english: string;
+  dutch: string;
   translation: string;
   phonetic?: string;
 };
+
+const DUTCH_PHRASES = [
+  "Ik moet onmiddellijk naar het ziekenhuis.",
+  "Ik heb coeliakie en heb gluten gegeten.",
+  "Ik moet een apotheek vinden.",
+  "Waar is het dichtstbijzijnde ziekenhuis?",
+  "Ik heb een allergische reactie. Ik heb hulp nodig.",
+  "Bel alstublieft een ambulance.",
+];
 
 export type EmergencyCountry = {
   code: string;
@@ -25,12 +35,12 @@ const phrasesFor = (
   ambulance: string,
   phon?: [string, string, string, string, string, string],
 ): Phrase[] => [
-  { category: "🚨 Medical Emergency", english: "I need a hospital immediately.", translation: medical, phonetic: phon?.[0] },
-  { category: "🌾 Celiac & Gluten", english: "I have celiac disease and I ate gluten.", translation: celiac, phonetic: phon?.[1] },
-  { category: "💊 Pharmacy", english: "I need to find a pharmacy.", translation: pharmacy, phonetic: phon?.[2] },
-  { category: "🏥 Directions", english: "Where is the nearest hospital?", translation: hospital, phonetic: phon?.[3] },
-  { category: "⚠️ Allergic Reaction", english: "I am having an allergic reaction. I need help.", translation: reaction, phonetic: phon?.[4] },
-  { category: "🚑 Call Ambulance", english: "Please call an ambulance.", translation: ambulance, phonetic: phon?.[5] },
+  { category: "🚨 Medical Emergency", english: "I need a hospital immediately.", dutch: DUTCH_PHRASES[0], translation: medical, phonetic: phon?.[0] },
+  { category: "🌾 Celiac & Gluten", english: "I have celiac disease and I ate gluten.", dutch: DUTCH_PHRASES[1], translation: celiac, phonetic: phon?.[1] },
+  { category: "💊 Pharmacy", english: "I need to find a pharmacy.", dutch: DUTCH_PHRASES[2], translation: pharmacy, phonetic: phon?.[2] },
+  { category: "🏥 Directions", english: "Where is the nearest hospital?", dutch: DUTCH_PHRASES[3], translation: hospital, phonetic: phon?.[3] },
+  { category: "⚠️ Allergic Reaction", english: "I am having an allergic reaction. I need help.", dutch: DUTCH_PHRASES[4], translation: reaction, phonetic: phon?.[4] },
+  { category: "🚑 Call Ambulance", english: "Please call an ambulance.", dutch: DUTCH_PHRASES[5], translation: ambulance, phonetic: phon?.[5] },
 ];
 
 export const EMERGENCY_COUNTRIES: EmergencyCountry[] = [

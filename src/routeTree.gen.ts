@@ -22,7 +22,7 @@ import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as CountriesSlugRouteImport } from './routes/countries.$slug'
+import { Route as CountriesSlugRouteImport } from './routes/countries_.$slug'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as AppTripsRouteImport } from './routes/_app/trips'
 import { Route as AppTravelModeRouteImport } from './routes/_app/travel-mode'
@@ -102,9 +102,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const CountriesSlugRoute = CountriesSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => CountriesRoute,
+  id: '/countries_/$slug',
+  path: '/countries/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   id: '/checkout/success',
@@ -180,7 +180,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
-  '/countries': typeof CountriesRouteWithChildren
+  '/countries': typeof CountriesRoute
   '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -208,7 +208,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
-  '/countries': typeof CountriesRouteWithChildren
+  '/countries': typeof CountriesRoute
   '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -238,7 +238,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/blog': typeof BlogRoute
   '/contact': typeof ContactRoute
-  '/countries': typeof CountriesRouteWithChildren
+  '/countries': typeof CountriesRoute
   '/emergency': typeof EmergencyRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -253,7 +253,7 @@ export interface FileRoutesById {
   '/_app/travel-mode': typeof AppTravelModeRoute
   '/_app/trips': typeof AppTripsRouteWithChildren
   '/checkout/success': typeof CheckoutSuccessRoute
-  '/countries/$slug': typeof CountriesSlugRoute
+  '/countries_/$slug': typeof CountriesSlugRoute
   '/_app/restaurants/$slug': typeof AppRestaurantsSlugRoute
   '/_app/trips/$id': typeof AppTripsIdRoute
   '/_app/trips/new': typeof AppTripsNewRoute
@@ -340,7 +340,7 @@ export interface FileRouteTypes {
     | '/_app/travel-mode'
     | '/_app/trips'
     | '/checkout/success'
-    | '/countries/$slug'
+    | '/countries_/$slug'
     | '/_app/restaurants/$slug'
     | '/_app/trips/$id'
     | '/_app/trips/new'
@@ -355,13 +355,14 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   BlogRoute: typeof BlogRoute
   ContactRoute: typeof ContactRoute
-  CountriesRoute: typeof CountriesRouteWithChildren
+  CountriesRoute: typeof CountriesRoute
   EmergencyRoute: typeof EmergencyRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ResourcesRoute: typeof ResourcesRoute
   TermsRoute: typeof TermsRoute
   CheckoutSuccessRoute: typeof CheckoutSuccessRoute
+  CountriesSlugRoute: typeof CountriesSlugRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
@@ -458,12 +459,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/countries/$slug': {
-      id: '/countries/$slug'
-      path: '/$slug'
+    '/countries_/$slug': {
+      id: '/countries_/$slug'
+      path: '/countries/$slug'
       fullPath: '/countries/$slug'
       preLoaderRoute: typeof CountriesSlugRouteImport
-      parentRoute: typeof CountriesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/checkout/success': {
       id: '/checkout/success'
@@ -609,18 +610,6 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
-interface CountriesRouteChildren {
-  CountriesSlugRoute: typeof CountriesSlugRoute
-}
-
-const CountriesRouteChildren: CountriesRouteChildren = {
-  CountriesSlugRoute: CountriesSlugRoute,
-}
-
-const CountriesRouteWithChildren = CountriesRoute._addFileChildren(
-  CountriesRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
@@ -629,25 +618,16 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   BlogRoute: BlogRoute,
   ContactRoute: ContactRoute,
-  CountriesRoute: CountriesRouteWithChildren,
+  CountriesRoute: CountriesRoute,
   EmergencyRoute: EmergencyRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ResourcesRoute: ResourcesRoute,
   TermsRoute: TermsRoute,
   CheckoutSuccessRoute: CheckoutSuccessRoute,
+  CountriesSlugRoute: CountriesSlugRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
