@@ -227,9 +227,9 @@ function ResourcesHighlight() {
   ];
 
   const facts = [
-    { number: "1 op 100", label: "mensen heeft coeliakie, maar slechts 1 op 4 is officieel gediagnosticeerd" },
-    { number: "30+", label: "landen waar GlutenGo noodformuleringen beschikbaar heeft, volledig offline" },
-    { number: "€6 mrd", label: "groot is de glutenvrije markt wereldwijd en groeit nog steeds jaarlijks" },
+    { number: "1 op 100", label: "mensen hebben coeliakie, maar slechts 1 op 4 is officieel gediagnosticeerd" },
+    { number: "30+", label: "landen waarvoor GlutenGo noodfrases beschikbaar heeft, ook zonder internet" },
+    { number: "€6 mrd", label: "waard is de wereldwijde glutenvrije markt, en groeit elk jaar verder" },
   ];
 
   return (
