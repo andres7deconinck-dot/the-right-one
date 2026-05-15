@@ -5,8 +5,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Hotel, BadgeCheck, Eye, Heart, ArrowLeft, UtensilsCrossed, Calendar } from "lucide-react";
-import { getPostBySlug, addComment } from "@/lib/blog.functions";
+import { MapPin, Hotel, BadgeCheck, Eye, Heart, ArrowLeft, UtensilsCrossed, Calendar, Pencil } from "lucide-react";
+import { getPostBySlug, addComment, checkIsAdmin } from "@/lib/blog.functions";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
@@ -21,11 +21,18 @@ function BlogDetailPage() {
   const qc = useQueryClient();
   const fetchPost = useServerFn(getPostBySlug);
   const postComment = useServerFn(addComment);
+  const getAdminStatus = useServerFn(checkIsAdmin);
   const [comment, setComment] = useState("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["blog-post", slug],
     queryFn: () => fetchPost({ data: { slug } }),
+  });
+
+  const { data: adminData } = useQuery({
+    queryKey: ["is-admin"],
+    queryFn: () => getAdminStatus({ data: undefined }),
+    enabled: !!user,
   });
 
   const commentMut = useMutation({
@@ -64,9 +71,19 @@ function BlogDetailPage() {
           </div>
         )}
         <article className="mx-auto max-w-3xl px-5 py-12">
-          <Link to="/blog" className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="h-4 w-4" /> Back to all stories
-          </Link>
+          <div className="mb-6 flex items-center justify-between">
+            <Link to="/blog" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="h-4 w-4" /> Back to all stories
+            </Link>
+            {user && (user.id === post.author_id || adminData?.isAdmin) && (
+              <Link to="/blog/edit/$slug" params={{ slug }}>
+                <Button variant="outline" size="sm" className="gap-1.5">
+                  <Pencil className="h-3.5 w-3.5" />
+                  {adminData?.isAdmin && user.id !== post.author_id ? "Admin edit" : "Edit article"}
+                </Button>
+              </Link>
+            )}
+          </div>
 
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
             {post.country_name && <span className="inline-flex items-center gap-1"><MapPin className="h-4 w-4" /> {post.country_name}{post.city ? `, ${post.city}` : ""}</span>}

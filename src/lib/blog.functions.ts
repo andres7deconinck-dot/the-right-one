@@ -144,6 +144,84 @@ export const createPost = createServerFn({ method: "POST" })
     return post;
   });
 
+// ===== AUTH: get post for editing (author or admin) =====
+export const getPostForEdit = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { slug: string }) => z.object({ slug: z.string().min(1).max(120) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const { data: roles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", userId);
+    const isAdmin = (roles ?? []).some((r) => r.role === "admin");
+
+    const { data: post, error } = await supabaseAdmin
+      .from("blog_posts").select("*").eq("slug", data.slug).maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!post) throw new Error("Post not found");
+    if (!isAdmin && post.author_id !== userId) throw new Response("Forbidden", { status: 403 });
+    return { post, isAdmin };
+  });
+
+// ===== AUTH: update post (author or admin) =====
+const UpdatePostInput = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(5).max(160),
+  excerpt: z.string().max(300).optional().nullable(),
+  content: z.string().min(50).max(20000),
+  cover_image_url: z.string().url().max(500).optional().nullable(),
+  country_code: z.string().min(2).max(8).optional().nullable(),
+  country_name: z.string().max(80).optional().nullable(),
+  city: z.string().max(80).optional().nullable(),
+  hotel_name: z.string().max(120).optional().nullable(),
+  restaurant_name: z.string().max(120).optional().nullable(),
+  tags: z.array(z.string().min(1).max(30)).max(8).default([]),
+  display_author: z.string().max(120).optional().nullable(),
+  status: z.enum(["draft", "pending", "published", "rejected"]).optional(),
+  is_featured: z.boolean().optional(),
+  verified_by_admin: z.boolean().optional(),
+});
+
+export const updatePost = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => UpdatePostInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const { data: roles } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", userId);
+    const isAdmin = (roles ?? []).some((r) => r.role === "admin");
+
+    const { data: existing } = await supabaseAdmin.from("blog_posts").select("author_id").eq("id", data.id).maybeSingle();
+    if (!existing) throw new Error("Post not found");
+    if (!isAdmin && existing.author_id !== userId) throw new Response("Forbidden", { status: 403 });
+
+    const patch: Record<string, any> = {
+      title: data.title,
+      excerpt: data.excerpt || data.content.slice(0, 200),
+      content: data.content,
+      cover_image_url: data.cover_image_url ?? null,
+      country_code: data.country_code ?? null,
+      country_name: data.country_name ?? null,
+      city: data.city ?? null,
+      hotel_name: data.hotel_name ?? null,
+      restaurant_name: data.restaurant_name ?? null,
+      tags: data.tags,
+      display_author: data.display_author ?? null,
+      reading_minutes: computeReadingMinutes(data.content),
+      updated_at: new Date().toISOString(),
+    };
+
+    if (isAdmin) {
+      if (data.status !== undefined) {
+        patch.status = data.status;
+        if (data.status === "published") patch.published_at = new Date().toISOString();
+      }
+      if (data.is_featured !== undefined) patch.is_featured = data.is_featured;
+      if (data.verified_by_admin !== undefined) patch.verified_by_admin = data.verified_by_admin;
+    }
+
+    const { data: updated, error } = await supabaseAdmin.from("blog_posts").update(patch).eq("id", data.id).select("id, slug").single();
+    if (error) throw new Error(error.message);
+    return updated;
+  });
+
 // ===== AUTH: list my posts =====
 export const listMyPosts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
