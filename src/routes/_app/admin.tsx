@@ -235,21 +235,15 @@ function MigrationButton({ userToken }: { userToken: any }) {
   const run = async () => {
     setStatus("running");
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) throw new Error("Not logged in");
-      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/run-migration`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Failed");
+      const { data, error } = await supabase.functions.invoke("run-migration");
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
       setStatus("done");
       toast.success("Migration completed! Refresh the page.");
     } catch (e: any) {
       setStatus("error");
-      setMsg(e.message);
-      toast.error(e.message);
+      setMsg(e.message ?? String(e));
+      toast.error(e.message ?? "Failed");
     }
   };
 
