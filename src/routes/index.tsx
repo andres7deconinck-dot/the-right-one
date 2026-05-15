@@ -187,6 +187,39 @@ function Landing() {
         </Accordion>
       </section>
 
+      {/* Reddit community */}
+      <section className="mx-auto max-w-5xl px-5 py-16">
+        <div className="relative overflow-hidden rounded-3xl border border-orange-200 bg-gradient-to-br from-orange-50 via-rose-50 to-amber-50 p-8 md:p-12">
+          <div className="relative flex flex-col items-center gap-6 text-center md:flex-row md:text-left">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-[#FF4500] shadow-lg">
+              <svg viewBox="0 0 20 20" className="h-11 w-11 fill-white" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 5.522 4.477 10 10 10s10-4.478 10-10zm-2.647-1.273a1.44 1.44 0 00-1.44 1.44c0 .19.038.372.105.537a8.252 8.252 0 01-4.787-1.576l.862-4.058 2.82.593a1.022 1.022 0 101.02-1.101 1.022 1.022 0 00-.969.7l-3.138-.66-.984 4.632a8.267 8.267 0 01-4.794 1.59 1.44 1.44 0 10.159 2.868c.188 0 .367-.037.532-.104.312 1.887 2.354 3.312 4.761 3.312 2.408 0 4.45-1.425 4.762-3.312.165.067.344.104.532.104a1.44 1.44 0 000-2.88 1.44 1.44 0 00-1.441 1.44c0 .003 0 .006.001.01-.313.957-1.586 1.662-3.094 1.662-1.508 0-2.781-.705-3.093-1.663l.001-.01a1.44 1.44 0 00-1.44-1.44 1.44 1.44 0 00-.159 2.869 8.267 8.267 0 004.794 1.59 8.252 8.252 0 004.787-1.576 1.44 1.44 0 001.44-1.44z"/>
+              </svg>
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-orange-600">Community</p>
+              <h2 className="mt-1 font-display text-3xl md:text-4xl">Join us on Reddit</h2>
+              <p className="mt-2 max-w-lg text-muted-foreground">
+                Share your gluten-free travel experiences, ask questions and connect with fellow celiac travelers in the <span className="font-medium text-foreground">r/GlutenGo</span> community.
+              </p>
+            </div>
+            <a
+              href="https://www.reddit.com/r/GlutenGo/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0"
+            >
+              <Button size="lg" className="rounded-full bg-[#FF4500] px-8 text-white hover:bg-[#e03d00]">
+                r/GlutenGo
+                <svg viewBox="0 0 20 20" className="ml-2 h-4 w-4 fill-white" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M20 10c0-5.523-4.477-10-10-10S0 4.477 0 10c0 5.522 4.477 10 10 10s10-4.478 10-10zm-2.647-1.273a1.44 1.44 0 00-1.44 1.44c0 .19.038.372.105.537a8.252 8.252 0 01-4.787-1.576l.862-4.058 2.82.593a1.022 1.022 0 101.02-1.101 1.022 1.022 0 00-.969.7l-3.138-.66-.984 4.632a8.267 8.267 0 01-4.794 1.59 1.44 1.44 0 10.159 2.868c.188 0 .367-.037.532-.104.312 1.887 2.354 3.312 4.761 3.312 2.408 0 4.45-1.425 4.762-3.312.165.067.344.104.532.104a1.44 1.44 0 000-2.88 1.44 1.44 0 00-1.441 1.44c0 .003 0 .006.001.01-.313.957-1.586 1.662-3.094 1.662-1.508 0-2.781-.705-3.093-1.663l.001-.01a1.44 1.44 0 00-1.44-1.44 1.44 1.44 0 00-.159 2.869 8.267 8.267 0 004.794 1.59 8.252 8.252 0 004.787-1.576 1.44 1.44 0 001.44-1.44z"/>
+                </svg>
+              </Button>
+            </a>
+          </div>
+        </div>
+      </section>
+
       <SiteFooter />
     </div>
   );
