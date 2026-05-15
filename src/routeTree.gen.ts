@@ -24,6 +24,8 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CountriesSlugRouteImport } from './routes/countries_.$slug'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
+import { Route as BlogNewRouteImport } from './routes/blog.new'
+import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AppTripsRouteImport } from './routes/_app/trips'
 import { Route as AppTravelModeRouteImport } from './routes/_app/travel-mode'
 import { Route as AppRestaurantsRouteImport } from './routes/_app/restaurants'
@@ -111,6 +113,16 @@ const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
   path: '/checkout/success',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogNewRoute = BlogNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => BlogRoute,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BlogRoute,
+} as any)
 const AppTripsRoute = AppTripsRouteImport.update({
   id: '/trips',
   path: '/trips',
@@ -178,7 +190,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/countries': typeof CountriesRoute
   '/emergency': typeof EmergencyRoute
@@ -194,6 +206,8 @@ export interface FileRoutesByFullPath {
   '/restaurants': typeof AppRestaurantsRouteWithChildren
   '/travel-mode': typeof AppTravelModeRoute
   '/trips': typeof AppTripsRouteWithChildren
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/new': typeof BlogNewRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
   '/restaurants/$slug': typeof AppRestaurantsSlugRoute
@@ -206,7 +220,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/countries': typeof CountriesRoute
   '/emergency': typeof EmergencyRoute
@@ -222,6 +236,8 @@ export interface FileRoutesByTo {
   '/restaurants': typeof AppRestaurantsRouteWithChildren
   '/travel-mode': typeof AppTravelModeRoute
   '/trips': typeof AppTripsRouteWithChildren
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/new': typeof BlogNewRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
   '/restaurants/$slug': typeof AppRestaurantsSlugRoute
@@ -236,7 +252,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/countries': typeof CountriesRoute
   '/emergency': typeof EmergencyRoute
@@ -252,6 +268,8 @@ export interface FileRoutesById {
   '/_app/restaurants': typeof AppRestaurantsRouteWithChildren
   '/_app/travel-mode': typeof AppTravelModeRoute
   '/_app/trips': typeof AppTripsRouteWithChildren
+  '/blog/$slug': typeof BlogSlugRoute
+  '/blog/new': typeof BlogNewRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries_/$slug': typeof CountriesSlugRoute
   '/_app/restaurants/$slug': typeof AppRestaurantsSlugRoute
@@ -282,6 +300,8 @@ export interface FileRouteTypes {
     | '/restaurants'
     | '/travel-mode'
     | '/trips'
+    | '/blog/$slug'
+    | '/blog/new'
     | '/checkout/success'
     | '/countries/$slug'
     | '/restaurants/$slug'
@@ -310,6 +330,8 @@ export interface FileRouteTypes {
     | '/restaurants'
     | '/travel-mode'
     | '/trips'
+    | '/blog/$slug'
+    | '/blog/new'
     | '/checkout/success'
     | '/countries/$slug'
     | '/restaurants/$slug'
@@ -339,6 +361,8 @@ export interface FileRouteTypes {
     | '/_app/restaurants'
     | '/_app/travel-mode'
     | '/_app/trips'
+    | '/blog/$slug'
+    | '/blog/new'
     | '/checkout/success'
     | '/countries_/$slug'
     | '/_app/restaurants/$slug'
@@ -353,7 +377,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AssistantRoute: typeof AssistantRoute
   AuthRoute: typeof AuthRoute
-  BlogRoute: typeof BlogRoute
+  BlogRoute: typeof BlogRouteWithChildren
   ContactRoute: typeof ContactRoute
   CountriesRoute: typeof CountriesRoute
   EmergencyRoute: typeof EmergencyRoute
@@ -472,6 +496,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/checkout/success'
       preLoaderRoute: typeof CheckoutSuccessRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/blog/new': {
+      id: '/blog/new'
+      path: '/new'
+      fullPath: '/blog/new'
+      preLoaderRoute: typeof BlogNewRouteImport
+      parentRoute: typeof BlogRoute
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/_app/trips': {
       id: '/_app/trips'
@@ -610,13 +648,25 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface BlogRouteChildren {
+  BlogSlugRoute: typeof BlogSlugRoute
+  BlogNewRoute: typeof BlogNewRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogSlugRoute: BlogSlugRoute,
+  BlogNewRoute: BlogNewRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AboutRoute: AboutRoute,
   AssistantRoute: AssistantRoute,
   AuthRoute: AuthRoute,
-  BlogRoute: BlogRoute,
+  BlogRoute: BlogRouteWithChildren,
   ContactRoute: ContactRoute,
   CountriesRoute: CountriesRoute,
   EmergencyRoute: EmergencyRoute,
