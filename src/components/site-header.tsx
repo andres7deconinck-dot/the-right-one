@@ -1,10 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Wheat, Menu, X, ChevronDown, CreditCard, Sparkles, Smartphone, Plane, AlertCircle } from "lucide-react";
+import { Wheat, Menu, X, ChevronDown, CreditCard, Sparkles, Smartphone, Plane, AlertCircle, Shield } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { useLanguage } from "@/lib/i18n";
 import type { LangCode } from "@/lib/translations";
+import { checkIsAdmin } from "@/lib/blog.functions";
 
 const SITE_LANGUAGES = [
   { code: "en", flag: "🇬🇧", name: "English" },
@@ -85,11 +88,21 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
 
+  const checkAdmin = useServerFn(checkIsAdmin);
+  const { data: adminMeta } = useQuery({
+    queryKey: ["check-admin-nav", user?.id],
+    queryFn: () => checkAdmin({}),
+    enabled: !!user,
+    staleTime: 60_000,
+  });
+
   const mainLinks = [
     { to: "/restaurants", label: t.nav.restaurants },
     { to: "/ingredient-analyzer", label: t.nav.ingredientAnalyzer },
     { to: "/countries", label: t.nav.countries },
+    { to: "/blog", label: "Blog" },
     { to: "/pricing", label: t.nav.pricing },
+    ...(adminMeta?.isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
   ];
 
   const toolLinks = TOOL_META.map((meta, i) => ({
