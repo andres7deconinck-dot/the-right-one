@@ -147,7 +147,7 @@ function PostCard({ post, author, featured }: { post: any; author?: any; feature
             {author?.avatar_url ? (
               <img src={author.avatar_url} alt="" className="h-6 w-6 rounded-full" />
             ) : (
-              <div className="grid h-6 w-6 place-items-center rounded-full bg-primary/10 text-xs">{(author?.full_name || "?").slice(0, 1)}</div>
+              <div className="grid h-6 w-6 place-items-center rounded-full bg-primary/10"><PenLine className="h-3 w-3 text-primary" /></div>
             )}
             <span>{author?.full_name || "Anonymous"}</span>
             {author?.verified && <BadgeCheck className="h-3.5 w-3.5 text-primary" />}
