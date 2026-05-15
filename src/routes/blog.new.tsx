@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Image as ImageIcon, Upload } from "lucide-react";
-import { createPost } from "@/lib/blog.functions";
+import { createPost, updateMyProfile } from "@/lib/blog.functions";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { COUNTRIES } from "@/data/countries";
@@ -21,6 +21,7 @@ function NewPostPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const submit = useServerFn(createPost);
+  const updateProfile = useServerFn(updateMyProfile);
 
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
@@ -31,15 +32,22 @@ function NewPostPage() {
   const [restaurant, setRestaurant] = useState("");
   const [tags, setTags] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
-  const [displayAuthor, setDisplayAuthor] = useState("");
+  const [publishedAs, setPublishedAs] = useState("");
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth", search: { redirect: "/blog/new" } as any });
   }, [user, loading, navigate]);
 
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("full_name").eq("id", user.id).single()
+      .then(({ data }) => { if (data?.full_name) setPublishedAs(data.full_name); });
+  }, [user]);
+
   const mut = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
+      await updateProfile({ data: { full_name: publishedAs.trim() } });
       const country = COUNTRIES.find((c) => c.slug === countryCode);
       return submit({
         data: {
@@ -53,7 +61,6 @@ function NewPostPage() {
           hotel_name: hotel || null,
           restaurant_name: restaurant || null,
           tags: tags.split(",").map((t) => t.trim()).filter(Boolean).slice(0, 8),
-          display_author: displayAuthor.trim() || null,
         },
       });
     },
@@ -97,6 +104,12 @@ function NewPostPage() {
         </p>
 
         <div className="mt-8 space-y-5">
+          <div>
+            <Label>Published as *</Label>
+            <Input value={publishedAs} onChange={(e) => setPublishedAs(e.target.value)} placeholder="Your name or brand" maxLength={120} />
+            <p className="mt-1 text-xs text-muted-foreground">This is the author name shown on the article. It also updates your profile name.</p>
+          </div>
+
           <div>
             <Label>Title *</Label>
             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="My week eating gluten-free in Rome" maxLength={160} />
@@ -158,16 +171,10 @@ function NewPostPage() {
             <Input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="rome, pizza, family-friendly" />
           </div>
 
-          <div>
-            <Label>Published by (optional)</Label>
-            <Input value={displayAuthor} onChange={(e) => setDisplayAuthor(e.target.value)} placeholder="e.g. Aqua Fantasy Hotel · GlutenGo Editorial" maxLength={120} />
-            <p className="mt-1 text-xs text-muted-foreground">Leave empty to show your profile name. Fill in to show a hotel or brand name instead.</p>
-          </div>
-
           <div className="flex items-center justify-end gap-2 pt-2">
             <Button variant="outline" onClick={() => navigate({ to: "/blog" })}>Cancel</Button>
             <Button
-              disabled={title.length < 5 || content.length < 50 || mut.isPending}
+              disabled={title.length < 5 || content.length < 50 || !publishedAs.trim() || mut.isPending}
               onClick={() => mut.mutate()}
             >
               {mut.isPending ? "Submitting…" : "Submit article"}

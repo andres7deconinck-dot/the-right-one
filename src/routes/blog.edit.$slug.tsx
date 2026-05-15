@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Image as ImageIcon, Upload } from "lucide-react";
-import { getPostForEdit, updatePost } from "@/lib/blog.functions";
+import { getPostForEdit, updatePost, updateMyProfile } from "@/lib/blog.functions";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { COUNTRIES } from "@/data/countries";
@@ -24,6 +24,7 @@ function EditPostPage() {
   const navigate = useNavigate();
   const fetchForEdit = useServerFn(getPostForEdit);
   const submitUpdate = useServerFn(updatePost);
+  const updateProfile = useServerFn(updateMyProfile);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["blog-edit", slug],
@@ -34,6 +35,7 @@ function EditPostPage() {
 
   const post = data?.post;
   const isAdmin = data?.isAdmin ?? false;
+  const isAuthor = !!user && !!post && user.id === post.author_id;
 
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
@@ -44,7 +46,7 @@ function EditPostPage() {
   const [restaurant, setRestaurant] = useState("");
   const [tags, setTags] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
-  const [displayAuthor, setDisplayAuthor] = useState("");
+  const [publishedAs, setPublishedAs] = useState("");
   const [status, setStatus] = useState("published");
   const [isFeatured, setIsFeatured] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -64,14 +66,17 @@ function EditPostPage() {
       setRestaurant(post.restaurant_name ?? "");
       setTags((post.tags ?? []).join(", "));
       setCoverUrl(post.cover_image_url ?? "");
-      setDisplayAuthor(post.display_author ?? "");
       setStatus(post.status ?? "published");
       setIsFeatured(post.is_featured ?? false);
     }
-  }, [post]);
+    if (data?.authorName) setPublishedAs(data.authorName);
+  }, [post, data]);
 
   const mut = useMutation({
-    mutationFn: () => {
+    mutationFn: async () => {
+      if (isAuthor && publishedAs.trim()) {
+        await updateProfile({ data: { full_name: publishedAs.trim() } });
+      }
       const country = COUNTRIES.find((c) => c.slug === countryCode);
       return submitUpdate({
         data: {
@@ -86,7 +91,6 @@ function EditPostPage() {
           hotel_name: hotel || null,
           restaurant_name: restaurant || null,
           tags: tags.split(",").map((t) => t.trim()).filter(Boolean).slice(0, 8),
-          display_author: displayAuthor.trim() || null,
           ...(isAdmin ? { status: status as any, is_featured: isFeatured } : {}),
         },
       });
@@ -142,6 +146,14 @@ function EditPostPage() {
       <p className="mt-2 text-muted-foreground">Changes are saved immediately and visible on the article page.</p>
 
       <div className="mt-8 space-y-5">
+        {isAuthor && (
+          <div>
+            <Label>Published as *</Label>
+            <Input value={publishedAs} onChange={(e) => setPublishedAs(e.target.value)} placeholder="Your name or brand" maxLength={120} />
+            <p className="mt-1 text-xs text-muted-foreground">The author name shown on this article. Also updates your profile name.</p>
+          </div>
+        )}
+
         <div>
           <Label>Title *</Label>
           <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="My week eating gluten-free in Rome" maxLength={160} />
@@ -202,12 +214,6 @@ function EditPostPage() {
         <div>
           <Label>Tags (comma separated, max 8)</Label>
           <Input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="turkey, hotel, family-friendly" />
-        </div>
-
-        <div>
-          <Label>Published by (optional)</Label>
-          <Input value={displayAuthor} onChange={(e) => setDisplayAuthor(e.target.value)} placeholder="e.g. Aqua Fantasy Aquapark Hotel & Spa" maxLength={120} />
-          <p className="mt-1 text-xs text-muted-foreground">Leave empty to show your profile name.</p>
         </div>
 
         {isAdmin && (

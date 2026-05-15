@@ -100,7 +100,6 @@ const PostInput = z.object({
   hotel_name: z.string().max(120).optional().nullable(),
   restaurant_name: z.string().max(120).optional().nullable(),
   tags: z.array(z.string().min(1).max(30)).max(8).default([]),
-  display_author: z.string().max(120).optional().nullable(),
 });
 
 export const createPost = createServerFn({ method: "POST" })
@@ -132,7 +131,6 @@ export const createPost = createServerFn({ method: "POST" })
         city: data.city ?? null,
         hotel_name: data.hotel_name ?? null,
         restaurant_name: data.restaurant_name ?? null,
-        ...(data.display_author ? { display_author: data.display_author } : {}),
         tags: data.tags,
         status,
         published_at: status === "published" ? new Date().toISOString() : null,
@@ -158,7 +156,11 @@ export const getPostForEdit = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     if (!post) throw new Error("Post not found");
     if (!isAdmin && post.author_id !== userId) throw new Response("Forbidden", { status: 403 });
-    return { post, isAdmin };
+
+    const { data: authorProfile } = await supabaseAdmin
+      .from("profiles").select("full_name").eq("id", post.author_id).maybeSingle();
+
+    return { post, isAdmin, authorName: authorProfile?.full_name ?? "" };
   });
 
 // ===== AUTH: update post (author or admin) =====
@@ -174,7 +176,6 @@ const UpdatePostInput = z.object({
   hotel_name: z.string().max(120).optional().nullable(),
   restaurant_name: z.string().max(120).optional().nullable(),
   tags: z.array(z.string().min(1).max(30)).max(8).default([]),
-  display_author: z.string().max(120).optional().nullable(),
   status: z.enum(["draft", "pending", "published", "rejected"]).optional(),
   is_featured: z.boolean().optional(),
   verified_by_admin: z.boolean().optional(),
@@ -203,7 +204,6 @@ export const updatePost = createServerFn({ method: "POST" })
       hotel_name: data.hotel_name ?? null,
       restaurant_name: data.restaurant_name ?? null,
       tags: data.tags,
-      ...(data.display_author ? { display_author: data.display_author } : {}),
       reading_minutes: computeReadingMinutes(data.content),
       updated_at: new Date().toISOString(),
     };
@@ -248,6 +248,19 @@ export const addComment = createServerFn({ method: "POST" })
       author_id: context.userId,
       body: data.body,
     });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// ===== AUTH: update own profile name =====
+export const updateMyProfile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ full_name: z.string().min(1).max(120) }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await supabaseAdmin
+      .from("profiles")
+      .update({ full_name: data.full_name })
+      .eq("id", context.userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
