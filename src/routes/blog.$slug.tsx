@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Hotel, BadgeCheck, Eye, Heart, ArrowLeft, UtensilsCrossed, Calendar, Pencil } from "lucide-react";
+import { MapPin, Hotel, BadgeCheck, Eye, Heart, ArrowLeft, UtensilsCrossed, Calendar, Pencil, PenLine } from "lucide-react";
 import { getPostBySlug, addComment, checkIsAdmin } from "@/lib/blog.functions";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -97,11 +97,7 @@ function BlogDetailPage() {
           {/* Author + meta */}
           <div className="mt-6 flex flex-wrap items-center gap-4 border-y border-border py-4">
             <div className="flex items-center gap-3">
-              {author?.avatar_url ? (
-                <img src={author.avatar_url} className="h-10 w-10 rounded-full" alt="" />
-              ) : (
-                <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10">{(author?.full_name || "?").slice(0, 1)}</div>
-              )}
+              <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10"><PenLine className="h-5 w-5 text-primary" /></div>
               <div>
                 <div className="flex items-center gap-1 text-sm font-medium">
                   {author?.full_name || "Anonymous"}
