@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,24 +39,16 @@ function BlogDetailPage() {
   });
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen flex-col bg-background">
-        <SiteHeader /><main className="flex-1 px-5 py-20 text-center text-muted-foreground">Loading…</main><SiteFooter />
-      </div>
-    );
+    return <main className="flex-1 px-5 py-20 text-center text-muted-foreground">Loading…</main>;
   }
 
   if (!data?.post) {
     return (
-      <div className="flex min-h-screen flex-col bg-background">
-        <SiteHeader />
-        <main className="mx-auto max-w-2xl flex-1 px-5 py-20 text-center">
-          <h1 className="font-display text-4xl">Article not found</h1>
-          <p className="mt-3 text-muted-foreground">It may have been removed or unpublished.</p>
-          <Link to="/blog" className="mt-6 inline-block"><Button variant="outline">Back to blog</Button></Link>
-        </main>
-        <SiteFooter />
-      </div>
+      <main className="mx-auto max-w-2xl flex-1 px-5 py-20 text-center">
+        <h1 className="font-display text-4xl">Article not found</h1>
+        <p className="mt-3 text-muted-foreground">It may have been removed or unpublished.</p>
+        <Link to="/blog" className="mt-6 inline-block"><Button variant="outline">Back to blog</Button></Link>
+      </main>
     );
   }
 
@@ -66,9 +57,7 @@ function BlogDetailPage() {
   const comments = data.comments ?? [];
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <SiteHeader />
-      <main className="flex-1">
+    <main className="flex-1">
         {post.cover_image_url && (
           <div className="h-72 w-full overflow-hidden md:h-96">
             <img src={post.cover_image_url} alt={post.title} className="h-full w-full object-cover" />
@@ -174,8 +163,6 @@ function BlogDetailPage() {
             </ul>
           </section>
         </article>
-      </main>
-      <SiteFooter />
-    </div>
+    </main>
   );
 }

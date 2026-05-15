@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -89,9 +88,7 @@ function NewPostPage() {
   if (!user) return null;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <SiteHeader />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-12">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-12">
         <h1 className="font-display text-4xl">Write a travel story</h1>
         <p className="mt-2 text-muted-foreground">
           Share your gluten-free travel experience. Our team reviews each story before publishing — verified contributors are auto-approved.
@@ -169,8 +166,6 @@ function NewPostPage() {
             </Button>
           </div>
         </div>
-      </main>
-      <SiteFooter />
-    </div>
+    </main>
   );
 }

@@ -26,6 +26,7 @@ import { Route as CountriesSlugRouteImport } from './routes/countries_.$slug'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as BlogNewRouteImport } from './routes/blog.new'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AppTripsRouteImport } from './routes/_app/trips'
 import { Route as AppTravelModeRouteImport } from './routes/_app/travel-mode'
 import { Route as AppRestaurantsRouteImport } from './routes/_app/restaurants'
@@ -116,6 +117,11 @@ const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
 const BlogNewRoute = BlogNewRouteImport.update({
   id: '/new',
   path: '/new',
+  getParentRoute: () => BlogRoute,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/',
   getParentRoute: () => BlogRoute,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
@@ -651,11 +657,13 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 interface BlogRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
   BlogNewRoute: typeof BlogNewRoute
+  BlogIndexRoute: typeof BlogIndexRoute
 }
 
 const BlogRouteChildren: BlogRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
   BlogNewRoute: BlogNewRoute,
+  BlogIndexRoute: BlogIndexRoute,
 }
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
