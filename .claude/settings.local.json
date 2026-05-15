@@ -13,7 +13,8 @@
       "PowerShell(cmd /c \"dir C:\\\\Users\\\\andre\\\\Downloads\\\\favicon_io /B\")",
       "PowerShell(cmd /c \"type C:\\\\Windows\\\\System32\\\\drivers\\\\etc\\\\hosts\")",
       "PowerShell(cmd /c \"dir C:\\\\Users\\\\andre\\\\OneDrive\\\\Documenten\\\\GitHub\\\\gluten-free-wander\\\\public /B\")",
-      "PowerShell(cmd /c \"find /c /v \"\"\"\" \"\"C:\\\\Users\\\\andre\\\\OneDrive\\\\Documenten\\\\GitHub\\\\gluten-free-wander\\\\src\\\\lib\\\\translations.ts\"\"\")"
+      "PowerShell(cmd /c \"find /c /v \"\"\"\" \"\"C:\\\\Users\\\\andre\\\\OneDrive\\\\Documenten\\\\GitHub\\\\gluten-free-wander\\\\src\\\\lib\\\\translations.ts\"\"\")",
+      "PowerShell(npx supabase --version 2>&1)"
     ]
   }
 }

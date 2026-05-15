@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Shield, FileText, Users, Mail, Trash2, Eye, BadgeCheck, Star, Check, X } from "lucide-react";
+import { Shield, FileText, Users, Mail, Trash2, Eye, BadgeCheck, Star, Check, X, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,6 +48,9 @@ function AdminPage() {
         <h1 className="font-display text-3xl">Admin</h1>
       </div>
       <p className="mt-1 text-muted-foreground">Manage articles, users and subscribers.</p>
+
+      {/* Migration button */}
+      <MigrationButton userToken={user} />
 
       {/* Tabs */}
       <div className="mt-6 flex gap-1 border-b border-border">
@@ -221,6 +224,50 @@ function SubscribersTab() {
           <span className="text-xs text-muted-foreground">{new Date(s.created_at).toLocaleDateString()}</span>
         </div>
       ))}
+    </div>
+  );
+}
+
+function MigrationButton({ userToken }: { userToken: any }) {
+  const [status, setStatus] = useState<"idle" | "running" | "done" | "error">("idle");
+  const [msg, setMsg] = useState("");
+
+  const run = async () => {
+    setStatus("running");
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error("Not logged in");
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/run-migration`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed");
+      setStatus("done");
+      toast.success("Migration completed! Refresh the page.");
+    } catch (e: any) {
+      setStatus("error");
+      setMsg(e.message);
+      toast.error(e.message);
+    }
+  };
+
+  if (status === "done") return null;
+
+  return (
+    <div className="mt-4 flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4">
+      <Database className="h-5 w-5 shrink-0 text-amber-600" />
+      <div className="flex-1">
+        <p className="text-sm font-medium text-amber-800">Pending database migration</p>
+        <p className="text-xs text-amber-700">
+          Adds the <code className="rounded bg-amber-100 px-1">display_author</code> column and updates the Aqua Fantasy article.
+        </p>
+        {status === "error" && <p className="mt-1 text-xs text-rose-600">{msg}</p>}
+      </div>
+      <Button size="sm" onClick={run} disabled={status === "running"} className="bg-amber-600 hover:bg-amber-700 text-white">
+        {status === "running" ? "Running…" : "Run migration"}
+      </Button>
     </div>
   );
 }
