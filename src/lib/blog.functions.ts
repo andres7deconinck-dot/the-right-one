@@ -203,7 +203,7 @@ export const updatePost = createServerFn({ method: "POST" })
       hotel_name: data.hotel_name ?? null,
       restaurant_name: data.restaurant_name ?? null,
       tags: data.tags,
-      ...(data.display_author !== undefined ? { display_author: data.display_author ?? null } : {}),
+      ...(data.display_author ? { display_author: data.display_author } : {}),
       reading_minutes: computeReadingMinutes(data.content),
       updated_at: new Date().toISOString(),
     };
