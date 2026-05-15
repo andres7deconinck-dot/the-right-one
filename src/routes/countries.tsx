@@ -63,7 +63,7 @@ function CountriesPage() {
           {featured.map((c) => (
             <Link
               key={c.slug}
-              to="/countries/$slug"
+              to="/countries_/$slug"
               params={{ slug: c.slug }}
               className="group relative overflow-hidden rounded-3xl border border-border bg-card shadow-soft transition hover:-translate-y-1 hover:shadow-glow"
             >
@@ -132,7 +132,7 @@ function CountriesPage() {
           return (
             <Link
               key={c.slug}
-              to="/countries/$slug"
+              to="/countries_/$slug"
               params={{ slug: c.slug }}
               className="group overflow-hidden rounded-3xl border border-border bg-card shadow-soft transition hover:-translate-y-1 hover:shadow-glow"
             >
