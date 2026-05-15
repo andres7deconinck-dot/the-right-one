@@ -149,8 +149,8 @@ function PostCard({ post, author, featured }: { post: any; author?: any; feature
             ) : (
               <div className="grid h-6 w-6 place-items-center rounded-full bg-primary/10 text-xs">{(author?.full_name || "?").slice(0, 1)}</div>
             )}
-            <span>{author?.full_name || "Anonymous"}</span>
-            {author?.verified && <BadgeCheck className="h-3.5 w-3.5 text-primary" />}
+            <span>{post.display_author || author?.full_name || "Anonymous"}</span>
+            {!post.display_author && author?.verified && <BadgeCheck className="h-3.5 w-3.5 text-primary" />}
           </div>
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1"><Eye className="h-3 w-3" /> {post.views}</span>

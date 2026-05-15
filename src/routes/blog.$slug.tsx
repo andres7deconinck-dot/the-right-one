@@ -87,8 +87,8 @@ function BlogDetailPage() {
               )}
               <div>
                 <div className="flex items-center gap-1 text-sm font-medium">
-                  {author?.full_name || "Anonymous"}
-                  {author?.verified && <BadgeCheck className="h-4 w-4 text-primary" />}
+                  {post.display_author || author?.full_name || "Anonymous"}
+                  {!post.display_author && author?.verified && <BadgeCheck className="h-4 w-4 text-primary" />}
                 </div>
                 <div className="text-xs text-muted-foreground">{post.published_at ? new Date(post.published_at).toLocaleDateString() : ""}</div>
               </div>

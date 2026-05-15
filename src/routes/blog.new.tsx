@@ -31,6 +31,7 @@ function NewPostPage() {
   const [restaurant, setRestaurant] = useState("");
   const [tags, setTags] = useState("");
   const [coverUrl, setCoverUrl] = useState("");
+  const [displayAuthor, setDisplayAuthor] = useState("");
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -52,6 +53,7 @@ function NewPostPage() {
           hotel_name: hotel || null,
           restaurant_name: restaurant || null,
           tags: tags.split(",").map((t) => t.trim()).filter(Boolean).slice(0, 8),
+          display_author: displayAuthor.trim() || null,
         },
       });
     },
@@ -154,6 +156,12 @@ function NewPostPage() {
           <div>
             <Label>Tags (comma separated, max 8)</Label>
             <Input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="rome, pizza, family-friendly" />
+          </div>
+
+          <div>
+            <Label>Published by (optional)</Label>
+            <Input value={displayAuthor} onChange={(e) => setDisplayAuthor(e.target.value)} placeholder="e.g. Aqua Fantasy Hotel · GlutenGo Editorial" maxLength={120} />
+            <p className="mt-1 text-xs text-muted-foreground">Leave empty to show your profile name. Fill in to show a hotel or brand name instead.</p>
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-2">

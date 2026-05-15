@@ -100,6 +100,7 @@ const PostInput = z.object({
   hotel_name: z.string().max(120).optional().nullable(),
   restaurant_name: z.string().max(120).optional().nullable(),
   tags: z.array(z.string().min(1).max(30)).max(8).default([]),
+  display_author: z.string().max(120).optional().nullable(),
 });
 
 export const createPost = createServerFn({ method: "POST" })
@@ -131,6 +132,7 @@ export const createPost = createServerFn({ method: "POST" })
         city: data.city ?? null,
         hotel_name: data.hotel_name ?? null,
         restaurant_name: data.restaurant_name ?? null,
+        display_author: data.display_author ?? null,
         tags: data.tags,
         status,
         published_at: status === "published" ? new Date().toISOString() : null,
