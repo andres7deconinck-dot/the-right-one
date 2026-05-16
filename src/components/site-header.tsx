@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Wheat, Menu, X, ChevronDown, CreditCard, Sparkles, Smartphone, Plane, AlertCircle, Shield } from "lucide-react";
+import { Wheat, Menu, X, ChevronDown, CreditCard, Sparkles, Smartphone, AlertCircle, Shield, Utensils, Wine, Pill, ShoppingBag, Plane, Map } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -73,11 +73,19 @@ function LanguageSelector() {
   );
 }
 
+const SPOTS_META = [
+  { to: "/restaurants", icon: Utensils, label: "Restaurants", desc: "Glutenvrije restaurants wereldwijd" },
+  { to: "/bars", icon: Wine, label: "Bars", desc: "Veilige drankjes & bar opties" },
+  { to: "/pharmacies", icon: Pill, label: "Apotheker", desc: "Apotheken & medische hulp" },
+  { to: "/shops", icon: ShoppingBag, label: "Winkel", desc: "Glutenvrije supermarkten & winkels" },
+] as const;
+
 const TOOL_META = [
   { to: "/cards", icon: CreditCard, desc: "Medical-grade allergy cards in 16 languages" },
   { to: "/assistant", icon: Sparkles, desc: "Ask anything about traveling gluten-free" },
   { to: "/travel-mode", icon: Smartphone, desc: "Fullscreen card to show restaurant staff" },
   { to: "/trips", icon: Plane, desc: "Plan trips, save restaurants, download travel packs" },
+  { to: "/ingredient-analyzer", icon: Shield, desc: "Scan & analyze ingredients for hidden gluten" },
   { to: "/emergency", icon: AlertCircle, desc: "Critical phrases per country & language" },
 ] as const;
 
@@ -86,6 +94,7 @@ export function SiteHeader() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [spotsOpen, setSpotsOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
 
   const checkAdmin = useServerFn(checkIsAdmin);
@@ -96,9 +105,7 @@ export function SiteHeader() {
     staleTime: 60_000,
   });
 
-  const mainLinks = [
-    { to: "/restaurants", label: t.nav.restaurants },
-    { to: "/ingredient-analyzer", label: t.nav.ingredientAnalyzer },
+  const staticLinks = [
     { to: "/countries", label: t.nav.countries },
     { to: "/blog", label: "Blog" },
     { to: "/pricing", label: t.nav.pricing },
@@ -107,7 +114,7 @@ export function SiteHeader() {
 
   const toolLinks = TOOL_META.map((meta, i) => ({
     ...meta,
-    label: [t.nav.translationCards, t.nav.aiAssistant, t.nav.travelMode, t.nav.trips, t.nav.emergencyPhrases][i],
+    label: [t.nav.translationCards, t.nav.aiAssistant, t.nav.travelMode, t.nav.trips, t.nav.ingredientAnalyzer, t.nav.emergencyPhrases][i],
   }));
 
   return (
@@ -119,19 +126,56 @@ export function SiteHeader() {
           </span>
           <span className="font-display text-xl font-semibold tracking-tight">GlutenGo</span>
         </Link>
+
+        {/* Desktop nav */}
         <nav className="hidden items-center gap-7 md:flex">
-          {mainLinks.map((l) => (
+          {/* Trips */}
+          <Link to="/trips" className="text-sm text-muted-foreground transition-colors hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>
+            {t.nav.trips}
+          </Link>
+
+          {/* Find Spots dropdown */}
+          <div className="relative" onMouseEnter={() => setSpotsOpen(true)} onMouseLeave={() => setSpotsOpen(false)}>
+            <button className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground" aria-haspopup="true" aria-expanded={spotsOpen}>
+              Find Spots <ChevronDown className={`h-3.5 w-3.5 transition-transform ${spotsOpen ? "rotate-180" : ""}`} />
+            </button>
+            {spotsOpen && (
+              <div className="absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-2">
+                <div className="rounded-2xl border border-border bg-card p-2 shadow-glow">
+                  {SPOTS_META.map((s) => (
+                    <Link
+                      key={s.to}
+                      to={s.to}
+                      className="flex items-start gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-muted"
+                      onClick={() => setSpotsOpen(false)}
+                    >
+                      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                        <s.icon className="h-4 w-4" />
+                      </span>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{s.label}</p>
+                        <p className="text-xs text-muted-foreground">{s.desc}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Countries, Blog, Pricing, Admin */}
+          {staticLinks.map((l) => (
             <Link key={l.to} to={l.to} className="text-sm text-muted-foreground transition-colors hover:text-foreground" activeProps={{ className: "text-foreground font-medium" }}>
               {l.label}
             </Link>
           ))}
+
           {/* Tools dropdown */}
           <div className="relative" onMouseEnter={() => setToolsOpen(true)} onMouseLeave={() => setToolsOpen(false)}>
             <button className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground" aria-haspopup="true" aria-expanded={toolsOpen}>
               {t.nav.tools} <ChevronDown className={`h-3.5 w-3.5 transition-transform ${toolsOpen ? "rotate-180" : ""}`} />
             </button>
             {toolsOpen && (
-              /* pt-2 bridges the gap between button and panel so mouse doesn't leave the hover zone */
               <div className="absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-2">
                 <div className="rounded-2xl border border-border bg-card p-2 shadow-glow">
                   {toolLinks.map((tl) => (
@@ -155,6 +199,7 @@ export function SiteHeader() {
             )}
           </div>
         </nav>
+
         <div className="hidden items-center gap-2 md:flex">
           <LanguageSelector />
           {user ? (
@@ -169,14 +214,27 @@ export function SiteHeader() {
             </>
           )}
         </div>
+
         <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
           {open ? <X /> : <Menu />}
         </button>
       </div>
+
+      {/* Mobile menu */}
       {open && (
         <div className="border-t border-border bg-background md:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-1 p-4">
-            {mainLinks.map((l) => (
+            <Link to="/trips" className="rounded-lg px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
+              {t.nav.trips}
+            </Link>
+            <p className="mt-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Find Spots</p>
+            {SPOTS_META.map((s) => (
+              <Link key={s.to} to={s.to} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
+                <s.icon className="h-4 w-4 text-primary" />
+                {s.label}
+              </Link>
+            ))}
+            {staticLinks.map((l) => (
               <Link key={l.to} to={l.to} className="rounded-lg px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
                 {l.label}
               </Link>
