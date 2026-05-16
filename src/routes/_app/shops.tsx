@@ -66,7 +66,7 @@ function confidenceDot(c?: AIRestaurant["confidence"]) {
 function encodeSlug(r: AIRestaurant) {
   const raw = [r.name, r.city, r.country || ""].join("|");
   const b64 = btoa(unescape(encodeURIComponent(raw))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-  return `ai-${b64}`;
+  return `shop-${b64}`;
 }
 
 function decodeSlug(slug: string): { name: string; city: string; country: string } | null {

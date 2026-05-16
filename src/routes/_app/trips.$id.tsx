@@ -15,7 +15,7 @@ import { COUNTRIES } from "@/data/countries";
 import { toast } from "sonner";
 
 function decodeAISlug(slug: string): { name: string; city: string; country: string } | null {
-  const m = slug.match(/^ai-(.+)$/);
+  const m = slug.match(/^(?:ai|bar|pharmacy|shop)-(.+)$/);
   if (!m) return null;
   try {
     const b64 = m[1].replace(/-/g, "+").replace(/_/g, "/");
@@ -28,6 +28,13 @@ function decodeAISlug(slug: string): { name: string; city: string; country: stri
   } catch {
     return null;
   }
+}
+
+function slugVenueType(slug: string): "restaurant" | "bar" | "pharmacy" | "shop" {
+  if (slug.startsWith("bar-")) return "bar";
+  if (slug.startsWith("pharmacy-")) return "pharmacy";
+  if (slug.startsWith("shop-")) return "shop";
+  return "restaurant";
 }
 
 export const Route = createFileRoute("/_app/trips/$id")({
@@ -238,7 +245,7 @@ function TripDetail() {
                   { type: "shop",       label: "Shops",       Icon: ShoppingBag,     to: "/shops"       as const, color: "text-green-600" },
                 ] as const
               ).map(({ type, label, Icon, to, color }) => {
-                const group = savedRest.filter((s) => (s.venue_type ?? "restaurant") === type);
+                const group = savedRest.filter((s) => slugVenueType(s.restaurant_id) === type);
                 if (group.length === 0) return null;
                 return (
                   <div key={type}>
