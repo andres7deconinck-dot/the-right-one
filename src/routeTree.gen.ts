@@ -29,8 +29,10 @@ import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as BlogEditSlugRouteImport } from './routes/blog.edit.$slug'
 import { Route as AppTripsRouteImport } from './routes/_app/trips'
+import { Route as AppTripsIndexRouteImport } from './routes/_app/trips.index'
 import { Route as AppTravelModeRouteImport } from './routes/_app/travel-mode'
 import { Route as AppRestaurantsRouteImport } from './routes/_app/restaurants'
+import { Route as AppRestaurantsIndexRouteImport } from './routes/_app/restaurants.index'
 import { Route as AppRestaurantDetailRouteImport } from './routes/_app/restaurant-detail'
 import { Route as AppIngredientAnalyzerRouteImport } from './routes/_app/ingredient-analyzer'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
@@ -175,6 +177,16 @@ const AppAdminRoute = AppAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTripsIndexRoute = AppTripsIndexRouteImport.update({
+  id: '/_app/trips/',
+  path: '/',
+  getParentRoute: () => AppTripsRoute,
+} as any)
+const AppRestaurantsIndexRoute = AppRestaurantsIndexRouteImport.update({
+  id: '/_app/restaurants/',
+  path: '/',
+  getParentRoute: () => AppRestaurantsRoute,
+} as any)
 const AppTripsNewRoute = AppTripsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -222,7 +234,9 @@ export interface FileRoutesByFullPath {
   '/blog/new': typeof BlogNewRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
+  '/restaurants/': typeof AppRestaurantsIndexRoute
   '/restaurants/$slug': typeof AppRestaurantsSlugRoute
+  '/trips/': typeof AppTripsIndexRoute
   '/trips/$id': typeof AppTripsIdRoute
   '/trips/new': typeof AppTripsNewRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -252,7 +266,9 @@ export interface FileRoutesByTo {
   '/blog/new': typeof BlogNewRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
+  '/restaurants/': typeof AppRestaurantsIndexRoute
   '/restaurants/$slug': typeof AppRestaurantsSlugRoute
+  '/trips/': typeof AppTripsIndexRoute
   '/trips/$id': typeof AppTripsIdRoute
   '/trips/new': typeof AppTripsNewRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -278,8 +294,10 @@ export interface FileRoutesById {
   '/_app/ingredient-analyzer': typeof AppIngredientAnalyzerRoute
   '/_app/restaurant-detail': typeof AppRestaurantDetailRoute
   '/_app/restaurants': typeof AppRestaurantsRouteWithChildren
+  '/_app/restaurants/': typeof AppRestaurantsIndexRoute
   '/_app/travel-mode': typeof AppTravelModeRoute
   '/_app/trips': typeof AppTripsRouteWithChildren
+  '/_app/trips/': typeof AppTripsIndexRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/new': typeof BlogNewRoute
   '/checkout/success': typeof CheckoutSuccessRoute
@@ -377,7 +395,9 @@ export interface FileRouteTypes {
     | '/blog/new'
     | '/checkout/success'
     | '/countries_/$slug'
+    | '/_app/restaurants/'
     | '/_app/restaurants/$slug'
+    | '/_app/trips/'
     | '/_app/trips/$id'
     | '/_app/trips/new'
     | '/api/public/payments/webhook'
@@ -593,12 +613,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTripsIdRouteImport
       parentRoute: typeof AppTripsRoute
     }
+    '/_app/restaurants/': {
+      id: '/_app/restaurants/'
+      path: '/'
+      fullPath: '/restaurants/'
+      preLoaderRoute: typeof AppRestaurantsIndexRouteImport
+      parentRoute: typeof AppRestaurantsRoute
+    }
     '/_app/restaurants/$slug': {
       id: '/_app/restaurants/$slug'
       path: '/$slug'
       fullPath: '/restaurants/$slug'
       preLoaderRoute: typeof AppRestaurantsSlugRouteImport
       parentRoute: typeof AppRestaurantsRoute
+    }
+    '/_app/trips/': {
+      id: '/_app/trips/'
+      path: '/'
+      fullPath: '/trips/'
+      preLoaderRoute: typeof AppTripsIndexRouteImport
+      parentRoute: typeof AppTripsRoute
     }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
@@ -611,10 +645,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRestaurantsRouteChildren {
+  AppRestaurantsIndexRoute: typeof AppRestaurantsIndexRoute
   AppRestaurantsSlugRoute: typeof AppRestaurantsSlugRoute
 }
 
 const AppRestaurantsRouteChildren: AppRestaurantsRouteChildren = {
+  AppRestaurantsIndexRoute: AppRestaurantsIndexRoute,
   AppRestaurantsSlugRoute: AppRestaurantsSlugRoute,
 }
 
@@ -623,11 +659,13 @@ const AppRestaurantsRouteWithChildren = AppRestaurantsRoute._addFileChildren(
 )
 
 interface AppTripsRouteChildren {
+  AppTripsIndexRoute: typeof AppTripsIndexRoute
   AppTripsIdRoute: typeof AppTripsIdRoute
   AppTripsNewRoute: typeof AppTripsNewRoute
 }
 
 const AppTripsRouteChildren: AppTripsRouteChildren = {
+  AppTripsIndexRoute: AppTripsIndexRoute,
   AppTripsIdRoute: AppTripsIdRoute,
   AppTripsNewRoute: AppTripsNewRoute,
 }
