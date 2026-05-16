@@ -190,7 +190,7 @@ async function aiFetchWithRetry(body: unknown): Promise<Response> {
   let lastError: unknown;
   for (let attempt = 0; attempt < 3; attempt++) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15_000);
+    const timeout = setTimeout(() => controller.abort(), 30_000);
     try {
       const apiKey = process.env.LOVABLE_API_KEY;
       if (!apiKey) throw new Error("AI gateway is not configured.");
@@ -205,12 +205,15 @@ async function aiFetchWithRetry(body: unknown): Promise<Response> {
       });
       clearTimeout(timeout);
       if (res.ok || res.status < 500 || attempt === 2) return res;
-      await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
-    } catch (error) {
+      await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
+    } catch (error: any) {
       clearTimeout(timeout);
       lastError = error;
+      if (error?.name === "AbortError") {
+        lastError = new Error("Search timed out — the AI is taking too long. Please try again.");
+      }
       if (attempt === 2) break;
-      await new Promise((resolve) => setTimeout(resolve, 250 * (attempt + 1)));
+      await new Promise((resolve) => setTimeout(resolve, 500 * (attempt + 1)));
     }
   }
   throw lastError instanceof Error ? lastError : new Error("AI request failed");
