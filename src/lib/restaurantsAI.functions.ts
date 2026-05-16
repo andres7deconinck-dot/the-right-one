@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 
-export type VenueCategory = "restaurant" | "coffeebar" | "supermarket" | "pharmacy";
+export type VenueCategory = "restaurant" | "coffeebar" | "supermarket" | "pharmacy" | "bar";
 
 export type AIRestaurant = {
   id: string;
@@ -73,6 +73,18 @@ PRIORITISE:
 3. Health stores carrying GF vitamins, dietary products, and AOECS-certified items.
 4. Pharmacies that can order GF medications or advise on gluten-containing excipients in drugs.
 In glutenFreeNotes describe available GF products, supplements, and staff expertise.`,
+
+  bar: `${SYSTEM_BASE}
+Find bars, pubs, craft beer bars, wine bars, cocktail lounges and taprooms that are safe for people with coeliac disease.
+PRIORITISE:
+1. Bars that exclusively serve certified GF beers (Estrella Damm Daura, Glutenberg, Omission, Ground Breaker, Green's).
+2. Taprooms of dedicated GF breweries.
+3. Wine bars and cider bars (naturally GF drinks only).
+4. Cocktail bars with GF spirits lists and bartenders trained in celiac cross-contamination.
+5. Pubs with at least one certified GF beer on tap (not just bottled).
+In glutenFreeNotes: list which specific beers/ciders/cocktails are safe and note any cross-contamination risks (e.g. beer-based cocktails, shared bar towels, food served on bar surface).
+In mustTry: list 2-4 specific safe drinks to order (e.g. "Daura Damm GF beer", "House dry cider", "Mojito with Havana Club rum").
+Use the cuisine field for bar type (e.g. "Craft beer bar", "Wine bar", "Cocktail lounge", "Cider bar", "Gastropub").`,
 };
 
 const USER_PROMPTS: Record<VenueCategory, (place: string) => string> = {
@@ -80,6 +92,7 @@ const USER_PROMPTS: Record<VenueCategory, (place: string) => string> = {
   coffeebar: (p) => `Find coffee bars and cafés in: ${p} with gluten-free pastries or snacks. Include real addresses.`,
   supermarket: (p) => `Find supermarkets and health food stores in: ${p} with a good gluten-free product selection. Include real addresses.`,
   pharmacy: (p) => `Find pharmacies and health stores in: ${p} that stock gluten-free dietary products or can advise celiac patients. Include real addresses.`,
+  bar: (p) => `Find bars, pubs, craft beer taprooms, wine bars and cocktail bars in: ${p} that are safe for celiacs — with certified GF beers, ciders or cocktail menus. Include real addresses.`,
 };
 
 // ─── JSON Schema shared for all categories ────────────────────────────────────
@@ -161,6 +174,15 @@ const DEV_MOCK_SUPERMARKETS: AIRestaurant[] = [
   { id: "ai-demo-s8", venueType: "supermarket", name: "The Celiac Shop (Online + Collection)", cuisine: "Specialty GF store", priceLevel: "$$", glutenFreeLevel: "dedicated", glutenFreeNotes: "Dedicated GF-only store. 100% gluten-free environment. Wide range of hard-to-find GF products. Click-and-collect available. All products AOECS crossed-grain certified.", city: "Demo City", tags: ["gf-only", "AOECS", "click-collect", "specialist"], confidence: "high", verificationSource: "AOECS member store", cautionNote: "Demo data." },
 ];
 
+const DEV_MOCK_BARS: AIRestaurant[] = [
+  { id: "ai-demo-b1", venueType: "bar", name: "The Gluten-Free Taproom", cuisine: "Craft beer bar", priceLevel: "$$", glutenFreeLevel: "dedicated", glutenFreeNotes: "100% gluten-free taproom. All beers brewed in dedicated GF brewery. No wheat, barley or rye on premises. Glutenberg, Ground Breaker, and Green's beers on tap. GF snacks available.", mustTry: ["Glutenberg IPA (GF certified)", "Green's Discovery amber ale", "House GF cider on tap"], city: "Demo City", tags: ["craft-beer", "dedicated", "taproom", "gf-brewery"], confidence: "high", cautionNote: "Demo data — verify before visiting." },
+  { id: "ai-demo-b2", venueType: "bar", name: "Daura Tapas Bar", cuisine: "Spanish tapas bar", priceLevel: "$$", glutenFreeLevel: "extensive", glutenFreeNotes: "Specialises in Estrella Damm Daura (certified GF beer, <3 ppm gluten). Full GF tapas menu from dedicated kitchen. Bar surfaces cleaned hourly. Staff trained in celiac cross-contamination. Ask to confirm Daura tap on arrival.", mustTry: ["Estrella Daura GF draught", "GF sangria (house wine)", "Patatas bravas from GF kitchen"], city: "Demo City", tags: ["daura", "tapas", "gf-draught", "certified-beer"], confidence: "high", cautionNote: "Demo data." },
+  { id: "ai-demo-b3", venueType: "bar", name: "Vino & Co. Wine Bar", cuisine: "Wine bar", priceLevel: "$$$", glutenFreeLevel: "dedicated", glutenFreeNotes: "Wine-only bar — all wines, spirits and liqueurs are naturally GF. GF cheese boards and charcuterie prepared in dedicated kitchen. No beer served on premises. All staff allergen trained.", mustTry: ["Natural biodynamic wine selection", "House GF charcuterie board", "Certified GF Champagne"], city: "Demo City", tags: ["wine", "dedicated", "natural-wine", "charcuterie"], confidence: "high", cautionNote: "Demo data." },
+  { id: "ai-demo-b4", venueType: "bar", name: "The Cider House", cuisine: "Cider bar", priceLevel: "$", glutenFreeLevel: "dedicated", glutenFreeNotes: "Dedicated cider bar — all products naturally gluten-free by nature. 15+ artisan ciders on tap from small producers. No beer or wheat-based drinks served. Staff knowledgeable in celiac requirements. Clean dedicated bar surfaces.", mustTry: ["Dry farmhouse cider (house)", "Pear cider (poire)", "Sparkling rosé cider"], city: "Demo City", tags: ["cider", "dedicated", "artisan", "naturally-gf"], confidence: "high", cautionNote: "Demo data." },
+  { id: "ai-demo-b5", venueType: "bar", name: "Alchemy Cocktail Lounge", cuisine: "Cocktail lounge", priceLevel: "$$$", glutenFreeLevel: "extensive", glutenFreeNotes: "Craft cocktail bar with dedicated GF cocktail menu (flagged on menu). All spirits used are naturally GF (rum, tequila, vodka, gin, whisky*). No beer-based cocktails served. Bartenders trained in allergen awareness. *Some whisky may be flagged — ask bartender.", mustTry: ["GF Mojito (Havana Club rum)", "Margarita (100% agave tequila)", "GF Bloody Mary (tamari not soy sauce)"], city: "Demo City", tags: ["cocktails", "craft", "gf-menu", "dedicated-cocktails"], confidence: "medium", cautionNote: "Demo data — ask bartender about shared tools." },
+  { id: "ai-demo-b6", venueType: "bar", name: "The Local Pub (GF tap)", cuisine: "Traditional pub", priceLevel: "$", glutenFreeLevel: "options", glutenFreeNotes: "Standard pub with 1 dedicated GF beer tap (Daura Damm, <3 ppm certified) and Rekorderlig cider on draught. Regular bar surfaces — shared with food. Staff aware of celiac disease but kitchen is NOT GF safe. Stick to drinks only and avoid bar snacks.", mustTry: ["Daura Damm GF draught", "Rekorderlig cider draught", "House gin & tonic (GF spirit)"], city: "Demo City", tags: ["pub", "gf-tap", "cider", "regular-pub"], confidence: "medium", cautionNote: "Shared bar — food NOT safe for celiacs. Drinks only. Demo data." },
+];
+
 const DEV_MOCK_PHARMACIES: AIRestaurant[] = [
   { id: "ai-demo-p1", venueType: "pharmacy", name: "Apotheek BioFarm", cuisine: "Pharmacy", priceLevel: "$", glutenFreeLevel: "extensive", glutenFreeNotes: "Dedicated GF dietary section with supplements, GF vitamins and enzymatic aids (DPPIV). Pharmacist trained in celiac disease. Can advise on gluten-containing excipients in medications and order alternatives.", city: "Demo City", tags: ["pharmacy", "celiac-trained", "supplements", "gf-vitamins"], confidence: "high", cautionNote: "Demo data." },
   { id: "ai-demo-p2", venueType: "pharmacy", name: "Pharmacie du Cœliaque", cuisine: "Pharmacy", priceLevel: "$", glutenFreeLevel: "dedicated", glutenFreeNotes: "Specialist celiac-focused pharmacy. Stocks GF bread, pasta, snacks from AOECS-certified brands. Provides free medication gluten-content check service. Pharmacist speaks French and Dutch.", city: "Demo City", tags: ["pharmacy", "AOECS", "gf-food", "medication-check"], confidence: "high", verificationSource: "Belgian Celiac Association listing", cautionNote: "Demo data." },
@@ -175,6 +197,7 @@ const MOCK_BY_CATEGORY: Record<VenueCategory, AIRestaurant[]> = {
   coffeebar: DEV_MOCK_COFFEEBARS,
   supermarket: DEV_MOCK_SUPERMARKETS,
   pharmacy: DEV_MOCK_PHARMACIES,
+  bar: DEV_MOCK_BARS,
 };
 
 const DEMO_SUMMARY: Record<VenueCategory, string> = {
@@ -182,6 +205,7 @@ const DEMO_SUMMARY: Record<VenueCategory, string> = {
   coffeebar: `⚠️ Demo mode — showing sample coffee bars. Add LOVABLE_API_KEY to .env for live AI search.`,
   supermarket: `⚠️ Demo mode — showing sample supermarkets. Add LOVABLE_API_KEY to .env for live AI search.`,
   pharmacy: `⚠️ Demo mode — showing sample pharmacies. Add LOVABLE_API_KEY to .env for live AI search.`,
+  bar: `⚠️ Demo mode — showing sample bars. Add LOVABLE_API_KEY to .env for live AI search.`,
 };
 
 // ─── HTTP helper ──────────────────────────────────────────────────────────────
@@ -305,6 +329,10 @@ export const searchSupermarketsAI = createServerFn({ method: "GET" })
 export const searchPharmaciesAI = createServerFn({ method: "GET" })
   .inputValidator((data: { place: string }) => data)
   .handler(({ data }) => runSearch(data.place.trim(), "pharmacy"));
+
+export const searchBarsAI = createServerFn({ method: "GET" })
+  .inputValidator((data: { place: string }) => data)
+  .handler(({ data }) => runSearch(data.place.trim(), "bar"));
 
 export const fetchRestaurantDetailAI = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => data)
