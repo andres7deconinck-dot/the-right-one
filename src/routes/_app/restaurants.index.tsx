@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Bookmark, BookmarkCheck, Coffee, ExternalLink, Globe, Heart, Loader2,
-  MapPin, Pill, Phone, Search, ShoppingCart, Sparkles, Trash2,
+  Bookmark, BookmarkCheck, ExternalLink, Globe, Heart, Loader2,
+  MapPin, Phone, Search, Sparkles, Trash2,
   UtensilsCrossed, X, Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,13 +14,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   searchRestaurantsAI,
-  searchCoffeeBarsAI,
-  searchSupermarketsAI,
-  searchPharmaciesAI,
-  searchBarsAI,
   type AIRestaurant,
-  type AISearchResult,
-  type VenueCategory,
 } from "@/lib/restaurantsAI.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -29,8 +23,8 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_app/restaurants/")({
   head: () => ({
     meta: [
-      { title: "Gluten-Free Restaurant Finder: AI-Curated Venues Worldwide" },
-      { name: "description", content: "Find gluten-free restaurants, coffee bars, supermarkets and pharmacies in any city worldwide. AI-researched, celiac-safe venues with cross-contamination notes." },
+      { title: "Gluten-Free Restaurant Finder: AI-Curated Restaurants Worldwide" },
+      { name: "description", content: "Find gluten-free restaurants in any city worldwide. AI-researched, celiac-safe venues with detailed cross-contamination notes and safety ratings." },
     ],
   }),
   component: RestaurantsPage,
@@ -93,31 +87,11 @@ function decodeSlug(slug: string): { name: string; city: string; country: string
   } catch { return null; }
 }
 
-function venueIcon(type?: AIRestaurant["venueType"]) {
-  switch (type) {
-    case "coffeebar":   return Coffee;
-    case "supermarket": return ShoppingCart;
-    case "pharmacy":    return Pill;
-    default:            return UtensilsCrossed;
-  }
+function venueIcon(_type?: AIRestaurant["venueType"]) {
+  return UtensilsCrossed;
 }
 
-// ─── Category config ──────────────────────────────────────────────────────────
-
-const CATEGORIES: { id: VenueCategory; label: string; Icon: React.ElementType; placeholder: string }[] = [
-  { id: "restaurant",  label: "Restaurants",  Icon: UtensilsCrossed, placeholder: "e.g. Antwerp, Lisbon, Bali, Brugge…" },
-  { id: "coffeebar",   label: "Coffee Bars",  Icon: Coffee,          placeholder: "e.g. Ghent, Amsterdam, Barcelona…" },
-  { id: "supermarket", label: "Supermarkets", Icon: ShoppingCart,    placeholder: "e.g. Brussels, Paris, Berlin…" },
-  { id: "pharmacy",    label: "Pharmacies",   Icon: Pill,            placeholder: "e.g. Rome, Madrid, Tokyo…" },
-];
-
-const CATEGORY_SEARCH_FN: Record<VenueCategory, (args: { data: { place: string } }) => Promise<AISearchResult | null>> = {
-  restaurant:  searchRestaurantsAI,
-  coffeebar:   searchCoffeeBarsAI,
-  supermarket: searchSupermarketsAI,
-  pharmacy:    searchPharmaciesAI,
-  bar:         searchBarsAI,
-};
+const RESTAURANT_PLACEHOLDER = "e.g. Antwerp, Lisbon, Bali, Bruges…";
 
 // ─── Detail sheet ─────────────────────────────────────────────────────────────
 
@@ -441,16 +415,13 @@ function RestaurantsPage() {
   const qc = useQueryClient();
   const [input, setInput] = useState("");
   const [place, setPlace] = useState<string>("");
-  const [category, setCategory] = useState<VenueCategory>("restaurant");
   const [filter, setFilter] = useState<LevelFilter>("all");
   const [selected, setSelected] = useState<AIRestaurant | null>(null);
   const [view, setView] = useState<"search" | "saved">("search");
 
-  const activeCat = CATEGORIES.find(c => c.id === category)!;
-
   const { data, isFetching, error } = useQuery({
-    queryKey: ["ai-venues", place, category],
-    queryFn: () => CATEGORY_SEARCH_FN[category]({ data: { place } }),
+    queryKey: ["ai-venues", place, "restaurant"],
+    queryFn: () => searchRestaurantsAI({ data: { place } }),
     enabled: !!place,
     staleTime: 1000 * 60 * 60,
     retry: false,
@@ -517,9 +488,9 @@ function RestaurantsPage() {
       {/* Header */}
       <div className="flex flex-wrap items-end justify-between gap-4 max-w-full">
         <div className="max-w-2xl">
-          <h1 className="font-display text-4xl">Find gluten-free spots</h1>
+          <h1 className="font-display text-4xl">Find gluten-free restaurants</h1>
           <p className="mt-2 text-muted-foreground">
-            AI-researched restaurants, coffee bars, supermarkets and pharmacies in any city worldwide.
+            AI-researched, celiac-safe restaurants in any city worldwide.
           </p>
         </div>
         {user && (
@@ -551,7 +522,7 @@ function RestaurantsPage() {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={activeCat.placeholder}
+            placeholder={RESTAURANT_PLACEHOLDER}
             className="pl-9 h-12"
           />
         </div>
@@ -575,37 +546,6 @@ function RestaurantsPage() {
       {/* Search view */}
       {view === "search" && (
         <>
-          {/* Category tabs */}
-          <div className="mt-5 flex flex-wrap gap-2">
-            {CATEGORIES.map((cat) => {
-              const active = category === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => { setCategory(cat.id); setFilter("all"); }}
-                  className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
-                    active
-                      ? "border-primary bg-primary text-primary-foreground shadow-soft"
-                      : "border-border bg-card hover:bg-muted"
-                  }`}
-                >
-                  <cat.Icon className="h-4 w-4" />
-                  {cat.label}
-                  {place && !isFetching && (
-                    <span className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
-                      active ? "bg-white/20 text-white" : "bg-muted-foreground/10 text-muted-foreground"
-                    }`}>
-                      {category === cat.id
-                        ? filtered.length
-                        : qc.getQueryData<{ results: any[] }>(["ai-venues", place, cat.id])?.results.length ?? "·"
-                      }
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
           {/* Level filter */}
           {place && (
             <div className="mt-4 flex flex-wrap gap-2">
@@ -626,13 +566,10 @@ function RestaurantsPage() {
           {/* Empty state */}
           {!place && (
             <div className="mt-12 rounded-3xl border border-dashed border-border bg-cream/40 p-12 text-center">
-              <div className="flex justify-center gap-4 text-muted-foreground/40">
+              <div className="flex justify-center text-muted-foreground/40">
                 <UtensilsCrossed className="h-8 w-8" />
-                <Coffee className="h-8 w-8" />
-                <ShoppingCart className="h-8 w-8" />
-                <Pill className="h-8 w-8" />
               </div>
-              <p className="mt-4 text-muted-foreground">Search any city to find gluten-free friendly spots.</p>
+              <p className="mt-4 text-muted-foreground">Search any city to find gluten-free restaurants.</p>
             </div>
           )}
 
@@ -640,7 +577,7 @@ function RestaurantsPage() {
             <div className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
               {(error as Error).message}
               <div className="mt-3">
-                <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["ai-venues", place, category] })}>
+                <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["ai-venues", place, "restaurant"] })}>
                   Retry
                 </Button>
               </div>
@@ -666,7 +603,7 @@ function RestaurantsPage() {
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">{filtered.length}</span>{" "}
-                {activeCat.label.toLowerCase()} found in{" "}
+                restaurants found in{" "}
                 <span className="font-medium text-foreground">{data.place}</span>
               </p>
 
