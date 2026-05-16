@@ -19,8 +19,8 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_app/shops")({
   head: () => ({
     meta: [
-      { title: "Glutenvrije Winkels & Supermarkten — GlutenGo" },
-      { name: "description", content: "Vind glutenvrije winkels, gezondheidswinkels en supermarkten met een uitgebreid GF-aanbod wereldwijd." },
+      { title: "Gluten-Free Shops & Supermarkets — GlutenGo" },
+      { name: "description", content: "Find gluten-free shops, health stores and supermarkets with an extensive GF range worldwide." },
     ],
   }),
   component: ShopsPage,
@@ -30,10 +30,10 @@ export const Route = createFileRoute("/_app/shops")({
 
 function levelMeta(l: AIRestaurant["glutenFreeLevel"]) {
   switch (l) {
-    case "dedicated": return { label: "100% GF winkel", className: "bg-green-100 text-green-800 hover:bg-green-100 border-green-200" };
-    case "extensive": return { label: "Grote GF afdeling", className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-emerald-200" };
-    case "options":   return { label: "GF producten", className: "bg-lime-100 text-lime-700 hover:bg-lime-100 border-lime-200" };
-    default:          return { label: "Beperkt", className: "bg-muted text-muted-foreground border-border" };
+    case "dedicated": return { label: "100% GF shop", className: "bg-green-100 text-green-800 hover:bg-green-100 border-green-200" };
+    case "extensive": return { label: "Large GF section", className: "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-emerald-200" };
+    case "options":   return { label: "GF products", className: "bg-lime-100 text-lime-700 hover:bg-lime-100 border-lime-200" };
+    default:          return { label: "Limited", className: "bg-muted text-muted-foreground border-border" };
   }
 }
 
@@ -48,10 +48,10 @@ function levelBar(l: AIRestaurant["glutenFreeLevel"]) {
 
 function riskMeta(l: AIRestaurant["glutenFreeLevel"]) {
   switch (l) {
-    case "dedicated": return { label: "100% GF winkel", sub: "Volledig glutenvrij assortiment", color: "bg-green-50 border-green-200", badge: "bg-green-100 text-green-800", bar: "bg-green-500", risk: "Uitstekend" };
-    case "extensive": return { label: "Grote GF afdeling", sub: "Uitgebreid GF productaanbod", color: "bg-emerald-50 border-emerald-200", badge: "bg-emerald-100 text-emerald-700", bar: "bg-emerald-500", risk: "Zeer goed" };
-    case "options":   return { label: "GF producten", sub: "GF producten beschikbaar", color: "bg-lime-50 border-lime-200", badge: "bg-lime-100 text-lime-700", bar: "bg-lime-400", risk: "Voldoende" };
-    default:          return { label: "Beperkt", sub: "Beperkt GF aanbod", color: "bg-slate-50 border-slate-200", badge: "bg-slate-100 text-slate-700", bar: "bg-slate-400", risk: "Beperkt" };
+    case "dedicated": return { label: "100% GF shop", sub: "Fully gluten-free range", color: "bg-green-50 border-green-200", badge: "bg-green-100 text-green-800", bar: "bg-green-500", risk: "Excellent" };
+    case "extensive": return { label: "Large GF section", sub: "Extensive GF product range", color: "bg-emerald-50 border-emerald-200", badge: "bg-emerald-100 text-emerald-700", bar: "bg-emerald-500", risk: "Very good" };
+    case "options":   return { label: "GF products", sub: "GF products available", color: "bg-lime-50 border-lime-200", badge: "bg-lime-100 text-lime-700", bar: "bg-lime-400", risk: "Sufficient" };
+    default:          return { label: "Limited", sub: "Limited GF range", color: "bg-slate-50 border-slate-200", badge: "bg-slate-100 text-slate-700", bar: "bg-slate-400", risk: "Limited" };
   }
 }
 
@@ -108,7 +108,7 @@ function ShopSheet({
   const hasAddress = !!(r.address || r.city);
 
   const addToTrip = async () => {
-    if (!user) { toast.error("Meld je aan om op te slaan"); return; }
+    if (!user) { toast.error("Sign in to save"); return; }
     setAddingTrip(true);
     try {
       const trip_id = selectedTrip === "none" ? null : selectedTrip;
@@ -119,7 +119,7 @@ function ShopSheet({
       if (error) { toast.error(error.message); return; }
       onToggleSave();
       const tripName = trips.find(t => t.id === trip_id)?.title || trips.find(t => t.id === trip_id)?.destination_city;
-      toast.success(trip_id ? `Opgeslagen in "${tripName}"` : "Opgeslagen in favorieten");
+      toast.success(trip_id ? `Saved to "${tripName}"` : "Saved to favourites");
     } finally { setAddingTrip(false); }
   };
 
@@ -150,7 +150,7 @@ function ShopSheet({
             <Badge className={`${meta.badge} text-xs font-semibold`}>{meta.label}</Badge>
             <span className="text-xs text-muted-foreground">{meta.sub}</span>
             {certTags.length > 0 && (
-              <span className="ml-auto text-[11px] text-green-700 font-medium">✓ Gecertificeerd</span>
+              <span className="ml-auto text-[11px] text-green-700 font-medium">✓ Certified</span>
             )}
           </div>
           <div className="mt-3">
@@ -176,7 +176,7 @@ function ShopSheet({
           )}
 
           <div className="rounded-2xl border border-green-200 bg-green-50/60 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-green-800 mb-2">GF productaanbod</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-green-800 mb-2">GF product range</p>
             <p className="text-sm leading-relaxed text-foreground">{r.glutenFreeNotes}</p>
             {r.cautionNote && (
               <div className="mt-3 flex gap-2.5 rounded-xl border border-green-200 bg-green-100 px-3 py-2.5">
@@ -188,7 +188,7 @@ function ShopSheet({
 
           {r.mustTry && r.mustTry.length > 0 && (
             <div className="rounded-2xl border border-border bg-card p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">Vind hier in de winkel</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">Find in store</p>
               <ul className="grid gap-1.5">
                 {r.mustTry.map((d) => (
                   <li key={d} className="flex items-center gap-2 rounded-xl bg-green-50 px-3 py-1.5 text-sm">
@@ -201,7 +201,7 @@ function ShopSheet({
 
           {hasAddress && (
             <div className="rounded-2xl overflow-hidden border border-border">
-              <iframe src={mapsEmbed} className="h-44 w-full border-0" loading="lazy" title={`Kaart: ${r.name}`} />
+              <iframe src={mapsEmbed} className="h-44 w-full border-0" loading="lazy" title={`Map: ${r.name}`} />
               <div className="flex items-center justify-between border-t border-border bg-card px-3 py-2">
                 <div className="flex items-start gap-1.5 min-w-0">
                   <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0 text-muted-foreground" />
@@ -220,7 +220,7 @@ function ShopSheet({
 
           {(r.phone || r.website || r.openingHours) && (
             <div className="rounded-2xl border border-border bg-card p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Contact & openingsuren</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Contact & opening hours</p>
               {r.openingHours && (
                 <p className="whitespace-pre-line rounded-xl bg-muted/50 px-3 py-2 text-xs mb-2">{r.openingHours}</p>
               )}
@@ -240,7 +240,7 @@ function ShopSheet({
           )}
 
           <p className="text-[10px] text-muted-foreground pb-2">
-            AI-onderzoek. Controleer altijd etiketten en vraag personeel bij twijfel.
+            AI research. Always check labels and ask staff if in doubt.
           </p>
         </div>
 
@@ -248,15 +248,15 @@ function ShopSheet({
           {user && (
             <div>
               <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">
-                {isSaved ? "Opgeslagen" : "Toevoegen aan trip"}
+                {isSaved ? "Saved" : "Add to trip"}
               </p>
               <div className="flex gap-2">
                 <Select value={selectedTrip} onValueChange={setSelectedTrip}>
                   <SelectTrigger className="h-9 flex-1 text-sm">
-                    <SelectValue placeholder="Kies een trip…" />
+                    <SelectValue placeholder="Choose a trip…" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Alleen opslaan (geen trip)</SelectItem>
+                    <SelectItem value="none">Save only (no trip)</SelectItem>
                     {trips.map((t) => (
                       <SelectItem key={t.id} value={t.id}>
                         {t.title || t.destination_city || t.destination_country}
@@ -265,15 +265,15 @@ function ShopSheet({
                   </SelectContent>
                 </Select>
                 <Button size="sm" onClick={addToTrip} disabled={addingTrip} variant={isSaved ? "outline" : "default"} className="gap-1.5 shrink-0">
-                  {isSaved ? <><BookmarkCheck className="h-3.5 w-3.5" /> Bijwerken</>
+                  {isSaved ? <><BookmarkCheck className="h-3.5 w-3.5" /> Update</>
                     : addingTrip ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    : <><Plus className="h-3.5 w-3.5" /> Toevoegen</>}
+                    : <><Plus className="h-3.5 w-3.5" /> Add</>}
                 </Button>
               </div>
               {isSaved && currentTripId && (
-                <p className="mt-1.5 text-xs text-emerald-600">✓ Opgeslagen in "{trips.find(t => t.id === currentTripId)?.title || "trip"}"</p>
+                <p className="mt-1.5 text-xs text-emerald-600">✓ Saved to "{trips.find(t => t.id === currentTripId)?.title || "trip"}"</p>
               )}
-              {isSaved && !currentTripId && <p className="mt-1.5 text-xs text-emerald-600">✓ Opgeslagen in favorieten</p>}
+              {isSaved && !currentTripId && <p className="mt-1.5 text-xs text-emerald-600">✓ Saved to favourites</p>}
             </div>
           )}
           {hasAddress && (
@@ -298,7 +298,7 @@ function SavedView({ user, savedData, trips, onRemove }: { user: any; savedData:
     return (
       <div className="mt-12 rounded-3xl border border-dashed border-border bg-green-50/40 p-12 text-center">
         <ShoppingBag className="mx-auto h-10 w-10 text-muted-foreground/40" />
-        <p className="mt-3 text-muted-foreground">Meld je aan om glutenvrije winkels op te slaan.</p>
+        <p className="mt-3 text-muted-foreground">Sign in to save gluten-free shops.</p>
       </div>
     );
   }
@@ -306,7 +306,7 @@ function SavedView({ user, savedData, trips, onRemove }: { user: any; savedData:
     return (
       <div className="mt-12 rounded-3xl border border-dashed border-border bg-green-50/40 p-12 text-center">
         <ShoppingBag className="mx-auto h-10 w-10 text-muted-foreground/40" />
-        <p className="mt-3 text-muted-foreground">Nog geen winkels opgeslagen.</p>
+        <p className="mt-3 text-muted-foreground">No shops saved yet.</p>
       </div>
     );
   }
@@ -316,7 +316,7 @@ function SavedView({ user, savedData, trips, onRemove }: { user: any; savedData:
     await supabase.from("saved_restaurants").delete().eq("user_id", user.id).eq("restaurant_id", slug);
     onRemove(slug);
     setRemoving(null);
-    toast.success("Verwijderd uit favorieten");
+    toast.success("Removed from favourites");
   };
 
   return (
@@ -396,7 +396,7 @@ function ShopsPage() {
 
   const toggleSave = useMutation({
     mutationFn: async (r: AIRestaurant) => {
-      if (!user) throw new Error("Meld je aan om op te slaan");
+      if (!user) throw new Error("Sign in to save");
       const id = encodeSlug(r);
       if (savedIds.has(id)) {
         await supabase.from("saved_restaurants").delete().eq("user_id", user.id).eq("restaurant_id", id);
@@ -408,7 +408,7 @@ function ShopsPage() {
     },
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["saved-shops", user?.id] });
-      toast.success(res.saved ? "Opgeslagen" : "Verwijderd");
+      toast.success(res.saved ? "Saved" : "Removed");
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -431,9 +431,9 @@ function ShopsPage() {
             </span>
             <span className="text-sm font-medium text-green-700 bg-green-50 border border-green-200 rounded-full px-3 py-1">Find Spots — Winkel</span>
           </div>
-          <h1 className="font-display text-4xl">Glutenvrije winkels & supermarkten</h1>
+          <h1 className="font-display text-4xl">Gluten-free shops & supermarkets</h1>
           <p className="mt-2 text-muted-foreground">
-            Vind winkels, gezondheidswinkels en supermarkten met een uitgebreid glutenvrij aanbod. Van AOECS-gecertificeerde producten tot verse GF bakkerijen — wereldwijd.
+            Find shops, health stores and supermarkets with an extensive gluten-free range. From AOECS-certified products to fresh GF bakeries — worldwide.
           </p>
         </div>
         {user && (
@@ -442,7 +442,7 @@ function ShopsPage() {
             className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${view === "saved" ? "border-green-400 bg-green-50 text-green-700" : "border-border bg-card hover:bg-muted"}`}
           >
             <Heart className={`h-4 w-4 ${view === "saved" ? "fill-green-500 text-green-500" : "text-muted-foreground"}`} />
-            Mijn favorieten
+            My favourites
             {savedData.size > 0 && (
               <span className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none ${view === "saved" ? "bg-green-200 text-green-700" : "bg-muted text-muted-foreground"}`}>
                 {savedData.size}
@@ -455,17 +455,17 @@ function ShopsPage() {
       {/* Info strip */}
       <div className="mt-5 rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
         <Leaf className="inline h-4 w-4 mr-1.5 text-green-600" />
-        <strong>Let op:</strong> Zoek naar het AOECS <span className="font-semibold">doorgestreept graantje</span> logo op verpakkingen — dat is de gouden standaard voor glutenvrije gecertificeerde producten in Europa.
+        <strong>Look for:</strong> The AOECS <span className="font-semibold">crossed-grain</span> logo on packaging — the gold standard for certified gluten-free products in Europe.
       </div>
 
       {/* Search */}
       <form onSubmit={onSearch} className="mt-5 flex flex-wrap gap-2">
         <div className="relative flex-1 min-w-[260px]">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="bijv. Parijs, Berlijn, Sydney, Antwerpen…" className="pl-9 h-12" />
+          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="e.g. Paris, Berlin, Sydney, Antwerp…" className="pl-9 h-12" />
         </div>
         <Button type="submit" size="lg" disabled={!input.trim() || isFetching} className="h-12 px-6 bg-green-600 hover:bg-green-700 text-white">
-          {isFetching ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Zoeken…</> : <><Sparkles className="mr-2 h-4 w-4" /> Zoek winkels</>}
+          {isFetching ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Searching…</> : <><Sparkles className="mr-2 h-4 w-4" /> Search shops</>}
         </Button>
       </form>
 
@@ -481,7 +481,7 @@ function ShopsPage() {
                 <button key={k} onClick={() => setFilter(k)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${filter === k ? "border-green-600 bg-green-600 text-white" : "border-border bg-card hover:bg-muted"}`}
                 >
-                  {k === "all" ? "Alle winkels" : k === "dedicated" ? "✓ 100% GF winkel" : k === "extensive" ? "Grote GF afdeling" : "GF producten aanwezig"}
+                  {k === "all" ? "All shops" : k === "dedicated" ? "✓ 100% GF shop" : k === "extensive" ? "Large GF section" : "GF products available"}
                 </button>
               ))}
             </div>
@@ -493,8 +493,8 @@ function ShopsPage() {
                 <ShoppingBag className="h-10 w-10" />
                 <Leaf className="h-10 w-10" />
               </div>
-              <p className="mt-4 text-muted-foreground">Zoek een stad om glutenvrije winkels en supermarkten te vinden.</p>
-              <p className="mt-1 text-sm text-muted-foreground/70">Van speciaalboetieks met 100% GF tot supermarkten met een grote free-from afdeling.</p>
+              <p className="mt-4 text-muted-foreground">Search any city to find gluten-free shops and supermarkets.</p>
+              <p className="mt-1 text-sm text-muted-foreground/70">From dedicated 100% GF boutiques to supermarkets with a large free-from section.</p>
             </div>
           )}
 
@@ -502,7 +502,7 @@ function ShopsPage() {
             <div className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
               {(error as Error).message}
               <div className="mt-3">
-                <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["ai-shops", place] })}>Opnieuw proberen</Button>
+                <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["ai-shops", place] })}>Retry</Button>
               </div>
             </div>
           )}
@@ -521,12 +521,12 @@ function ShopsPage() {
                 </div>
               )}
               <p className="mt-4 text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">{filtered.length}</span> winkels gevonden in{" "}
+                <span className="font-medium text-foreground">{filtered.length}</span> shops found in{" "}
                 <span className="font-medium text-foreground">{data.place}</span>
               </p>
               {filtered.length === 0 ? (
                 <div className="mt-8 rounded-3xl border border-dashed border-border bg-cream/40 p-12 text-center text-muted-foreground">
-                  Geen resultaten voor dit filter.
+                  No results for this filter.
                 </div>
               ) : (
                 <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -539,7 +539,7 @@ function ShopsPage() {
                       <article key={slug} className="group relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-soft transition hover:-translate-y-0.5 hover:shadow-glow">
                         <div className={`h-1.5 w-full ${levelBar(r.glutenFreeLevel)}`} />
                         <div className="flex flex-1 flex-col p-5">
-                          <button onClick={() => toggleSave.mutate(r)} className="absolute right-4 top-5 grid h-8 w-8 place-items-center rounded-full bg-background/90 shadow-sm backdrop-blur transition hover:scale-110" aria-label="Opslaan">
+                          <button onClick={() => toggleSave.mutate(r)} className="absolute right-4 top-5 grid h-8 w-8 place-items-center rounded-full bg-background/90 shadow-sm backdrop-blur transition hover:scale-110" aria-label="Save">
                             <Heart className={`h-4 w-4 ${isSaved ? "fill-green-500 text-green-500" : "text-muted-foreground"}`} />
                           </button>
                           <div className="flex items-center gap-2 mb-2">

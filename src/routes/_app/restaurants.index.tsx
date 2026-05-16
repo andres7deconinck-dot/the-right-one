@@ -68,10 +68,10 @@ function confidenceMeta(level?: AIRestaurant["confidence"]) {
 
 function riskMeta(l: AIRestaurant["glutenFreeLevel"]) {
   switch (l) {
-    case "dedicated": return { label: "Zeer veilig", sub: "100% glutenvrij restaurant", color: "bg-emerald-50 border-emerald-200", badge: "bg-emerald-100 text-emerald-700", bar: "bg-emerald-500", risk: "Laag risico" };
-    case "extensive": return { label: "Veilig", sub: "Uitgebreid glutenvrij menu", color: "bg-teal-50 border-teal-200", badge: "bg-teal-100 text-teal-700", bar: "bg-teal-500", risk: "Laag risico" };
-    case "options":   return { label: "Voorzichtig", sub: "Glutenvrije opties beschikbaar", color: "bg-amber-50 border-amber-200", badge: "bg-amber-100 text-amber-700", bar: "bg-amber-400", risk: "Matig risico" };
-    default:          return { label: "Beperkt", sub: "Beperkte glutenvrije opties", color: "bg-rose-50 border-rose-200", badge: "bg-rose-100 text-rose-700", bar: "bg-rose-400", risk: "Hoog risico" };
+    case "dedicated": return { label: "Very safe", sub: "100% gluten-free restaurant", color: "bg-emerald-50 border-emerald-200", badge: "bg-emerald-100 text-emerald-700", bar: "bg-emerald-500", risk: "Low risk" };
+    case "extensive": return { label: "Safe", sub: "Extensive gluten-free menu", color: "bg-teal-50 border-teal-200", badge: "bg-teal-100 text-teal-700", bar: "bg-teal-500", risk: "Low risk" };
+    case "options":   return { label: "Caution", sub: "Gluten-free options available", color: "bg-amber-50 border-amber-200", badge: "bg-amber-100 text-amber-700", bar: "bg-amber-400", risk: "Medium risk" };
+    default:          return { label: "Limited", sub: "Limited gluten-free options", color: "bg-rose-50 border-rose-200", badge: "bg-rose-100 text-rose-700", bar: "bg-rose-400", risk: "High risk" };
   }
 }
 
@@ -198,7 +198,7 @@ function RestaurantSheet({
 
           <div className="mt-3">
             <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
-              <span>Veiligheidsniveau</span>
+              <span>Safety level</span>
               <span className="font-medium">{meta.risk}</span>
             </div>
             <div className="h-1.5 w-full rounded-full bg-black/10">
@@ -218,7 +218,7 @@ function RestaurantSheet({
           )}
 
           <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Glutenvrij protocol</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-primary mb-2">Gluten-free protocol</p>
             <p className="text-sm leading-relaxed text-foreground">{r.glutenFreeNotes}</p>
             {r.cautionNote && (
               <div className="mt-3 flex gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
@@ -230,7 +230,7 @@ function RestaurantSheet({
 
           {hasAddress && (
             <div className="rounded-2xl overflow-hidden border border-border">
-              <iframe src={mapsEmbed} className="h-44 w-full border-0" loading="lazy" title={`Kaart: ${r.name}`} />
+              <iframe src={mapsEmbed} className="h-44 w-full border-0" loading="lazy" title={`Map: ${r.name}`} />
               <div className="flex items-center justify-between border-t border-border bg-card px-3 py-2">
                 <div className="flex items-start gap-1.5 min-w-0">
                   <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0 text-muted-foreground" />
@@ -249,7 +249,7 @@ function RestaurantSheet({
 
           {r.mustTry && r.mustTry.length > 0 && (
             <div className="rounded-2xl border border-border bg-card p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">Glutenvrij aanbevolen</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">Gluten-free recommended</p>
               <ul className="grid gap-1.5">
                 {r.mustTry.map((d) => (
                   <li key={d} className="flex items-center gap-2 rounded-xl bg-muted/50 px-3 py-1.5 text-sm">
@@ -262,7 +262,7 @@ function RestaurantSheet({
 
           {(r.phone || r.website || r.openingHours) && (
             <div className="rounded-2xl border border-border bg-card p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Contact & openingsuren</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Contact & opening hours</p>
               {r.openingHours && (
                 <p className="whitespace-pre-line rounded-xl bg-muted/50 px-3 py-2 text-xs mb-2">{r.openingHours}</p>
               )}
@@ -282,7 +282,7 @@ function RestaurantSheet({
           )}
 
           <p className="text-[10px] text-muted-foreground pb-2">
-            AI-onderzoek. Toon altijd je vertaalkaart en bevestig het glutenvrije protocol bij aankomst.
+            AI research. Always show your translation card and confirm the gluten-free protocol on arrival.
           </p>
         </div>
 
@@ -292,15 +292,15 @@ function RestaurantSheet({
           {user && (
             <div>
               <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">
-                {isSaved ? "Opgeslagen" : "Toevoegen aan trip"}
+                {isSaved ? "Saved" : "Add to trip"}
               </p>
               <div className="flex gap-2">
                 <Select value={selectedTrip} onValueChange={setSelectedTrip}>
                   <SelectTrigger className="h-9 flex-1 text-sm">
-                    <SelectValue placeholder="Kies een trip…" />
+                    <SelectValue placeholder="Choose a trip…" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Alleen opslaan (geen trip)</SelectItem>
+                    <SelectItem value="none">Save only (no trip)</SelectItem>
                     {trips.map((t) => (
                       <SelectItem key={t.id} value={t.id}>
                         {t.title || t.destination_city || t.destination_country}
@@ -310,20 +310,20 @@ function RestaurantSheet({
                 </Select>
                 <Button size="sm" onClick={addToTrip} disabled={addingTrip} variant={isSaved ? "outline" : "default"} className="gap-1.5 shrink-0">
                   {isSaved
-                    ? <><BookmarkCheck className="h-3.5 w-3.5" /> Bijwerken</>
+                    ? <><BookmarkCheck className="h-3.5 w-3.5" /> Update</>
                     : addingTrip
                       ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      : <><Plus className="h-3.5 w-3.5" /> Toevoegen</>
+                      : <><Plus className="h-3.5 w-3.5" /> Add</>
                   }
                 </Button>
               </div>
               {isSaved && currentTripId && (
                 <p className="mt-1.5 text-xs text-emerald-600">
-                  ✓ Opgeslagen in "{trips.find(t => t.id === currentTripId)?.title || trips.find(t => t.id === currentTripId)?.destination_city || "trip"}"
+                  ✓ Saved to "{trips.find(t => t.id === currentTripId)?.title || trips.find(t => t.id === currentTripId)?.destination_city || "trip"}"
                 </p>
               )}
               {isSaved && !currentTripId && (
-                <p className="mt-1.5 text-xs text-emerald-600">✓ Opgeslagen in favorieten</p>
+                <p className="mt-1.5 text-xs text-emerald-600">✓ Saved to favourites</p>
               )}
             </div>
           )}
@@ -331,7 +331,7 @@ function RestaurantSheet({
           {/* Bottom row: full page + maps */}
           <div className="flex gap-2">
             <Link to="/restaurants/$slug" params={{ slug: encodeSlug(r) }} className="flex-1">
-              <Button variant="outline" className="w-full text-sm">Volledige pagina</Button>
+              <Button variant="outline" className="w-full text-sm">Full page</Button>
             </Link>
             {hasAddress && (
               <a href={mapsUrl} target="_blank" rel="noreferrer">
@@ -532,7 +532,7 @@ function RestaurantsPage() {
             }`}
           >
             <Heart className={`h-4 w-4 ${view === "saved" ? "fill-rose-500 text-rose-500" : "text-muted-foreground"}`} />
-            Mijn favorieten
+            My favourites
             {savedData.size > 0 && (
               <span className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
                 view === "saved" ? "bg-rose-200 text-rose-700" : "bg-muted text-muted-foreground"

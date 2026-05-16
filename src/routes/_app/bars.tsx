@@ -19,8 +19,8 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_app/bars")({
   head: () => ({
     meta: [
-      { title: "Glutenvrije Bars & Pubs — GlutenGo" },
-      { name: "description", content: "Vind glutenvrije bars, pubs, craft beer taprooms, wijnbars en cocktailbars wereldwijd. AI-onderzochte spots met veilige dranklijsten voor coeliakie." },
+      { title: "Gluten-Free Bars & Pubs Worldwide — GlutenGo" },
+      { name: "description", content: "Find gluten-free bars, pubs, craft beer taprooms, wine bars and cocktail lounges worldwide. AI-researched venues with safe drink lists for coeliac disease." },
     ],
   }),
   component: BarsPage,
@@ -31,9 +31,9 @@ export const Route = createFileRoute("/_app/bars")({
 function levelMeta(l: AIRestaurant["glutenFreeLevel"]) {
   switch (l) {
     case "dedicated": return { label: "100% GF bar", className: "bg-amber-100 text-amber-800 hover:bg-amber-100 border-amber-200" };
-    case "extensive": return { label: "GF dranken", className: "bg-orange-100 text-orange-700 hover:bg-orange-100 border-orange-200" };
-    case "options":   return { label: "GF opties", className: "bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-yellow-200" };
-    default:          return { label: "Beperkt", className: "bg-muted text-muted-foreground border-border" };
+    case "extensive": return { label: "GF drinks", className: "bg-orange-100 text-orange-700 hover:bg-orange-100 border-orange-200" };
+    case "options":   return { label: "GF options", className: "bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-yellow-200" };
+    default:          return { label: "Limited", className: "bg-muted text-muted-foreground border-border" };
   }
 }
 
@@ -48,10 +48,10 @@ function levelBar(l: AIRestaurant["glutenFreeLevel"]) {
 
 function riskMeta(l: AIRestaurant["glutenFreeLevel"]) {
   switch (l) {
-    case "dedicated": return { label: "100% GF bar", sub: "Volledig glutenvrije bar", color: "bg-amber-50 border-amber-200", badge: "bg-amber-100 text-amber-800", bar: "bg-amber-500", risk: "Laag risico" };
-    case "extensive": return { label: "GF dranken", sub: "Uitgebreid GF drankenaanbod", color: "bg-orange-50 border-orange-200", badge: "bg-orange-100 text-orange-700", bar: "bg-orange-400", risk: "Laag risico" };
-    case "options":   return { label: "Voorzichtig", sub: "Enkele GF drankopties", color: "bg-yellow-50 border-yellow-200", badge: "bg-yellow-100 text-yellow-700", bar: "bg-yellow-400", risk: "Matig risico" };
-    default:          return { label: "Beperkt", sub: "Beperkte GF opties", color: "bg-rose-50 border-rose-200", badge: "bg-rose-100 text-rose-700", bar: "bg-rose-400", risk: "Hoog risico" };
+    case "dedicated": return { label: "100% GF bar", sub: "Fully gluten-free bar", color: "bg-amber-50 border-amber-200", badge: "bg-amber-100 text-amber-800", bar: "bg-amber-500", risk: "Low risk" };
+    case "extensive": return { label: "GF drinks", sub: "Extensive GF drinks range", color: "bg-orange-50 border-orange-200", badge: "bg-orange-100 text-orange-700", bar: "bg-orange-400", risk: "Low risk" };
+    case "options":   return { label: "Caution", sub: "Limited GF drink options", color: "bg-yellow-50 border-yellow-200", badge: "bg-yellow-100 text-yellow-700", bar: "bg-yellow-400", risk: "Medium risk" };
+    default:          return { label: "Limited", sub: "Very limited GF options", color: "bg-rose-50 border-rose-200", badge: "bg-rose-100 text-rose-700", bar: "bg-rose-400", risk: "High risk" };
   }
 }
 
@@ -108,7 +108,7 @@ function BarSheet({
   const hasAddress = !!(r.address || r.city);
 
   const addToTrip = async () => {
-    if (!user) { toast.error("Meld je aan om op te slaan"); return; }
+    if (!user) { toast.error("Sign in to save"); return; }
     setAddingTrip(true);
     try {
       const trip_id = selectedTrip === "none" ? null : selectedTrip;
@@ -119,7 +119,7 @@ function BarSheet({
       if (error) { toast.error(error.message); return; }
       onToggleSave();
       const tripName = trips.find(t => t.id === trip_id)?.title || trips.find(t => t.id === trip_id)?.destination_city;
-      toast.success(trip_id ? `Opgeslagen in "${tripName}"` : "Opgeslagen in favorieten");
+      toast.success(trip_id ? `Saved to "${tripName}"` : "Saved to favourites");
     } finally { setAddingTrip(false); }
   };
 
@@ -149,12 +149,12 @@ function BarSheet({
             <span className="text-xs text-muted-foreground">{meta.sub}</span>
             <span className="ml-auto flex items-center gap-1 text-[11px] text-muted-foreground">
               <span className={`inline-block h-2 w-2 rounded-full ${confidenceDot(r.confidence)}`} />
-              {r.confidence === "high" ? "Hoge betrouwbaarheid" : r.confidence === "low" ? "Lage betrouwbaarheid" : "Gemiddeld"}
+              {r.confidence === "high" ? "High confidence" : r.confidence === "low" ? "Low confidence" : "Medium confidence"}
             </span>
           </div>
           <div className="mt-3">
             <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
-              <span>GF-veiligheidsniveau</span><span className="font-medium">{meta.risk}</span>
+              <span>GF safety level</span><span className="font-medium">{meta.risk}</span>
             </div>
             <div className="h-1.5 w-full rounded-full bg-black/10">
               <div className={`h-1.5 rounded-full ${meta.bar} transition-all`}
@@ -172,7 +172,7 @@ function BarSheet({
           )}
 
           <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-amber-800 mb-2">Veilige drankjes protocol</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-amber-800 mb-2">Safe drinks protocol</p>
             <p className="text-sm leading-relaxed text-foreground">{r.glutenFreeNotes}</p>
             {r.cautionNote && (
               <div className="mt-3 flex gap-2.5 rounded-xl border border-amber-300 bg-amber-100 px-3 py-2.5">
@@ -184,7 +184,7 @@ function BarSheet({
 
           {r.mustTry && r.mustTry.length > 0 && (
             <div className="rounded-2xl border border-border bg-card p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">Aanbevolen GF drankjes</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2.5">Recommended GF drinks</p>
               <ul className="grid gap-1.5">
                 {r.mustTry.map((d) => (
                   <li key={d} className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-1.5 text-sm">
@@ -197,7 +197,7 @@ function BarSheet({
 
           {hasAddress && (
             <div className="rounded-2xl overflow-hidden border border-border">
-              <iframe src={mapsEmbed} className="h-44 w-full border-0" loading="lazy" title={`Kaart: ${r.name}`} />
+              <iframe src={mapsEmbed} className="h-44 w-full border-0" loading="lazy" title={`Map: ${r.name}`} />
               <div className="flex items-center justify-between border-t border-border bg-card px-3 py-2">
                 <div className="flex items-start gap-1.5 min-w-0">
                   <MapPin className="h-3.5 w-3.5 mt-0.5 shrink-0 text-muted-foreground" />
@@ -216,7 +216,7 @@ function BarSheet({
 
           {(r.phone || r.website || r.openingHours) && (
             <div className="rounded-2xl border border-border bg-card p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Contact & openingsuren</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">Contact & opening hours</p>
               {r.openingHours && (
                 <p className="whitespace-pre-line rounded-xl bg-muted/50 px-3 py-2 text-xs mb-2">{r.openingHours}</p>
               )}
@@ -236,7 +236,7 @@ function BarSheet({
           )}
 
           <p className="text-[10px] text-muted-foreground pb-2">
-            AI-onderzoek. Toon altijd je vertaalkaart en bevestig GF-drankprotocol bij aankomst.
+            AI research. Always show your translation card and confirm the GF drink protocol on arrival.
           </p>
         </div>
 
@@ -245,15 +245,15 @@ function BarSheet({
           {user && (
             <div>
               <p className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">
-                {isSaved ? "Opgeslagen" : "Toevoegen aan trip"}
+                {isSaved ? "Saved" : "Add to trip"}
               </p>
               <div className="flex gap-2">
                 <Select value={selectedTrip} onValueChange={setSelectedTrip}>
                   <SelectTrigger className="h-9 flex-1 text-sm">
-                    <SelectValue placeholder="Kies een trip…" />
+                    <SelectValue placeholder="Choose a trip…" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">Alleen opslaan (geen trip)</SelectItem>
+                    <SelectItem value="none">Save only (no trip)</SelectItem>
                     {trips.map((t) => (
                       <SelectItem key={t.id} value={t.id}>
                         {t.title || t.destination_city || t.destination_country}
@@ -262,16 +262,16 @@ function BarSheet({
                   </SelectContent>
                 </Select>
                 <Button size="sm" onClick={addToTrip} disabled={addingTrip} variant={isSaved ? "outline" : "default"} className="gap-1.5 shrink-0">
-                  {isSaved ? <><BookmarkCheck className="h-3.5 w-3.5" /> Bijwerken</>
+                  {isSaved ? <><BookmarkCheck className="h-3.5 w-3.5" /> Update</>
                     : addingTrip ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    : <><Plus className="h-3.5 w-3.5" /> Toevoegen</>}
+                    : <><Plus className="h-3.5 w-3.5" /> Add</>}
                 </Button>
               </div>
               {isSaved && currentTripId && (
-                <p className="mt-1.5 text-xs text-emerald-600">✓ Opgeslagen in "{trips.find(t => t.id === currentTripId)?.title || "trip"}"</p>
+                <p className="mt-1.5 text-xs text-emerald-600">✓ Saved to "{trips.find(t => t.id === currentTripId)?.title || "trip"}"</p>
               )}
               {isSaved && !currentTripId && (
-                <p className="mt-1.5 text-xs text-emerald-600">✓ Opgeslagen in favorieten</p>
+                <p className="mt-1.5 text-xs text-emerald-600">✓ Saved to favourites</p>
               )}
             </div>
           )}
@@ -297,7 +297,7 @@ function SavedView({ user, savedData, trips, onRemove }: { user: any; savedData:
     return (
       <div className="mt-12 rounded-3xl border border-dashed border-border bg-amber-50/40 p-12 text-center">
         <Wine className="mx-auto h-10 w-10 text-muted-foreground/40" />
-        <p className="mt-3 text-muted-foreground">Meld je aan om je favoriete bars te bewaren.</p>
+        <p className="mt-3 text-muted-foreground">Sign in to save your favourite bars.</p>
       </div>
     );
   }
@@ -305,7 +305,7 @@ function SavedView({ user, savedData, trips, onRemove }: { user: any; savedData:
     return (
       <div className="mt-12 rounded-3xl border border-dashed border-border bg-amber-50/40 p-12 text-center">
         <Wine className="mx-auto h-10 w-10 text-muted-foreground/40" />
-        <p className="mt-3 text-muted-foreground">Nog geen bars opgeslagen. Zoek een stad en tik het hartje.</p>
+        <p className="mt-3 text-muted-foreground">No bars saved yet. Search a city and tap the heart icon.</p>
       </div>
     );
   }
@@ -315,7 +315,7 @@ function SavedView({ user, savedData, trips, onRemove }: { user: any; savedData:
     await supabase.from("saved_restaurants").delete().eq("user_id", user.id).eq("restaurant_id", slug);
     onRemove(slug);
     setRemoving(null);
-    toast.success("Verwijderd uit favorieten");
+    toast.success("Removed from favourites");
   };
 
   return (
@@ -401,7 +401,7 @@ function BarsPage() {
 
   const toggleSave = useMutation({
     mutationFn: async (r: AIRestaurant) => {
-      if (!user) throw new Error("Meld je aan om op te slaan");
+      if (!user) throw new Error("Sign in to save");
       const id = encodeSlug(r);
       if (savedIds.has(id)) {
         await supabase.from("saved_restaurants").delete().eq("user_id", user.id).eq("restaurant_id", id);
@@ -413,7 +413,7 @@ function BarsPage() {
     },
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["saved-bars", user?.id] });
-      toast.success(res.saved ? "Opgeslagen" : "Verwijderd");
+      toast.success(res.saved ? "Saved" : "Removed");
     },
     onError: (e: any) => toast.error(e.message),
   });
@@ -436,9 +436,9 @@ function BarsPage() {
             </span>
             <span className="text-sm font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-3 py-1">Find Spots — Bars</span>
           </div>
-          <h1 className="font-display text-4xl">Glutenvrije bars & pubs</h1>
+          <h1 className="font-display text-4xl">Gluten-free bars & pubs</h1>
           <p className="mt-2 text-muted-foreground">
-            Vind bars, craft beer taprooms, wijnbars en cocktailbars waar je veilig kunt drinken als coeliakie-patiënt — wereldwijd, AI-onderzocht.
+            Find bars, craft beer taprooms, wine bars and cocktail lounges where you can drink safely with coeliac disease — worldwide, AI-researched.
           </p>
         </div>
         {user && (
@@ -447,7 +447,7 @@ function BarsPage() {
             className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all ${view === "saved" ? "border-amber-400 bg-amber-50 text-amber-700" : "border-border bg-card hover:bg-muted"}`}
           >
             <Heart className={`h-4 w-4 ${view === "saved" ? "fill-amber-500 text-amber-500" : "text-muted-foreground"}`} />
-            Mijn favorieten
+            My favourites
             {savedData.size > 0 && (
               <span className={`ml-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-none ${view === "saved" ? "bg-amber-200 text-amber-700" : "bg-muted text-muted-foreground"}`}>
                 {savedData.size}
@@ -461,10 +461,10 @@ function BarsPage() {
       <form onSubmit={onSearch} className="mt-6 flex flex-wrap gap-2">
         <div className="relative flex-1 min-w-[260px]">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="bijv. Gent, Amsterdam, Lissabon, Tokio…" className="pl-9 h-12" />
+          <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="e.g. Ghent, Amsterdam, Lisbon, Tokyo…" className="pl-9 h-12" />
         </div>
         <Button type="submit" size="lg" disabled={!input.trim() || isFetching} className="h-12 px-6 bg-amber-600 hover:bg-amber-700 text-white">
-          {isFetching ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Zoeken…</> : <><Sparkles className="mr-2 h-4 w-4" /> Zoek bars</>}
+          {isFetching ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Searching…</> : <><Sparkles className="mr-2 h-4 w-4" /> Search bars</>}
         </Button>
       </form>
 
@@ -483,7 +483,7 @@ function BarsPage() {
                 <button key={k} onClick={() => setFilter(k)}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${filter === k ? "border-amber-500 bg-amber-500 text-white" : "border-border bg-card hover:bg-muted"}`}
                 >
-                  {k === "all" ? "Alle bars" : k === "dedicated" ? "✓ 100% GF bar" : k === "extensive" ? "Goede GF keuze" : "GF drankopties"}
+                  {k === "all" ? "All bars" : k === "dedicated" ? "✓ 100% GF bar" : k === "extensive" ? "Good GF selection" : "GF drink options"}
                 </button>
               ))}
             </div>
@@ -496,8 +496,8 @@ function BarsPage() {
                 <Wine className="h-10 w-10" />
                 <Beer className="h-10 w-10" />
               </div>
-              <p className="mt-4 text-muted-foreground">Zoek een stad om glutenvrije bars te vinden.</p>
-              <p className="mt-1 text-sm text-muted-foreground/70">Van craft beer taprooms tot wijnbars en cocktaillounge — veilig genieten.</p>
+              <p className="mt-4 text-muted-foreground">Search any city to find gluten-free bars.</p>
+              <p className="mt-1 text-sm text-muted-foreground/70">From craft beer taprooms to wine bars and cocktail lounges — enjoy safely.</p>
             </div>
           )}
 
@@ -505,7 +505,7 @@ function BarsPage() {
             <div className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
               {(error as Error).message}
               <div className="mt-3">
-                <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["ai-bars", place] })}>Opnieuw proberen</Button>
+                <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["ai-bars", place] })}>Retry</Button>
               </div>
             </div>
           )}
@@ -524,15 +524,15 @@ function BarsPage() {
                 </div>
               )}
               <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-                AI-onderzoek helpt om veilige bars te vinden. Geen medische garantie. Bevestig altijd het GF-drankprotocol bij de barman.
+                AI research helps shortlist safe bars. Not a medical guarantee. Always confirm the GF drink protocol with the bartender.
               </div>
               <p className="mt-4 text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">{filtered.length}</span> bars gevonden in{" "}
+                <span className="font-medium text-foreground">{filtered.length}</span> bars found in{" "}
                 <span className="font-medium text-foreground">{data.place}</span>
               </p>
               {filtered.length === 0 ? (
                 <div className="mt-8 rounded-3xl border border-dashed border-border bg-cream/40 p-12 text-center text-muted-foreground">
-                  Geen resultaten voor dit filter. Probeer "Alle bars".
+                  No results for this filter. Try "All bars".
                 </div>
               ) : (
                 <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -546,7 +546,7 @@ function BarsPage() {
                         <div className="flex flex-1 flex-col p-5">
                           <button onClick={() => toggleSave.mutate(r)}
                             className="absolute right-4 top-5 grid h-8 w-8 place-items-center rounded-full bg-background/90 shadow-sm backdrop-blur transition hover:scale-110"
-                            aria-label="Opslaan"
+                            aria-label="Save"
                           >
                             <Heart className={`h-4 w-4 ${isSaved ? "fill-amber-500 text-amber-500" : "text-muted-foreground"}`} />
                           </button>
@@ -563,7 +563,7 @@ function BarsPage() {
                             <Badge className={`${meta.className} text-xs`}>{meta.label}</Badge>
                             <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
                               <span className={`inline-block h-2 w-2 rounded-full ${confidenceDot(r.confidence)}`} />
-                              {r.confidence === "high" ? "Betrouwbaar" : r.confidence === "low" ? "Onzeker" : "Gemiddeld"}
+                              {r.confidence === "high" ? "Reliable" : r.confidence === "low" ? "Uncertain" : "Medium"}
                             </span>
                             {r.tags?.slice(0, 2).map((t) => <Badge key={t} variant="outline" className="text-[11px] capitalize">{t}</Badge>)}
                           </div>
