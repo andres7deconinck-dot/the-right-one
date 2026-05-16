@@ -113,7 +113,7 @@ function PharmacySheet({
     try {
       const trip_id = selectedTrip === "none" ? null : selectedTrip;
       const { error } = await supabase.from("saved_restaurants").upsert(
-        { user_id: user.id, restaurant_id: slug, trip_id, venue_type: "pharmacy" },
+        { user_id: user.id, restaurant_id: slug, trip_id },
         { onConflict: "user_id,restaurant_id" },
       );
       if (error) { toast.error(error.message); return; }
@@ -407,7 +407,7 @@ function PharmaciesPage() {
         await supabase.from("saved_restaurants").delete().eq("user_id", user.id).eq("restaurant_id", id);
         return { saved: false };
       }
-      const { error } = await supabase.from("saved_restaurants").insert({ user_id: user.id, restaurant_id: id, venue_type: "pharmacy" });
+      const { error } = await supabase.from("saved_restaurants").insert({ user_id: user.id, restaurant_id: id });
       if (error) throw error;
       return { saved: true };
     },
