@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, BookOpen, Download, FileText, MapPin, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, BookOpen, Download, FileText, MapPin, Pill, Plus, ShoppingBag, Trash2, UtensilsCrossed, Wine } from "lucide-react";
 import { jsPDF } from "jspdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -169,7 +169,7 @@ function TripDetail() {
       <Tabs defaultValue="overview" className="mt-8">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="restaurants">Restaurants</TabsTrigger>
+          <TabsTrigger value="restaurants">Saved Spots</TabsTrigger>
           <TabsTrigger value="cards">Cards</TabsTrigger>
           <TabsTrigger value="checklist">Checklist</TabsTrigger>
           <TabsTrigger value="pack">Travel Pack</TabsTrigger>
@@ -218,32 +218,58 @@ function TripDetail() {
         <TabsContent value="restaurants" className="mt-6">
           {savedRest.length === 0 ? (
             <Empty
-              msg="No restaurants saved to this trip yet."
+              msg="No spots saved to this trip yet."
               cta={
-                <Link to="/restaurants">
-                  <Button size="sm">Find restaurants{trip?.destination_city ? ` in ${trip.destination_city}` : ""}</Button>
-                </Link>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  <Link to="/restaurants"><Button size="sm" variant="outline"><UtensilsCrossed className="mr-1.5 h-3.5 w-3.5" /> Restaurants</Button></Link>
+                  <Link to="/bars"><Button size="sm" variant="outline"><Wine className="mr-1.5 h-3.5 w-3.5" /> Bars</Button></Link>
+                  <Link to="/pharmacies"><Button size="sm" variant="outline"><Pill className="mr-1.5 h-3.5 w-3.5" /> Pharmacies</Button></Link>
+                  <Link to="/shops"><Button size="sm" variant="outline"><ShoppingBag className="mr-1.5 h-3.5 w-3.5" /> Shops</Button></Link>
+                </div>
               }
             />
           ) : (
-            <div className="space-y-2">
-              {savedRest.map((s) => {
-                const info = decodeAISlug(s.restaurant_id);
-                if (!info) return null;
+            <div className="space-y-6">
+              {(
+                [
+                  { type: "restaurant", label: "Restaurants", Icon: UtensilsCrossed, to: "/restaurants" as const, color: "text-emerald-600" },
+                  { type: "bar",        label: "Bars",        Icon: Wine,            to: "/bars"        as const, color: "text-amber-600" },
+                  { type: "pharmacy",   label: "Pharmacies",  Icon: Pill,            to: "/pharmacies"  as const, color: "text-blue-600" },
+                  { type: "shop",       label: "Shops",       Icon: ShoppingBag,     to: "/shops"       as const, color: "text-green-600" },
+                ] as const
+              ).map(({ type, label, Icon, to, color }) => {
+                const group = savedRest.filter((s) => (s.venue_type ?? "restaurant") === type);
+                if (group.length === 0) return null;
                 return (
-                  <div key={s.id} className="flex items-center justify-between rounded-2xl border border-border bg-card p-4">
-                    <div>
-                      <Link to="/restaurants/$slug" params={{ slug: s.restaurant_id }} className="font-medium hover:underline">{info.name}</Link>
-                      <p className="text-xs text-muted-foreground">{info.city}{info.country ? `, ${info.country}` : ""}</p>
+                  <div key={type}>
+                    <div className={`flex items-center gap-2 mb-2 ${color}`}>
+                      <Icon className="h-4 w-4" />
+                      <span className="text-sm font-semibold uppercase tracking-wider">{label}</span>
+                      <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">{group.length}</span>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => removeRest(s.id)}><Trash2 className="h-4 w-4" /></Button>
+                    <div className="space-y-2">
+                      {group.map((s) => {
+                        const info = decodeAISlug(s.restaurant_id);
+                        if (!info) return null;
+                        return (
+                          <div key={s.id} className="flex items-center justify-between rounded-2xl border border-border bg-card p-4">
+                            <div>
+                              <p className="font-medium">{info.name}</p>
+                              <p className="text-xs text-muted-foreground">{info.city}{info.country ? `, ${info.country}` : ""}</p>
+                            </div>
+                            <Button variant="ghost" size="sm" onClick={() => removeRest(s.id)}><Trash2 className="h-4 w-4" /></Button>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 );
               })}
-              <div className="mt-4">
-                <Link to="/restaurants">
-                  <Button variant="outline" size="sm"><Plus className="mr-1.5 h-3.5 w-3.5" /> Add more venues</Button>
-                </Link>
+              <div className="flex flex-wrap gap-2 pt-2">
+                <Link to="/restaurants"><Button variant="outline" size="sm"><UtensilsCrossed className="mr-1.5 h-3.5 w-3.5" /> Add restaurant</Button></Link>
+                <Link to="/bars"><Button variant="outline" size="sm"><Wine className="mr-1.5 h-3.5 w-3.5" /> Add bar</Button></Link>
+                <Link to="/pharmacies"><Button variant="outline" size="sm"><Pill className="mr-1.5 h-3.5 w-3.5" /> Add pharmacy</Button></Link>
+                <Link to="/shops"><Button variant="outline" size="sm"><ShoppingBag className="mr-1.5 h-3.5 w-3.5" /> Add shop</Button></Link>
               </div>
             </div>
           )}
