@@ -20,6 +20,7 @@ export const listPublishedPosts = createServerFn({ method: "GET" })
       .from("blog_posts")
       .select("id, title, slug, excerpt, cover_image_url, country_code, country_name, city, hotel_name, restaurant_name, tags, is_featured, verified_by_admin, views, likes, reading_minutes, published_at, author_id")
       .eq("status", "published")
+      .order("likes", { ascending: false })
       .order("published_at", { ascending: false })
       .limit(data.limit);
     if (data.country) q = q.eq("country_code", data.country);
@@ -249,6 +250,21 @@ export const addComment = createServerFn({ method: "POST" })
       body: data.body,
     });
     if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// ===== PUBLIC: like a post (idempotent via localStorage on client) =====
+export const likePost = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({ post_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data }) => {
+    const { error } = await supabaseAdmin.rpc("increment_post_likes", { pid: data.post_id });
+    if (error) {
+      // fallback: manual increment if RPC not available
+      const { data: post } = await supabaseAdmin
+        .from("blog_posts").select("likes").eq("id", data.post_id).single();
+      await supabaseAdmin
+        .from("blog_posts").update({ likes: (post?.likes ?? 0) + 1 }).eq("id", data.post_id);
+    }
     return { ok: true };
   });
 

@@ -1,12 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Hotel, BadgeCheck, Eye, Heart, ArrowLeft, UtensilsCrossed, Calendar, Pencil, PenLine, Trash2 } from "lucide-react";
-import { getPostBySlug, addComment, deleteComment, updateComment, checkIsAdmin } from "@/lib/blog.functions";
+import { getPostBySlug, addComment, deleteComment, updateComment, likePost, checkIsAdmin } from "@/lib/blog.functions";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
@@ -166,6 +166,11 @@ function BlogDetailPage() {
             </div>
           )}
 
+          {/* Like button */}
+          <div className="mt-8 flex justify-center">
+            <GFLikeButton postId={post.id} initialLikes={post.likes ?? 0} />
+          </div>
+
           {/* Comments */}
           <section className="mt-12 border-t border-border pt-8">
             <h2 className="font-display text-2xl">Comments ({comments.length})</h2>
@@ -238,5 +243,149 @@ function BlogDetailPage() {
           </section>
         </article>
     </main>
+  );
+}
+
+// ─── GF Like Button ───────────────────────────────────────────────────────────
+
+const BURST_COLORS = ["#f59e0b", "#ef4444", "#10b981", "#3b82f6", "#a855f7", "#f97316", "#ec4899", "#14b8a6"];
+const BURST_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
+
+function GFLikeButton({ postId, initialLikes }: { postId: string; initialLikes: number }) {
+  const likeFn = useServerFn(likePost);
+  const [liked, setLiked] = useState(false);
+  const [count, setCount] = useState(initialLikes);
+  const [bursting, setBursting] = useState(false);
+  const [popping, setPopping] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored: string[] = JSON.parse(localStorage.getItem("gf-liked-posts") ?? "[]");
+      setLiked(stored.includes(postId));
+    } catch {}
+  }, [postId]);
+
+  const handleLike = async () => {
+    if (liked || bursting) return;
+    setPopping(true);
+    setBursting(true);
+    setLiked(true);
+    setCount((c) => c + 1);
+    try {
+      const stored: string[] = JSON.parse(localStorage.getItem("gf-liked-posts") ?? "[]");
+      localStorage.setItem("gf-liked-posts", JSON.stringify([...stored, postId]));
+    } catch {}
+    likeFn({ data: { post_id: postId } }).catch(() => {});
+    setTimeout(() => setBursting(false), 700);
+    setTimeout(() => setPopping(false), 500);
+  };
+
+  return (
+    <>
+      <style>{`
+        @keyframes gf-burst-particle {
+          0%   { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 1; }
+          100% { transform: translate(calc(var(--tx) * 3), calc(var(--ty) * 3)) scale(0); opacity: 0; }
+        }
+        @keyframes gf-pop {
+          0%   { transform: scale(1); }
+          35%  { transform: scale(1.45); }
+          65%  { transform: scale(0.92); }
+          100% { transform: scale(1); }
+        }
+        @keyframes gf-count-fly {
+          0%   { transform: translateY(0); opacity: 1; }
+          40%  { transform: translateY(-10px); opacity: 0; }
+          41%  { transform: translateY(10px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes gf-cross-draw {
+          from { stroke-dashoffset: 30; }
+          to   { stroke-dashoffset: 0; }
+        }
+      `}</style>
+
+      <div className="relative inline-flex flex-col items-center gap-2">
+        {/* Burst particles */}
+        {bursting && BURST_ANGLES.map((angle, i) => {
+          const rad = (angle * Math.PI) / 180;
+          return (
+            <span
+              key={i}
+              style={{
+                position: "absolute",
+                left: "50%", top: "50%",
+                width: 7, height: 7,
+                borderRadius: "50%",
+                background: BURST_COLORS[i],
+                marginLeft: -3.5, marginTop: -3.5,
+                pointerEvents: "none",
+                "--tx": `${Math.round(Math.cos(rad) * 22)}px`,
+                "--ty": `${Math.round(Math.sin(rad) * 22)}px`,
+                animation: "gf-burst-particle 0.65s ease-out forwards",
+              } as React.CSSProperties}
+            />
+          );
+        })}
+
+        {/* Button */}
+        <button
+          onClick={handleLike}
+          disabled={liked}
+          title={liked ? "GF approved! ✓" : "Mark as GF friendly"}
+          style={popping ? { animation: "gf-pop 0.45s ease-out" } : {}}
+          className={`group relative flex items-center gap-3 rounded-2xl border-2 px-6 py-3 text-sm font-semibold shadow-sm transition-all duration-300 ${
+            liked
+              ? "border-amber-400 bg-amber-50 text-amber-700 shadow-amber-100"
+              : "border-border bg-card hover:border-amber-300 hover:bg-amber-50/60 hover:text-amber-600 hover:shadow-md cursor-pointer"
+          }`}
+        >
+          {/* Crossed-grain SVG — the international GF symbol */}
+          <svg viewBox="0 0 28 28" className="h-7 w-7 shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Grain body */}
+            <ellipse cx="14" cy="11" rx="5.5" ry="8"
+              fill={liked ? "#fcd34d" : "none"}
+              stroke={liked ? "#d97706" : "currentColor"}
+              strokeWidth="1.6"
+              className="transition-all duration-300"
+            />
+            {/* Grain texture lines */}
+            <line x1="14" y1="4" x2="14" y2="19" stroke={liked ? "#d97706" : "currentColor"} strokeWidth="1.2" />
+            <line x1="10.5" y1="8" x2="17.5" y2="8" stroke={liked ? "#d97706" : "currentColor"} strokeWidth="1" strokeLinecap="round" />
+            <line x1="9.5" y1="11" x2="18.5" y2="11" stroke={liked ? "#d97706" : "currentColor"} strokeWidth="1" strokeLinecap="round" />
+            <line x1="10.5" y1="14" x2="17.5" y2="14" stroke={liked ? "#d97706" : "currentColor"} strokeWidth="1" strokeLinecap="round" />
+            {/* Stalk */}
+            <line x1="14" y1="19" x2="14" y2="24" stroke={liked ? "#d97706" : "currentColor"} strokeWidth="1.6" strokeLinecap="round" />
+            {/* GF cross line — animated in when liked */}
+            {liked && (
+              <line x1="6" y1="4" x2="22" y2="24"
+                stroke="#dc2626" strokeWidth="2.2" strokeLinecap="round"
+                strokeDasharray="30" strokeDashoffset="0"
+                style={{ animation: "gf-cross-draw 0.3s ease-out forwards" }}
+              />
+            )}
+          </svg>
+
+          {/* Count */}
+          <span
+            style={popping ? { animation: "gf-count-fly 0.45s ease-out" } : {}}
+            className="tabular-nums text-base"
+          >
+            {count}
+          </span>
+
+          {/* Label */}
+          <span className="text-xs font-normal opacity-70">
+            {liked ? "GF approved!" : "GF friendly?"}
+          </span>
+        </button>
+
+        {liked && (
+          <p className="text-[11px] text-amber-600 font-medium animate-pulse">
+            ✓ You marked this article as gluten-free friendly
+          </p>
+        )}
+      </div>
+    </>
   );
 }
