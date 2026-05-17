@@ -84,7 +84,8 @@ const TOOL_BASE = [
 export function SiteHeader() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const nx = getNavExtras(lang);
   const [open, setOpen] = useState(false);
   const [spotsOpen, setSpotsOpen] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
@@ -104,9 +105,17 @@ export function SiteHeader() {
     ...(adminMeta?.isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
   ];
 
-  const toolLinks = TOOL_META.map((meta, i) => ({
+  const SPOTS_META = SPOTS_BASE.map((s) => ({
+    ...s,
+    label: nx.spots[s.key].label,
+    desc: nx.spots[s.key].desc,
+  }));
+
+  const TOOL_LABELS = [t.nav.translationCards, t.nav.aiAssistant, t.nav.travelMode, t.nav.trips, t.nav.ingredientAnalyzer, t.nav.emergencyPhrases];
+  const toolLinks = TOOL_BASE.map((meta, i) => ({
     ...meta,
-    label: [t.nav.translationCards, t.nav.aiAssistant, t.nav.travelMode, t.nav.trips, t.nav.ingredientAnalyzer, t.nav.emergencyPhrases][i],
+    label: TOOL_LABELS[i],
+    desc: nx.tools[meta.descKey],
   }));
 
   return (
@@ -129,7 +138,7 @@ export function SiteHeader() {
           {/* Find Spots dropdown */}
           <div className="relative" onMouseEnter={() => setSpotsOpen(true)} onMouseLeave={() => setSpotsOpen(false)}>
             <button className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground" aria-haspopup="true" aria-expanded={spotsOpen}>
-              Find Spots <ChevronDown className={`h-3.5 w-3.5 transition-transform ${spotsOpen ? "rotate-180" : ""}`} />
+              {nx.findSpots} <ChevronDown className={`h-3.5 w-3.5 transition-transform ${spotsOpen ? "rotate-180" : ""}`} />
             </button>
             {spotsOpen && (
               <div className="absolute left-1/2 top-full z-50 w-64 -translate-x-1/2 pt-2">
