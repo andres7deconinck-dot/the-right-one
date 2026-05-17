@@ -87,7 +87,7 @@ function ContactPage() {
           </div>
           <div className="rounded-2xl border border-border/60 bg-card-soft p-5">
             <Mail className="h-5 w-5 text-primary" />
-            <p className="mt-2 text-sm font-medium">hello@glutengo.app</p>
+            <p className="mt-2 text-sm font-medium">info.deconinckdigital@gmail.com</p>
             <p className="mt-1 text-xs text-muted-foreground">Or use the form — both reach the same inbox.</p>
           </div>
           <div className="rounded-2xl border border-destructive/30 bg-destructive/5 p-5">

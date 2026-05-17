@@ -37,13 +37,13 @@ function PrivacyPage() {
         <p className="text-muted-foreground">We do not sell your data to advertisers. We do not run ad networks. We do not share your medical preferences with third parties.</p>
 
         <h2 className="mt-8 font-display text-2xl">Your rights (GDPR)</h2>
-        <p className="text-muted-foreground">You can request a copy of your data, ask us to correct or delete it, or withdraw consent at any time. Email <a href="mailto:privacy@glutengo.app" className="text-primary underline">privacy@glutengo.app</a>.</p>
+        <p className="text-muted-foreground">You can request a copy of your data, ask us to correct or delete it, or withdraw consent at any time. Email <a href="mailto:info.deconinckdigital@gmail.com" className="text-primary underline">info.deconinckdigital@gmail.com</a>.</p>
 
         <h2 className="mt-8 font-display text-2xl">Cookies</h2>
         <p className="text-muted-foreground">We use functional cookies for sign-in and preferences. Optional analytics cookies require your consent.</p>
 
         <h2 className="mt-8 font-display text-2xl">Contact</h2>
-        <p className="text-muted-foreground">Questions? <a href="mailto:privacy@glutengo.app" className="text-primary underline">privacy@glutengo.app</a></p>
+        <p className="text-muted-foreground">Questions? <a href="mailto:info.deconinckdigital@gmail.com" className="text-primary underline">info.deconinckdigital@gmail.com</a></p>
       </article>
       <SiteFooter />
     </div>
