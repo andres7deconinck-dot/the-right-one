@@ -5,8 +5,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Hotel, BadgeCheck, Eye, Heart, ArrowLeft, UtensilsCrossed, Calendar, Pencil, PenLine } from "lucide-react";
-import { getPostBySlug, addComment, checkIsAdmin } from "@/lib/blog.functions";
+import { MapPin, Hotel, BadgeCheck, Eye, Heart, ArrowLeft, UtensilsCrossed, Calendar, Pencil, PenLine, Trash2 } from "lucide-react";
+import { getPostBySlug, addComment, deleteComment, updateComment, checkIsAdmin } from "@/lib/blog.functions";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
@@ -21,8 +21,12 @@ function BlogDetailPage() {
   const qc = useQueryClient();
   const fetchPost = useServerFn(getPostBySlug);
   const postComment = useServerFn(addComment);
+  const removeComment = useServerFn(deleteComment);
+  const editComment = useServerFn(updateComment);
   const getAdminStatus = useServerFn(checkIsAdmin);
   const [comment, setComment] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editBody, setEditBody] = useState("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["blog-post", slug],
@@ -43,6 +47,26 @@ function BlogDetailPage() {
       qc.invalidateQueries({ queryKey: ["blog-post", slug] });
     },
     onError: (e: any) => toast.error(e.message ?? "Failed to post"),
+  });
+
+  const deleteMut = useMutation({
+    mutationFn: (comment_id: string) => removeComment({ data: { comment_id } }),
+    onSuccess: () => {
+      toast.success("Comment deleted");
+      qc.invalidateQueries({ queryKey: ["blog-post", slug] });
+    },
+    onError: (e: any) => toast.error(e.message ?? "Failed to delete"),
+  });
+
+  const updateMut = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: string }) =>
+      editComment({ data: { comment_id: id, body } }),
+    onSuccess: () => {
+      setEditingId(null);
+      toast.success("Comment updated");
+      qc.invalidateQueries({ queryKey: ["blog-post", slug] });
+    },
+    onError: (e: any) => toast.error(e.message ?? "Failed to update"),
   });
 
   if (isLoading) {
@@ -164,15 +188,52 @@ function BlogDetailPage() {
             )}
 
             <ul className="mt-6 space-y-4">
-              {comments.map((c: any) => (
-                <li key={c.id} className="rounded-xl border border-border bg-card p-4">
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span className="font-medium text-foreground">{c.author?.full_name || "Anonymous"}</span>
-                    <span>{new Date(c.created_at).toLocaleDateString()}</span>
-                  </div>
-                  <p className="mt-2 text-sm">{c.body}</p>
-                </li>
-              ))}
+              {comments.map((c: any) => {
+                const isOwn = user?.id === c.author_id;
+                const isEditing = editingId === c.id;
+                return (
+                  <li key={c.id} className="rounded-xl border border-border bg-card p-4">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span className="font-medium text-foreground">{c.author?.full_name || "Anonymous"}</span>
+                      <div className="flex items-center gap-3">
+                        <span>{new Date(c.created_at).toLocaleDateString()}</span>
+                        {isOwn && !isEditing && (
+                          <button
+                            onClick={() => { setEditingId(c.id); setEditBody(c.body); }}
+                            className="hover:text-foreground transition-colors"
+                            aria-label="Edit comment"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                        {(isOwn || adminData?.isAdmin) && (
+                          <button
+                            onClick={() => deleteMut.mutate(c.id)}
+                            disabled={deleteMut.isPending}
+                            className="hover:text-destructive transition-colors"
+                            aria-label="Delete comment"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    {isEditing ? (
+                      <div className="mt-2">
+                        <Textarea value={editBody} onChange={(e) => setEditBody(e.target.value)} rows={3} className="text-sm" />
+                        <div className="mt-2 flex gap-2">
+                          <Button size="sm" disabled={!editBody.trim() || updateMut.isPending} onClick={() => updateMut.mutate({ id: c.id, body: editBody.trim() })}>
+                            {updateMut.isPending ? "Saving…" : "Save"}
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>Cancel</Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="mt-2 text-sm">{c.body}</p>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           </section>
         </article>

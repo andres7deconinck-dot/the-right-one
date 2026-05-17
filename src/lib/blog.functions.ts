@@ -252,6 +252,40 @@ export const addComment = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// ===== AUTH: delete own comment (admin can delete any) =====
+export const deleteComment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ comment_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: row } = await supabaseAdmin
+      .from("blog_comments").select("author_id").eq("id", data.comment_id).single();
+    if (!row) throw new Error("Comment not found");
+    const { data: profile } = await supabaseAdmin
+      .from("profiles").select("role").eq("id", context.userId).single();
+    if (row.author_id !== context.userId && profile?.role !== "admin")
+      throw new Error("Not authorized");
+    const { error } = await supabaseAdmin.from("blog_comments").delete().eq("id", data.comment_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// ===== AUTH: edit own comment =====
+export const updateComment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({
+    comment_id: z.string().uuid(),
+    body: z.string().min(1).max(2000),
+  }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await supabaseAdmin
+      .from("blog_comments")
+      .update({ body: data.body })
+      .eq("id", data.comment_id)
+      .eq("author_id", context.userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 // ===== AUTH: update own profile name =====
 export const updateMyProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
