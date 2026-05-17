@@ -44,7 +44,7 @@ function TermsPage() {
         <p className="text-muted-foreground">To the maximum extent permitted by law, GlutenGo's total liability is limited to the amount you paid in the 12 months preceding the claim.</p>
 
         <h2 className="mt-8 font-display text-2xl">8. Contact</h2>
-        <p className="text-muted-foreground">Questions? <a href="mailto:hello@glutengo.app" className="text-primary underline">hello@glutengo.app</a> — Andres Deconinck, Belgium.</p>
+        <p className="text-muted-foreground">Questions? <a href="mailto:info.deconinckdigital@gmail.com" className="text-primary underline">info.deconinckdigital@gmail.com</a> — Andres Deconinck, Belgium.</p>
       </article>
       <SiteFooter />
     </div>

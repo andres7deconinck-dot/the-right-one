@@ -29,7 +29,7 @@ function RefundPage() {
 
         <h2 className="mt-8 font-display text-2xl">How to request a refund</h2>
         <p className="text-muted-foreground">
-          Send an email to <a href="mailto:hello@glutengo.app" className="text-primary underline">hello@glutengo.app</a> with
+          Send an email to <a href="mailto:info.deconinckdigital@gmail.com" className="text-primary underline">info.deconinckdigital@gmail.com</a> with
           the subject line "Refund request" and include the email address associated with your account.
           We will process your refund within 5 business days.
         </p>
@@ -42,7 +42,7 @@ function RefundPage() {
 
         <h2 className="mt-8 font-display text-2xl">Contact</h2>
         <p className="text-muted-foreground">
-          Questions? <a href="mailto:hello@glutengo.app" className="text-primary underline">hello@glutengo.app</a>
+          Questions? <a href="mailto:info.deconinckdigital@gmail.com" className="text-primary underline">info.deconinckdigital@gmail.com</a>
         </p>
       </article>
       <SiteFooter />
