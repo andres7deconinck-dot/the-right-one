@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { COUNTRIES } from "@/data/countries";
 import { useLanguage } from "@/lib/i18n";
+import { getResourcesContent } from "@/data/resourcesContent";
 
 export const Route = createFileRoute("/")({
   head: () => ({
