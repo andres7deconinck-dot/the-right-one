@@ -7,21 +7,13 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 import { useLanguage } from "@/lib/i18n";
 import type { LangCode } from "@/lib/translations";
+import { getNavExtras } from "@/lib/navExtras";
 import { checkIsAdmin } from "@/lib/blog.functions";
 
 const SITE_LANGUAGES = [
   { code: "en", flag: "🇬🇧", name: "English" },
   { code: "nl", flag: "🇳🇱", name: "Nederlands" },
   { code: "fr", flag: "🇫🇷", name: "Français" },
-  { code: "de", flag: "🇩🇪", name: "Deutsch" },
-  { code: "it", flag: "🇮🇹", name: "Italiano" },
-  { code: "es", flag: "🇪🇸", name: "Español" },
-  { code: "pt", flag: "🇵🇹", name: "Português" },
-  { code: "ja", flag: "🇯🇵", name: "日本語" },
-  { code: "th", flag: "🇹🇭", name: "ภาษาไทย" },
-  { code: "pl", flag: "🇵🇱", name: "Polski" },
-  { code: "ar", flag: "🇸🇦", name: "العربية" },
-  { code: "zh", flag: "🇨🇳", name: "中文" },
 ];
 
 function LanguageSelector() {
