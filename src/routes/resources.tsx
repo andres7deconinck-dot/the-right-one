@@ -2,238 +2,41 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ExternalLink, Plane, Luggage, Heart, Lightbulb, Globe2, Shield, FileText, CreditCard, Stethoscope, Info, ChevronRight } from "lucide-react";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/lib/i18n";
+import { getResourcesContent } from "@/data/resourcesContent";
 
 export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
-      { title: "Handige Tips & Links voor Coeliakiepatiënten | GlutenGo" },
-      { name: "description", content: "Alles wat je moet weten als coeliakiepatiënt op reis: extra bagage rechten, belastingvoordelen, handige websites, verzekeringen en reisTips." },
-      { name: "keywords", content: "coeliakie reistips, extra bagage coeliakie, auto-immuunziekte vergoeding, glutenvrij reizen tips, coeliakie rechten vliegtuig" },
-      { property: "og:title", content: "Handige Tips & Links voor Coeliakiepatiënten" },
-      { property: "og:description", content: "Extra bagage, belastingvoordelen, handige sites en reisTips voor coeliakiepatiënten." },
-      { property: "og:url", content: "https://glutengo.app/resources" },
+      { title: "Helpful Tips & Links for People with Celiac Disease | GlutenGo" },
+      { name: "description", content: "Everything you need to know as a celiac traveler: extra baggage rights, tax benefits, useful websites, insurance and travel tips." },
+      { property: "og:title", content: "Helpful Tips & Links for People with Celiac Disease" },
+      { property: "og:description", content: "Extra baggage, tax benefits, useful sites and travel tips for people with celiac disease." },
+      { property: "og:url", content: "https://www.glutengo.be/resources" },
     ],
+    links: [{ rel: "canonical", href: "https://www.glutengo.be/resources" }],
   }),
   component: ResourcesPage,
 });
 
-const USEFUL_SITES = [
-  {
-    category: "Coeliakie organisaties",
-    icon: Heart,
-    color: "bg-rose-50 text-rose-600 border-rose-200",
-    sites: [
-      { name: "Coeliakie België", url: "https://www.coeliakie.be", desc: "Officiële Belgische coeliakie organisatie, productenlijsten, recepten en nieuws." },
-      { name: "Nederlandse Coeliakie Vereniging", url: "https://www.glutenvrij.nl", desc: "NCV: erkenning, vergoedingen en reisinfo voor Nederland." },
-      { name: "Coeliac UK", url: "https://www.coeliac.org.uk", desc: "Grootste coeliakie organisatie ter wereld. Gratis reiskaarten downloadbaar." },
-      { name: "Celiac Disease Foundation", url: "https://celiac.org", desc: "Wetenschappelijke updates, dieetadvies en reisbronnen." },
-      { name: "Association of European Coeliac Societies", url: "https://aoecs.eu", desc: "AOECS coördineert het Europese licentiesysteem voor glutenvrije producten." },
-    ],
-  },
-  {
-    category: "Reis & eten",
-    icon: Globe2,
-    color: "bg-blue-50 text-blue-600 border-blue-200",
-    sites: [
-      { name: "Find Me Gluten Free", url: "https://www.findmeglutenfree.com", desc: "Gebruikersreviews van glutenvrije restaurants wereldwijd." },
-      { name: "Gluten Free Passport", url: "https://glutenfreepassport.com", desc: "Reiskaarten en fiches per land in meerdere talen." },
-      { name: "Triumph Dining", url: "https://www.triumphdining.com", desc: "Glutenvrije reiskaarten voor 80+ landen, betaald maar kwalitatief." },
-      { name: "iEatOut Gluten Free", url: "https://www.ieatout.com.au", desc: "App en website voor restaurants met glutenvrije opties." },
-      { name: "AllergyEats", url: "https://www.allergyeats.com", desc: "VS-gerichte allergiefriendly restaurant zoeker met gebruikersbeoordelingen." },
-    ],
-  },
-  {
-    category: "Wetenschap & gezondheid",
-    icon: Stethoscope,
-    color: "bg-emerald-50 text-emerald-600 border-emerald-200",
-    sites: [
-      { name: "Beyond Celiac", url: "https://www.beyondceliac.org", desc: "Wetenschappelijk onderzoek, klinische studies en patiëntenadvocacy." },
-      { name: "University of Chicago Celiac Center", url: "https://www.cureceliacdisease.org", desc: "Medisch kenniscentrum met gratis patiëntenbrochures." },
-      { name: "Celiac.com", url: "https://www.celiac.com", desc: "Forum, nieuws en productupdates. Een van de oudste bronnen online." },
-    ],
-  },
+const BAGGAGE_ICONS = [Luggage, CreditCard, Shield, FileText];
+const BAGGAGE_COLORS = [
+  { card: "border-emerald-200 bg-emerald-50", badge: "bg-emerald-100 text-emerald-700" },
+  { card: "border-blue-200 bg-blue-50", badge: "bg-blue-100 text-blue-700" },
+  { card: "border-amber-200 bg-amber-50", badge: "bg-amber-100 text-amber-700" },
+  { card: "border-purple-200 bg-purple-50", badge: "bg-purple-100 text-purple-700" },
 ];
-
-const BAGGAGE_TIPS = [
-  {
-    title: "Medisch voedsel = gratis extra bagage",
-    icon: Luggage,
-    color: "border-emerald-200 bg-emerald-50",
-    badge: "Luchtvaart",
-    badgeColor: "bg-emerald-100 text-emerald-700",
-    content: `Veel luchtvaartmaatschappijen staan toe dat je glutenvrij voedsel meeneemt als medische noodzaak, bovenop de normale bagagelimieten. Vraag dit aan bij het inchecken of via de klantenservice van de luchtvaartmaatschappij.
-
-Bewijs dat helpt: een doktersattest of diagnosebrief van je arts (bij voorkeur in het Engels), samen met de AOECS glutenvrij licentienummers van je producten.`,
-    airlines: [
-      { name: "Brussels Airlines", note: "Vraag 'medical meal' bij boeking + melding bij check-in." },
-      { name: "Lufthansa", note: "Glutenvrije maaltijd gratis bestellen, extra medisch voedsel in handbagage toegestaan met attest." },
-      { name: "KLM", note: "Special Meals optie 'Gluten Intolerant Meal' (GFML) bij boeking." },
-      { name: "Ryanair / EasyJet", note: "Geen speciale maaltijden, maar eigen eten aan boord altijd toegestaan." },
-    ],
-  },
-  {
-    title: "Financiële tegemoetkoming wereldwijd",
-    icon: CreditCard,
-    color: "border-blue-200 bg-blue-50",
-    badge: "Financieel",
-    badgeColor: "bg-blue-100 text-blue-700",
-    content: `Veel landen voorzien een financiële compensatie voor de meerkosten van glutenvrij eten — de regeling verschilt per land en je hebt overal een officiële diagnose nodig. Zie de tabel hieronder voor een overzicht per land.`,
-    links: [
-      { name: "AOECS — overzicht per land", url: "https://aoecs.eu" },
-    ],
-  },
-  {
-    title: "Verzekering voor coeliakie op reis",
-    icon: Shield,
-    color: "border-amber-200 bg-amber-50",
-    badge: "Verzekering",
-    badgeColor: "bg-amber-100 text-amber-700",
-    content: `Standaard reisverzekeringen dekken niet altijd coeliakie-gerelateerde incidenten. Vraag altijd expliciet of je gedekt bent voor ziekenhuisopname door glutenbesmetting in het buitenland, annulering door medische complicaties en repatriëring.
-
-Meld coeliakie altijd bij het afsluiten van een verzekering. Verzekeraars die hier goed mee omgaan zijn onder meer Europ Assistance, Allianz Travel en AXA Travel.`,
-    links: [],
-  },
-  {
-    title: "Medisch attest: altijd meenemen",
-    icon: FileText,
-    color: "border-purple-200 bg-purple-50",
-    badge: "Document",
-    badgeColor: "bg-purple-100 text-purple-700",
-    content: `Een doktersattest in het Engels (en liefst ook in de lokale taal) is je beste reisdocument. Het helpt bij toegang tot speciale vliegtuigmaaltijden, extra bagageruimte voor medisch voedsel, douane bij grote hoeveelheden glutenvrij voedsel en medische hulp in het buitenland.
-
-Vraag je huisarts om een brief met je diagnose, de datum, de ernst van de aandoening (coeliakie is een auto-immuunziekte) en een bevestiging dat een glutenvrij dieet medisch noodzakelijk is.`,
-    links: [],
-  },
+const SITE_CAT_COLORS = [
+  "bg-rose-50 text-rose-600 border-rose-200",
+  "bg-blue-50 text-blue-600 border-blue-200",
+  "bg-emerald-50 text-emerald-600 border-emerald-200",
 ];
-
-const QUICK_TIPS = [
-  {
-    emoji: "✈️",
-    title: "Bestel altijd een speciale maaltijd",
-    text: "Bij de meeste luchtvaartmaatschappijen kun je 24-72u voor vertrek een GFML (Gluten Free Meal) bestellen via je boeking. Gratis, en veiliger dan de standaardmaaltijd.",
-  },
-  {
-    emoji: "🏨",
-    title: "Bel je hotel altijd op voorhand",
-    text: "Bel liever dan mail. Vraag expliciet of het ontbijt glutenvrij kan, en of er een aparte broodrooster of werkoppervlak is. Bevestig de dag voor aankomst.",
-  },
-  {
-    emoji: "🛒",
-    title: "Zoek een lokale supermarkt op dag 1",
-    text: "Vind direct bij aankomst de dichtstbijzijnde supermarkt en sla glutenvrije basisproducten in. Rijstwafels, fruit, noten en yoghurt redden menige noodsituatie.",
-  },
-  {
-    emoji: "📱",
-    title: "Download offline kaarten",
-    text: "Download Google Maps offline voor je bestemming. Zoek op 'gluten free' of 'coeliac' in de stad, veel restaurants taggen zichzelf. Geen wifi nodig.",
-  },
-  {
-    emoji: "🌿",
-    title: "Landen met van nature glutenvrije keukens",
-    text: "Japan (rijst, vis), Mexico (maïstortillas), India (rijst, linzen, dal), Thailand (rijst, noodles met tamari) en Ethiopië (teff-injera) zijn van nature veelal glutenvrij. Vraag wel altijd naar sojasaus en marinades.",
-  },
-  {
-    emoji: "🚨",
-    title: "Stel een noodplan op",
-    text: "Ken het dichtstbijzijnde ziekenhuis, weet hoe je 'allergische reactie' zegt in de lokale taal, en heb altijd een noodsnack bij. GlutenGo's Emergency Phrases helpen je het juiste te zeggen.",
-  },
-  {
-    emoji: "🍷",
-    title: "Alcohol en bier: let op",
-    text: "Wijn en sterke drank (whisky, vodka op aardappel) zijn vaak veilig. Gewoon bier bevat gluten. Kies glutenvrij bier of cider. Sommige amandellikeur en speciale dranken kunnen ook problematisch zijn.",
-  },
-  {
-    emoji: "💊",
-    title: "Neem je eigen enzymen mee",
-    text: "Gluten-digestieve enzymen (zoals GluteGuard of AN-PEP-enzymen) beschermen niet volledig, maar kunnen bij kleine besmettingen helpen als back-up. Raadpleeg eerst je arts.",
-  },
-  {
-    emoji: "🌐",
-    title: "Leer de lokale taal voor 'tarwe'",
-    text: "Tarwe heet: wheat (EN), blé (FR), Weizen (DE), grano/frumento (IT), trigo (ES/PT), コムギ komugi (JA), ข้าวสาลี khao sali (TH). Ken het woord, dan kun je menukaarten zelf lezen.",
-  },
-  {
-    emoji: "📋",
-    title: "Eetdagboek bijhouden op reis",
-    text: "Noteer wat je gegeten hebt en waar. Bij een reactie kun je zo veel sneller achterhalen wat de oorzaak was, handig voor jezelf en voor je arts.",
-  },
-];
-
-const COUNTRY_RIGHTS = [
-  {
-    flag: "🇧🇪", country: "België",
-    benefit: "Belastingaftrek meerkosten GF-voeding als ziekte-uitgaven via FOD Financiën. Coeliakie België publiceert jaarlijks de forfaitaire bedragen.",
-    legal: "Allergeneninformatie verplicht in horeca (EU 1169/2011).",
-    link: { name: "Coeliakie België", url: "https://www.coeliakie.be" },
-  },
-  {
-    flag: "🇳🇱", country: "Nederland",
-    benefit: "Specifieke zorgkosten-aftrek (dieetkosten) via Belastingdienst, jaarlijks vast bedrag (~€900) bij officiële diagnose.",
-    legal: "Verplichte allergenenetikettering in restaurants (EU-wet).",
-    link: { name: "NCV Belastinginfo", url: "https://www.glutenvrij.nl/belasting" },
-  },
-  {
-    flag: "🇮🇹", country: "Italië",
-    benefit: "Maandelijkse staatsvergoeding (€56-140 afhankelijk van leeftijd/geslacht) via Servizio Sanitario Nazionale voor gecertificeerde GF-producten in apotheek.",
-    legal: "Coeliakie wettelijk erkend als sociale ziekte (Wet 123/2005). Schoolkantines & ziekenhuizen moeten GF-maaltijden aanbieden.",
-    link: { name: "AIC Italië", url: "https://www.celiachia.it" },
-  },
-  {
-    flag: "🇬🇧", country: "Verenigd Koninkrijk",
-    benefit: "GF-brood en mix op NHS-voorschrift (varieert per regio — Engeland beperkt, Schotland/Wales/NI ruimer).",
-    legal: "Allergenenwet (Natasha's Law 2021): álle voorverpakt eten in winkels moet alle ingrediënten tonen. Strenge horeca-verplichtingen.",
-    link: { name: "Coeliac UK", url: "https://www.coeliac.org.uk" },
-  },
-  {
-    flag: "🇩🇪", country: "Duitsland",
-    benefit: "Geen directe vergoeding, maar GF-meerkosten aftrekbaar als 'außergewöhnliche Belastungen' bij Finanzamt met dokterscertificaat.",
-    legal: "Schwerbehindertenausweis (gehandicaptenkaart, GdB 20) mogelijk bij coeliakie — geeft fiscale voordelen.",
-    link: { name: "DZG Duitsland", url: "https://www.dzg-online.de" },
-  },
-  {
-    flag: "🇫🇷", country: "Frankrijk",
-    benefit: "Gedeeltelijke terugbetaling GF-producten via Sécurité Sociale (~€33-46/maand) op voorschrift, alleen voor producten met ACS-code.",
-    legal: "Allergenen verplicht op restaurantmenu's (decreet 2015).",
-    link: { name: "AFDIAG Frankrijk", url: "https://www.afdiag.fr" },
-  },
-  {
-    flag: "🇪🇸", country: "Spanje",
-    benefit: "Geen nationale vergoeding, maar enkele autonome regio's (Navarra, Castilla-La Mancha, Extremadura) geven jaarlijkse subsidie €600-1500.",
-    legal: "Allergeneninformatie verplicht in horeca.",
-    link: { name: "FACE Spanje", url: "https://celiacos.org" },
-  },
-  {
-    flag: "🇺🇸", country: "Verenigde Staten",
-    benefit: "Meerkosten GF-voedsel aftrekbaar als 'medical expense' op IRS Form 1040 Schedule A (alleen het verschil met regulier eten, > 7,5% AGI).",
-    legal: "ADA (Americans with Disabilities Act): coeliakie erkend als handicap. Scholen/universiteiten/werkgevers moeten GF-accommodaties bieden. FDA-regel: 'gluten-free' = <20 ppm.",
-    link: { name: "Celiac Disease Foundation", url: "https://celiac.org/gluten-free-living/federal-benefits/tax-deduction-guide-for-gluten-free-diet" },
-  },
-  {
-    flag: "🇨🇦", country: "Canada",
-    benefit: "Meerkosten GF-voeding aftrekbaar als 'Medical Expense Tax Credit' (METC) op federale belastingaangifte met dokterscertificaat.",
-    legal: "Health Canada: 'gluten-free' label = <20 ppm. Federale allergenenwet verplicht.",
-    link: { name: "Canadian Celiac Association", url: "https://www.celiac.ca" },
-  },
-  {
-    flag: "🇦🇺", country: "Australië",
-    benefit: "Geen directe vergoeding, maar GF-meerkosten kunnen onder NDIS vallen bij ernstige bijkomende beperkingen.",
-    legal: "Strengste GF-norm ter wereld: <3 ppm voor 'gluten free' label (FSANZ). Allergenenwet verplicht.",
-    link: { name: "Coeliac Australia", url: "https://www.coeliac.org.au" },
-  },
-];
-
-const DID_YOU_KNOW = [
-  { fact: "1 op 100 mensen heeft coeliakie, maar slechts 1 op 4 is officieel gediagnosticeerd.", source: "Beyond Celiac" },
-  { fact: "Het glutenvrije markt was in 2023 wereldwijd meer dan €6 miljard waard, en groeit jaarlijks 9%.", source: "Statista" },
-  { fact: "Finse en Italiaanse kinderen hebben de hoogste coeliakie-prevalentie ter wereld.", source: "European Journal of Gastroenterology" },
-  { fact: "Een glutenvrij dieet moet levenslang gevolgd worden. Ook bij geen symptomen herstelt de darmvlokken pas na 1-2 jaar.", source: "Celiac Disease Foundation" },
-  { fact: "Havermout is van nature glutenvrij, maar wordt bijna altijd besmet tijdens de oogst of verwerking. Kies altijd gecertificeerde GF-haver.", source: "Coeliakie België" },
-  { fact: "In Italië krijgt elke officieel gediagnosticeerde coeliakiepatiënt een maandelijkse vergoeding van de staat voor glutenvrije voedingsproducten.", source: "Italian Ministry of Health" },
-  { fact: "Veel vliegmaatschappijen serveren glutenvrije speciale maaltijden vóór andere passagiers, zodat je er zeker van bent dat het juiste bord bij jou terechtkomt.", source: "Coeliac UK" },
-  { fact: "Coeliakie is de enige auto-immuunziekte waarbij de omgevingstrigger (gluten) volledig bekend én vermijdbaar is.", source: "NIH" },
-];
+const SITE_CAT_ICONS = [Heart, Globe2, Stethoscope];
 
 function ResourcesPage() {
+  const { lang } = useLanguage();
+  const c = getResourcesContent(lang);
+
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
@@ -242,30 +45,25 @@ function ResourcesPage() {
       <section className="bg-hero">
         <div className="mx-auto max-w-3xl px-5 py-16 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur">
-            <Lightbulb className="h-3.5 w-3.5 text-accent" /> Handige informatie
+            <Lightbulb className="h-3.5 w-3.5 text-accent" /> {c.hero.badge}
           </span>
-          <h1 className="mt-5 font-display text-5xl leading-tight md:text-6xl">
-            Alles wat je moet weten
-          </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-            Handige websites, reisrechten, belastingvoordelen, tips en weetjes voor coeliakiepatiënten die reizen.
-          </p>
+          <h1 className="mt-5 font-display text-5xl leading-tight md:text-6xl">{c.hero.title}</h1>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">{c.hero.subtitle}</p>
         </div>
       </section>
 
       <div className="mx-auto max-w-5xl px-5 py-16 space-y-20">
-
-        {/* Quick tips grid */}
+        {/* Quick tips */}
         <section>
           <div className="flex items-center gap-3 mb-8">
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/10 text-primary"><Lightbulb className="h-5 w-5" /></span>
             <div>
-              <h2 className="font-display text-3xl">Reiswetjes & tips</h2>
-              <p className="text-sm text-muted-foreground">Praktische kennis voor onderweg</p>
+              <h2 className="font-display text-3xl">{c.sections.quickTips.title}</h2>
+              <p className="text-sm text-muted-foreground">{c.sections.quickTips.subtitle}</p>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {QUICK_TIPS.map((tip) => (
+            {c.quickTips.map((tip) => (
               <div key={tip.title} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
                 <div className="flex items-start gap-3">
                   <span className="text-2xl mt-0.5">{tip.emoji}</span>
@@ -279,20 +77,21 @@ function ResourcesPage() {
           </div>
         </section>
 
-        {/* Rechten, bagage & vergoedingen */}
+        {/* Rights & benefits */}
         <section>
           <div className="flex items-center gap-3 mb-8">
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-emerald-100 text-emerald-700"><Shield className="h-5 w-5" /></span>
             <div>
-              <h2 className="font-display text-3xl">Rechten & vergoedingen</h2>
-              <p className="text-sm text-muted-foreground">Extra bagage, belastingvoordelen en verzekering</p>
+              <h2 className="font-display text-3xl">{c.sections.rightsBenefits.title}</h2>
+              <p className="text-sm text-muted-foreground">{c.sections.rightsBenefits.subtitle}</p>
             </div>
           </div>
           <div className="space-y-5">
-            {BAGGAGE_TIPS.map((item) => {
-              const Icon = item.icon;
+            {c.baggageTips.map((item, idx) => {
+              const Icon = BAGGAGE_ICONS[idx] ?? Info;
+              const col = BAGGAGE_COLORS[idx] ?? BAGGAGE_COLORS[0];
               return (
-                <div key={item.title} className={`rounded-3xl border p-6 ${item.color}`}>
+                <div key={item.title} className={`rounded-3xl border p-6 ${col.card}`}>
                   <div className="flex items-start justify-between gap-3 flex-wrap">
                     <div className="flex items-center gap-3">
                       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-white/60">
@@ -300,14 +99,10 @@ function ResourcesPage() {
                       </span>
                       <h3 className="font-display text-xl">{item.title}</h3>
                     </div>
-                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${item.badgeColor}`}>
-                      {item.badge}
-                    </span>
+                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${col.badge}`}>{item.badge}</span>
                   </div>
-                  <p className="mt-4 text-sm leading-relaxed whitespace-pre-line text-foreground/80">
-                    {item.content}
-                  </p>
-                  {"airlines" in item && item.airlines && (
+                  <p className="mt-4 text-sm leading-relaxed whitespace-pre-line text-foreground/80">{item.content}</p>
+                  {item.airlines && (
                     <div className="mt-4 grid gap-2 sm:grid-cols-2">
                       {item.airlines.map((a) => (
                         <div key={a.name} className="rounded-xl bg-white/50 px-4 py-2.5 text-sm">
@@ -317,16 +112,10 @@ function ResourcesPage() {
                       ))}
                     </div>
                   )}
-                  {"links" in item && item.links && item.links.length > 0 && (
+                  {item.links && item.links.length > 0 && (
                     <div className="mt-4 flex flex-wrap gap-2">
                       {item.links.map((l) => (
-                        <a
-                          key={l.name}
-                          href={l.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 rounded-full border border-current/20 bg-white/60 px-4 py-1.5 text-xs font-medium hover:bg-white/80 transition-colors"
-                        >
+                        <a key={l.name} href={l.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-current/20 bg-white/60 px-4 py-1.5 text-xs font-medium hover:bg-white/80 transition-colors">
                           {l.name} <ExternalLink className="h-3 w-3" />
                         </a>
                       ))}
@@ -338,75 +127,63 @@ function ResourcesPage() {
           </div>
         </section>
 
-        {/* Rechten per land */}
+        {/* Rights per country */}
         <section>
           <div className="flex items-center gap-3 mb-8">
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-rose-100 text-rose-700"><Globe2 className="h-5 w-5" /></span>
             <div>
-              <h2 className="font-display text-3xl">Rechten & vergoedingen per land</h2>
-              <p className="text-sm text-muted-foreground">Wat krijg je waar? Vergoedingen, fiscale aftrek en wettelijke bescherming wereldwijd</p>
+              <h2 className="font-display text-3xl">{c.sections.rightsByCountry.title}</h2>
+              <p className="text-sm text-muted-foreground">{c.sections.rightsByCountry.subtitle}</p>
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            {COUNTRY_RIGHTS.map((c) => (
-              <div key={c.country} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
+            {c.countryRights.map((cr) => (
+              <div key={cr.country} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-3xl">{c.flag}</span>
-                  <h3 className="font-display text-xl">{c.country}</h3>
+                  <span className="text-3xl">{cr.flag}</span>
+                  <h3 className="font-display text-xl">{cr.country}</h3>
                 </div>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700 mb-1">💰 Financieel</p>
-                    <p className="text-sm text-foreground/80 leading-relaxed">{c.benefit}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700 mb-1">{c.labels.financial}</p>
+                    <p className="text-sm text-foreground/80 leading-relaxed">{cr.benefit}</p>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-blue-700 mb-1">⚖️ Wettelijk</p>
-                    <p className="text-sm text-foreground/80 leading-relaxed">{c.legal}</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-blue-700 mb-1">{c.labels.legal}</p>
+                    <p className="text-sm text-foreground/80 leading-relaxed">{cr.legal}</p>
                   </div>
                 </div>
-                <a
-                  href={c.link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-                >
-                  {c.link.name} <ExternalLink className="h-3 w-3" />
+                <a href={cr.link.url} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+                  {cr.link.name} <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
             ))}
           </div>
-          <p className="mt-4 text-xs text-muted-foreground italic">
-            ⚠️ Regelgeving verandert regelmatig. Bevestig altijd via de officiële bron of de coeliakie-vereniging van je land.
-          </p>
+          <p className="mt-4 text-xs text-muted-foreground italic">{c.sections.rightsByCountry.disclaimer}</p>
         </section>
 
-        {/* Handige websites */}
+        {/* Useful sites */}
         <section>
           <div className="flex items-center gap-3 mb-8">
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-blue-100 text-blue-700"><Globe2 className="h-5 w-5" /></span>
             <div>
-              <h2 className="font-display text-3xl">Handige websites</h2>
-              <p className="text-sm text-muted-foreground">Betrouwbare bronnen voor coeliakie en glutenvrij reizen</p>
+              <h2 className="font-display text-3xl">{c.sections.usefulSites.title}</h2>
+              <p className="text-sm text-muted-foreground">{c.sections.usefulSites.subtitle}</p>
             </div>
           </div>
           <div className="space-y-8">
-            {USEFUL_SITES.map((cat) => {
-              const CatIcon = cat.icon;
+            {c.usefulSites.map((cat, idx) => {
+              const CatIcon = SITE_CAT_ICONS[idx] ?? Heart;
+              const color = SITE_CAT_COLORS[idx] ?? SITE_CAT_COLORS[0];
               return (
                 <div key={cat.category}>
-                  <div className={`mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium ${cat.color}`}>
+                  <div className={`mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium ${color}`}>
                     <CatIcon className="h-4 w-4" />
                     {cat.category}
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {cat.sites.map((site) => (
-                      <a
-                        key={site.name}
-                        href={site.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group rounded-2xl border border-border bg-card p-4 shadow-soft transition hover:-translate-y-0.5 hover:shadow-glow hover:border-primary/30"
-                      >
+                      <a key={site.name} href={site.url} target="_blank" rel="noopener noreferrer" className="group rounded-2xl border border-border bg-card p-4 shadow-soft transition hover:-translate-y-0.5 hover:shadow-glow hover:border-primary/30">
                         <div className="flex items-start justify-between gap-2">
                           <p className="font-semibold text-sm group-hover:text-primary transition-colors">{site.name}</p>
                           <ExternalLink className="h-3.5 w-3.5 shrink-0 text-muted-foreground mt-0.5" />
@@ -421,23 +198,23 @@ function ResourcesPage() {
           </div>
         </section>
 
-        {/* Weetjes */}
+        {/* Did you know */}
         <section>
           <div className="flex items-center gap-3 mb-8">
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-amber-100 text-amber-700"><Info className="h-5 w-5" /></span>
             <div>
-              <h2 className="font-display text-3xl">Wist je dat…</h2>
-              <p className="text-sm text-muted-foreground">Interessante feiten over coeliakie en glutenvrij leven</p>
+              <h2 className="font-display text-3xl">{c.sections.didYouKnow.title}</h2>
+              <p className="text-sm text-muted-foreground">{c.sections.didYouKnow.subtitle}</p>
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {DID_YOU_KNOW.map((item, i) => (
+            {c.didYouKnow.map((item, i) => (
               <div key={i} className="rounded-2xl border border-border bg-card p-5 shadow-soft">
                 <div className="flex items-start gap-3">
                   <span className="font-display text-3xl text-primary/30 leading-none">{String(i + 1).padStart(2, "0")}</span>
                   <div>
                     <p className="text-sm leading-relaxed">{item.fact}</p>
-                    <p className="mt-2 text-xs text-muted-foreground">Bron: {item.source}</p>
+                    <p className="mt-2 text-xs text-muted-foreground">{c.labels.source}: {item.source}</p>
                   </div>
                 </div>
               </div>
@@ -448,24 +225,21 @@ function ResourcesPage() {
         {/* CTA */}
         <section className="rounded-3xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 p-10 text-center">
           <Plane className="mx-auto h-10 w-10 text-primary" />
-          <h2 className="mt-4 font-display text-3xl">Klaar voor je reis?</h2>
-          <p className="mt-3 text-muted-foreground max-w-md mx-auto">
-            Genereer je glutenvrij vertaalkaart, zoek restaurants en bekijk onze landengidsen, alles in één app.
-          </p>
+          <h2 className="mt-4 font-display text-3xl">{c.sections.cta.title}</h2>
+          <p className="mt-3 text-muted-foreground max-w-md mx-auto">{c.sections.cta.subtitle}</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link to="/cards">
               <Button size="lg" className="rounded-full px-7">
-                <CreditCard className="mr-2 h-4 w-4" /> Maak een vertaalkaart
+                <CreditCard className="mr-2 h-4 w-4" /> {c.sections.cta.cards}
               </Button>
             </Link>
             <Link to="/countries">
               <Button size="lg" variant="outline" className="rounded-full px-7">
-                Landengidsen bekijken <ChevronRight className="ml-2 h-4 w-4" />
+                {c.sections.cta.countries} <ChevronRight className="ml-2 h-4 w-4" />
               </Button>
             </Link>
           </div>
         </section>
-
       </div>
 
       <SiteFooter />
