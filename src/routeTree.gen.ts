@@ -22,18 +22,15 @@ import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as CountriesSlugRouteImport } from './routes/countries_.$slug'
 import { Route as CheckoutSuccessRouteImport } from './routes/checkout.success'
 import { Route as BlogNewRouteImport } from './routes/blog.new'
 import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
-import { Route as BlogIndexRouteImport } from './routes/blog.index'
-import { Route as BlogEditSlugRouteImport } from './routes/blog.edit.$slug'
 import { Route as AppTripsRouteImport } from './routes/_app/trips'
-import { Route as AppTripsIndexRouteImport } from './routes/_app/trips.index'
 import { Route as AppTravelModeRouteImport } from './routes/_app/travel-mode'
 import { Route as AppShopsRouteImport } from './routes/_app/shops'
 import { Route as AppRestaurantsRouteImport } from './routes/_app/restaurants'
-import { Route as AppRestaurantsIndexRouteImport } from './routes/_app/restaurants.index'
 import { Route as AppRestaurantDetailRouteImport } from './routes/_app/restaurant-detail'
 import { Route as AppPharmaciesRouteImport } from './routes/_app/pharmacies'
 import { Route as AppIngredientAnalyzerRouteImport } from './routes/_app/ingredient-analyzer'
@@ -41,6 +38,9 @@ import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AppCardsRouteImport } from './routes/_app/cards'
 import { Route as AppBarsRouteImport } from './routes/_app/bars'
 import { Route as AppAdminRouteImport } from './routes/_app/admin'
+import { Route as AppTripsIndexRouteImport } from './routes/_app/trips.index'
+import { Route as AppRestaurantsIndexRouteImport } from './routes/_app/restaurants.index'
+import { Route as BlogEditSlugRouteImport } from './routes/blog.edit.$slug'
 import { Route as AppTripsNewRouteImport } from './routes/_app/trips.new'
 import { Route as AppTripsIdRouteImport } from './routes/_app/trips.$id'
 import { Route as AppRestaurantsSlugRouteImport } from './routes/_app/restaurants.$slug'
@@ -110,6 +110,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BlogRoute,
+} as any)
 const CountriesSlugRoute = CountriesSlugRouteImport.update({
   id: '/countries_/$slug',
   path: '/countries/$slug',
@@ -123,16 +128,6 @@ const CheckoutSuccessRoute = CheckoutSuccessRouteImport.update({
 const BlogNewRoute = BlogNewRouteImport.update({
   id: '/new',
   path: '/new',
-  getParentRoute: () => BlogRoute,
-} as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/',
-  getParentRoute: () => BlogRoute,
-} as any)
-const BlogEditSlugRoute = BlogEditSlugRouteImport.update({
-  id: '/blog/edit/$slug',
-  path: '/edit/$slug',
   getParentRoute: () => BlogRoute,
 } as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
@@ -151,18 +146,8 @@ const AppTravelModeRoute = AppTravelModeRouteImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 const AppShopsRoute = AppShopsRouteImport.update({
-  id: '/_app/shops',
+  id: '/shops',
   path: '/shops',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPharmaciesRoute = AppPharmaciesRouteImport.update({
-  id: '/_app/pharmacies',
-  path: '/pharmacies',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppBarsRoute = AppBarsRouteImport.update({
-  id: '/_app/bars',
-  path: '/bars',
   getParentRoute: () => AppRoute,
 } as any)
 const AppRestaurantsRoute = AppRestaurantsRouteImport.update({
@@ -173,6 +158,11 @@ const AppRestaurantsRoute = AppRestaurantsRouteImport.update({
 const AppRestaurantDetailRoute = AppRestaurantDetailRouteImport.update({
   id: '/restaurant-detail',
   path: '/restaurant-detail',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPharmaciesRoute = AppPharmaciesRouteImport.update({
+  id: '/pharmacies',
+  path: '/pharmacies',
   getParentRoute: () => AppRoute,
 } as any)
 const AppIngredientAnalyzerRoute = AppIngredientAnalyzerRouteImport.update({
@@ -190,20 +180,30 @@ const AppCardsRoute = AppCardsRouteImport.update({
   path: '/cards',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBarsRoute = AppBarsRouteImport.update({
+  id: '/bars',
+  path: '/bars',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAdminRoute = AppAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AppRoute,
 } as any)
 const AppTripsIndexRoute = AppTripsIndexRouteImport.update({
-  id: '/_app/trips/',
+  id: '/',
   path: '/',
   getParentRoute: () => AppTripsRoute,
 } as any)
 const AppRestaurantsIndexRoute = AppRestaurantsIndexRouteImport.update({
-  id: '/_app/restaurants/',
+  id: '/',
   path: '/',
   getParentRoute: () => AppRestaurantsRoute,
+} as any)
+const BlogEditSlugRoute = BlogEditSlugRouteImport.update({
+  id: '/edit/$slug',
+  path: '/edit/$slug',
+  getParentRoute: () => BlogRoute,
 } as any)
 const AppTripsNewRoute = AppTripsNewRouteImport.update({
   id: '/new',
@@ -255,11 +255,13 @@ export interface FileRoutesByFullPath {
   '/blog/new': typeof BlogNewRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
-  '/restaurants/': typeof AppRestaurantsIndexRoute
+  '/blog/': typeof BlogIndexRoute
   '/restaurants/$slug': typeof AppRestaurantsSlugRoute
-  '/trips/': typeof AppTripsIndexRoute
   '/trips/$id': typeof AppTripsIdRoute
   '/trips/new': typeof AppTripsNewRoute
+  '/blog/edit/$slug': typeof BlogEditSlugRoute
+  '/restaurants/': typeof AppRestaurantsIndexRoute
+  '/trips/': typeof AppTripsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
@@ -267,7 +269,6 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/assistant': typeof AssistantRoute
   '/auth': typeof AuthRoute
-  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/countries': typeof CountriesRoute
   '/emergency': typeof EmergencyRoute
@@ -282,19 +283,19 @@ export interface FileRoutesByTo {
   '/ingredient-analyzer': typeof AppIngredientAnalyzerRoute
   '/pharmacies': typeof AppPharmaciesRoute
   '/restaurant-detail': typeof AppRestaurantDetailRoute
-  '/restaurants': typeof AppRestaurantsRouteWithChildren
   '/shops': typeof AppShopsRoute
   '/travel-mode': typeof AppTravelModeRoute
-  '/trips': typeof AppTripsRouteWithChildren
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/new': typeof BlogNewRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries/$slug': typeof CountriesSlugRoute
-  '/restaurants/': typeof AppRestaurantsIndexRoute
+  '/blog': typeof BlogIndexRoute
   '/restaurants/$slug': typeof AppRestaurantsSlugRoute
-  '/trips/': typeof AppTripsIndexRoute
   '/trips/$id': typeof AppTripsIdRoute
   '/trips/new': typeof AppTripsNewRoute
+  '/blog/edit/$slug': typeof BlogEditSlugRoute
+  '/restaurants': typeof AppRestaurantsIndexRoute
+  '/trips': typeof AppTripsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
@@ -320,18 +321,20 @@ export interface FileRoutesById {
   '/_app/pharmacies': typeof AppPharmaciesRoute
   '/_app/restaurant-detail': typeof AppRestaurantDetailRoute
   '/_app/restaurants': typeof AppRestaurantsRouteWithChildren
-  '/_app/restaurants/': typeof AppRestaurantsIndexRoute
   '/_app/shops': typeof AppShopsRoute
   '/_app/travel-mode': typeof AppTravelModeRoute
   '/_app/trips': typeof AppTripsRouteWithChildren
-  '/_app/trips/': typeof AppTripsIndexRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/blog/new': typeof BlogNewRoute
   '/checkout/success': typeof CheckoutSuccessRoute
   '/countries_/$slug': typeof CountriesSlugRoute
+  '/blog/': typeof BlogIndexRoute
   '/_app/restaurants/$slug': typeof AppRestaurantsSlugRoute
   '/_app/trips/$id': typeof AppTripsIdRoute
   '/_app/trips/new': typeof AppTripsNewRoute
+  '/blog/edit/$slug': typeof BlogEditSlugRoute
+  '/_app/restaurants/': typeof AppRestaurantsIndexRoute
+  '/_app/trips/': typeof AppTripsIndexRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
@@ -364,9 +367,13 @@ export interface FileRouteTypes {
     | '/blog/new'
     | '/checkout/success'
     | '/countries/$slug'
+    | '/blog/'
     | '/restaurants/$slug'
     | '/trips/$id'
     | '/trips/new'
+    | '/blog/edit/$slug'
+    | '/restaurants/'
+    | '/trips/'
     | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -374,7 +381,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/assistant'
     | '/auth'
-    | '/blog'
     | '/contact'
     | '/countries'
     | '/emergency'
@@ -389,17 +395,19 @@ export interface FileRouteTypes {
     | '/ingredient-analyzer'
     | '/pharmacies'
     | '/restaurant-detail'
-    | '/restaurants'
     | '/shops'
     | '/travel-mode'
-    | '/trips'
     | '/blog/$slug'
     | '/blog/new'
     | '/checkout/success'
     | '/countries/$slug'
+    | '/blog'
     | '/restaurants/$slug'
     | '/trips/$id'
     | '/trips/new'
+    | '/blog/edit/$slug'
+    | '/restaurants'
+    | '/trips'
     | '/api/public/payments/webhook'
   id:
     | '__root__'
@@ -431,11 +439,13 @@ export interface FileRouteTypes {
     | '/blog/new'
     | '/checkout/success'
     | '/countries_/$slug'
-    | '/_app/restaurants/'
+    | '/blog/'
     | '/_app/restaurants/$slug'
-    | '/_app/trips/'
     | '/_app/trips/$id'
     | '/_app/trips/new'
+    | '/blog/edit/$slug'
+    | '/_app/restaurants/'
+    | '/_app/trips/'
     | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
@@ -551,6 +561,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/': {
+      id: '/blog/'
+      path: '/'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof BlogRoute
+    }
     '/countries_/$slug': {
       id: '/countries_/$slug'
       path: '/countries/$slug'
@@ -593,6 +610,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTravelModeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/shops': {
+      id: '/_app/shops'
+      path: '/shops'
+      fullPath: '/shops'
+      preLoaderRoute: typeof AppShopsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/restaurants': {
       id: '/_app/restaurants'
       path: '/restaurants'
@@ -605,6 +629,13 @@ declare module '@tanstack/react-router' {
       path: '/restaurant-detail'
       fullPath: '/restaurant-detail'
       preLoaderRoute: typeof AppRestaurantDetailRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/pharmacies': {
+      id: '/_app/pharmacies'
+      path: '/pharmacies'
+      fullPath: '/pharmacies'
+      preLoaderRoute: typeof AppPharmaciesRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/ingredient-analyzer': {
@@ -628,13 +659,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCardsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/admin': {
-      id: '/_app/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AppAdminRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/bars': {
       id: '/_app/bars'
       path: '/bars'
@@ -642,19 +666,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBarsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/pharmacies': {
-      id: '/_app/pharmacies'
-      path: '/pharmacies'
-      fullPath: '/pharmacies'
-      preLoaderRoute: typeof AppPharmaciesRouteImport
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/shops': {
-      id: '/_app/shops'
-      path: '/shops'
-      fullPath: '/shops'
-      preLoaderRoute: typeof AppShopsRouteImport
-      parentRoute: typeof AppRoute
+    '/_app/trips/': {
+      id: '/_app/trips/'
+      path: '/'
+      fullPath: '/trips/'
+      preLoaderRoute: typeof AppTripsIndexRouteImport
+      parentRoute: typeof AppTripsRoute
+    }
+    '/_app/restaurants/': {
+      id: '/_app/restaurants/'
+      path: '/'
+      fullPath: '/restaurants/'
+      preLoaderRoute: typeof AppRestaurantsIndexRouteImport
+      parentRoute: typeof AppRestaurantsRoute
+    }
+    '/blog/edit/$slug': {
+      id: '/blog/edit/$slug'
+      path: '/edit/$slug'
+      fullPath: '/blog/edit/$slug'
+      preLoaderRoute: typeof BlogEditSlugRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/_app/trips/new': {
       id: '/_app/trips/new'
@@ -670,26 +708,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTripsIdRouteImport
       parentRoute: typeof AppTripsRoute
     }
-    '/_app/restaurants/': {
-      id: '/_app/restaurants/'
-      path: '/'
-      fullPath: '/restaurants/'
-      preLoaderRoute: typeof AppRestaurantsIndexRouteImport
-      parentRoute: typeof AppRestaurantsRoute
-    }
     '/_app/restaurants/$slug': {
       id: '/_app/restaurants/$slug'
       path: '/$slug'
       fullPath: '/restaurants/$slug'
       preLoaderRoute: typeof AppRestaurantsSlugRouteImport
       parentRoute: typeof AppRestaurantsRoute
-    }
-    '/_app/trips/': {
-      id: '/_app/trips/'
-      path: '/'
-      fullPath: '/trips/'
-      preLoaderRoute: typeof AppTripsIndexRouteImport
-      parentRoute: typeof AppTripsRoute
     }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
@@ -702,13 +726,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRestaurantsRouteChildren {
-  AppRestaurantsIndexRoute: typeof AppRestaurantsIndexRoute
   AppRestaurantsSlugRoute: typeof AppRestaurantsSlugRoute
+  AppRestaurantsIndexRoute: typeof AppRestaurantsIndexRoute
 }
 
 const AppRestaurantsRouteChildren: AppRestaurantsRouteChildren = {
-  AppRestaurantsIndexRoute: AppRestaurantsIndexRoute,
   AppRestaurantsSlugRoute: AppRestaurantsSlugRoute,
+  AppRestaurantsIndexRoute: AppRestaurantsIndexRoute,
 }
 
 const AppRestaurantsRouteWithChildren = AppRestaurantsRoute._addFileChildren(
@@ -716,15 +740,15 @@ const AppRestaurantsRouteWithChildren = AppRestaurantsRoute._addFileChildren(
 )
 
 interface AppTripsRouteChildren {
-  AppTripsIndexRoute: typeof AppTripsIndexRoute
   AppTripsIdRoute: typeof AppTripsIdRoute
   AppTripsNewRoute: typeof AppTripsNewRoute
+  AppTripsIndexRoute: typeof AppTripsIndexRoute
 }
 
 const AppTripsRouteChildren: AppTripsRouteChildren = {
-  AppTripsIndexRoute: AppTripsIndexRoute,
   AppTripsIdRoute: AppTripsIdRoute,
   AppTripsNewRoute: AppTripsNewRoute,
+  AppTripsIndexRoute: AppTripsIndexRoute,
 }
 
 const AppTripsRouteWithChildren = AppTripsRoute._addFileChildren(
@@ -798,3 +822,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
