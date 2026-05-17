@@ -228,60 +228,21 @@ function Landing() {
 // ─── Resources Highlight ─────────────────────────────────────────────────────
 
 function ResourcesHighlight() {
-  const rights = [
-    {
-      emoji: "🧳",
-      title: "Gratis extra bagage",
-      text: "Bij de meeste Europese luchtvaartmaatschappijen heb je als coeliakiepatiënt recht op extra bagage voor medisch voedsel. Vraag dit aan bij het inchecken met een doktersattest.",
-      tag: "Luchtvaart",
-      tagColor: "bg-blue-100 text-blue-700",
-    },
-    {
-      emoji: "💶",
-      title: "Belastingvoordeel",
-      text: "In België en Nederland kun je de meerkosten van glutenvrije producten gedeeltelijk recupereren via de belastingen. Houd je aankoopbonnen bij en vraag je arts om een diagnosebevestiging.",
-      tag: "Financieel",
-      tagColor: "bg-emerald-100 text-emerald-700",
-    },
-    {
-      emoji: "✈️",
-      title: "Medische maaltijd aan boord",
-      text: "Bestel gratis een GFML (Gluten Free Meal) bij je vluchtboeking. Dit is beschikbaar bij Brussels Airlines, KLM, Lufthansa en vele anderen, zonder extra kost.",
-      tag: "Maaltijden",
-      tagColor: "bg-amber-100 text-amber-700",
-    },
-    {
-      emoji: "📄",
-      title: "Medisch attest",
-      text: "Een Engelstalig doktersattest opent deuren: extra bagageruimte, speciale maaltijden, en begrip bij douane wanneer je grote hoeveelheden glutenvrij voedsel meeneemt.",
-      tag: "Document",
-      tagColor: "bg-purple-100 text-purple-700",
-    },
-  ];
-
-  const facts = [
-    { number: "1 op 100", label: "mensen heeft coeliakie, maar slechts 1 op 4 is officieel gediagnosticeerd" },
-    { number: "30+", label: "landen waar GlutenGo noodformuleringen beschikbaar heeft, volledig offline" },
-    { number: "€6 mrd", label: "groot is de glutenvrije markt wereldwijd en groeit nog steeds jaarlijks" },
-  ];
+  const { lang } = useLanguage();
+  const c = getResourcesContent(lang);
+  const { rights, facts, badge, title, subtitle, seeAll } = c.homeHighlight;
 
   return (
     <section className="bg-cream/50 py-24">
       <div className="mx-auto max-w-7xl px-5">
-        {/* Header */}
         <div className="mx-auto max-w-2xl text-center">
           <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
-            <Shield className="h-3.5 w-3.5" /> Rechten en tips
+            <Shield className="h-3.5 w-3.5" /> {badge}
           </span>
-          <h2 className="mt-4 font-display text-4xl tracking-tight md:text-5xl">
-            Rechten die je waarschijnlijk nog niet kent
-          </h2>
-          <p className="mt-4 text-muted-foreground text-lg">
-            Als coeliakiepatiënt heb je meer mogelijkheden dan je denkt. Van gratis extra bagage tot belastingvoordelen.
-          </p>
+          <h2 className="mt-4 font-display text-4xl tracking-tight md:text-5xl">{title}</h2>
+          <p className="mt-4 text-muted-foreground text-lg">{subtitle}</p>
         </div>
 
-        {/* Stats strip */}
         <div className="mt-12 grid gap-4 sm:grid-cols-3">
           {facts.map((f) => (
             <div key={f.number} className="rounded-2xl border border-border bg-card p-5 text-center shadow-soft">
@@ -291,7 +252,6 @@ function ResourcesHighlight() {
           ))}
         </div>
 
-        {/* Rights cards */}
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {rights.map((r) => (
             <div key={r.title} className="rounded-3xl border border-border bg-card p-6 shadow-soft">
@@ -305,11 +265,10 @@ function ResourcesHighlight() {
           ))}
         </div>
 
-        {/* CTA */}
         <div className="mt-10 text-center">
           <Link to="/resources">
             <Button size="lg" variant="outline" className="rounded-full px-8">
-              Bekijk alle tips, rechten en handige links
+              {seeAll}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
