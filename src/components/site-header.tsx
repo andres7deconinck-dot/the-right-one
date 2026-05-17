@@ -228,7 +228,7 @@ export function SiteHeader() {
             <Link to="/trips" className="rounded-lg px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
               {t.nav.trips}
             </Link>
-            <p className="mt-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Find Spots</p>
+            <p className="mt-2 px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{nx.findSpots}</p>
             {SPOTS_META.map((s) => (
               <Link key={s.to} to={s.to} className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
                 <s.icon className="h-4 w-4 text-primary" />
