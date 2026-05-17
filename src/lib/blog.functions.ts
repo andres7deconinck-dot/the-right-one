@@ -217,7 +217,7 @@ export const updatePost = createServerFn({ method: "POST" })
       if (data.verified_by_admin !== undefined) patch.verified_by_admin = data.verified_by_admin;
     }
 
-    const { data: updated, error } = await supabaseAdmin.from("blog_posts").update(patch).eq("id", data.id).select("id, slug").single();
+    const { data: updated, error } = await supabaseAdmin.from("blog_posts").update(patch as never).eq("id", data.id).select("id, slug").single();
     if (error) throw new Error(error.message);
     return updated;
   });
