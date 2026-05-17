@@ -65,20 +65,20 @@ function LanguageSelector() {
   );
 }
 
-const SPOTS_META = [
-  { to: "/restaurants", icon: Utensils, label: "Restaurants", desc: "Glutenvrije restaurants wereldwijd" },
-  { to: "/bars", icon: Wine, label: "Bars", desc: "Veilige drankjes & bar opties" },
-  { to: "/pharmacies", icon: Pill, label: "Apotheker", desc: "Apotheken & medische hulp" },
-  { to: "/shops", icon: ShoppingBag, label: "Winkel", desc: "Glutenvrije supermarkten & winkels" },
+const SPOTS_BASE = [
+  { to: "/restaurants", icon: Utensils, key: "restaurants" as const },
+  { to: "/bars", icon: Wine, key: "bars" as const },
+  { to: "/pharmacies", icon: Pill, key: "pharmacies" as const },
+  { to: "/shops", icon: ShoppingBag, key: "shops" as const },
 ] as const;
 
-const TOOL_META = [
-  { to: "/cards", icon: CreditCard, desc: "Medical-grade allergy cards in 16 languages" },
-  { to: "/assistant", icon: Sparkles, desc: "Ask anything about traveling gluten-free" },
-  { to: "/travel-mode", icon: Smartphone, desc: "Fullscreen card to show restaurant staff" },
-  { to: "/trips", icon: Plane, desc: "Plan trips, save restaurants, download travel packs" },
-  { to: "/ingredient-analyzer", icon: Shield, desc: "Scan & analyze ingredients for hidden gluten" },
-  { to: "/emergency", icon: AlertCircle, desc: "Critical phrases per country & language" },
+const TOOL_BASE = [
+  { to: "/cards", icon: CreditCard, descKey: "cards" as const },
+  { to: "/assistant", icon: Sparkles, descKey: "assistant" as const },
+  { to: "/travel-mode", icon: Smartphone, descKey: "travelMode" as const },
+  { to: "/trips", icon: Plane, descKey: "trips" as const },
+  { to: "/ingredient-analyzer", icon: Shield, descKey: "ingredient" as const },
+  { to: "/emergency", icon: AlertCircle, descKey: "emergency" as const },
 ] as const;
 
 export function SiteHeader() {
