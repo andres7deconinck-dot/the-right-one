@@ -112,22 +112,169 @@ function TripDetail() {
 
   const generatePDF = () => {
     if (!isActive) { toast.error("Travel pack PDF is a Traveler/Family feature"); return; }
-    const doc = new jsPDF();
-    let y = 20;
-    doc.setFontSize(22); doc.text(`${flagFor(trip.destination_country)} ${trip.title || trip.destination_city || trip.destination_country}`, 20, y); y += 10;
-    doc.setFontSize(11); doc.setTextColor(100);
-    doc.text(`${trip.start_date || ""} → ${trip.end_date || ""}`, 20, y); y += 12;
-    doc.setTextColor(0); doc.setFontSize(14); doc.text("Restaurants", 20, y); y += 7;
-    doc.setFontSize(10);
-    savedRest.forEach((s) => {
-      const info = decodeAISlug(s.restaurant_id);
-      if (!info) return;
-      doc.text(`• ${info.name} — ${info.city}${info.country ? ", " + info.country : ""}`, 22, y, { maxWidth: 170 }); y += 6;
-    });
-    y += 6; doc.setFontSize(14); doc.text("Checklist", 20, y); y += 7; doc.setFontSize(10);
-    items.forEach((i) => { doc.text(`${i.is_completed ? "[x]" : "[ ]"} ${i.label}`, 22, y); y += 6; });
-    if (notes) { y += 6; doc.setFontSize(14); doc.text("Notes", 20, y); y += 7; doc.setFontSize(10); doc.text(notes, 22, y, { maxWidth: 170 }); }
-    doc.save(`glutengo-${trip.title || trip.destination_country || "trip"}.pdf`);
+
+    const doc = new jsPDF({ unit: "mm", format: "a4" });
+    const PW = 210, PH = 297, M = 16, CW = PW - M * 2;
+    let y = 0;
+
+    // colours
+    const C = {
+      primary:  [26,  74,  54]  as [number,number,number],
+      green:    [22, 163,  74]  as [number,number,number],
+      amber:    [217,119,   6]  as [number,number,number],
+      blue:     [37,  99, 235]  as [number,number,number],
+      teal:     [16, 185, 129]  as [number,number,number],
+      body:     [30,  30,  30]  as [number,number,number],
+      muted:    [110,110, 110]  as [number,number,number],
+      white:    [255,255, 255]  as [number,number,number],
+      lightBg:  [245,250, 245]  as [number,number,number],
+      amberBg:  [254,252, 232]  as [number,number,number],
+      amberBdr: [251,191,  36]  as [number,number,number],
+    };
+
+    const footer = () => {
+      const n = (doc.internal as any).getNumberOfPages();
+      doc.setFontSize(8); doc.setFont("helvetica","normal");
+      doc.setTextColor(...C.muted);
+      doc.text("GlutenGo Travel Pack  |  glutengo.be  |  info.deconinckdigital@gmail.com", M, PH - 7);
+      doc.text(`Page ${n}`, PW - M, PH - 7, { align: "right" });
+    };
+
+    const newPage = () => { doc.addPage(); y = M; footer(); };
+    const guard = (need: number) => { if (y + need > PH - 18) newPage(); };
+
+    const section = (title: string, col: [number,number,number]) => {
+      guard(18);
+      doc.setFillColor(...col);
+      doc.rect(M, y, 3, 9, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(...col);
+      doc.text(title, M + 6, y + 6.8);
+      doc.setDrawColor(...col); doc.setLineWidth(0.25);
+      doc.line(M, y + 10, M + CW, y + 10);
+      y += 15;
+    };
+
+    const venueRow = (name: string, sub: string) => {
+      guard(13);
+      doc.setFillColor(248, 250, 248);
+      doc.roundedRect(M + 4, y - 1, CW - 4, 11, 1.5, 1.5, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(...C.body);
+      doc.text(name, M + 8, y + 4.5, { maxWidth: CW - 14 });
+      doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...C.muted);
+      doc.text(sub, M + 8, y + 9, { maxWidth: CW - 14 });
+      y += 13;
+    };
+
+    // ── Header bar ──────────────────────────────────────────────────────────────
+    doc.setFillColor(...C.primary);
+    doc.rect(0, 0, PW, 40, "F");
+    doc.setFillColor(74, 222, 128);
+    doc.rect(0, 37, PW, 3, "F");
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(28); doc.setTextColor(...C.white);
+    doc.text("GlutenGo", M, 20);
+    doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(195, 230, 210);
+    doc.text("Gluten-Free Travel Pack", M, 30);
+    doc.setFontSize(8.5); doc.setTextColor(160, 210, 185);
+    doc.text(`Generated ${new Date().toLocaleDateString("en-GB", { day:"2-digit", month:"long", year:"numeric" })}`, PW - M, 28, { align: "right" });
+
+    y = 50;
+
+    // ── Trip info box ───────────────────────────────────────────────────────────
+    doc.setFillColor(...C.lightBg);
+    doc.roundedRect(M, y, CW, 30, 3, 3, "F");
+    doc.setDrawColor(...C.primary); doc.setLineWidth(0.4);
+    doc.roundedRect(M, y, CW, 30, 3, 3, "S");
+
+    const tripTitle = trip.title || trip.destination_city || trip.destination_country || "My Trip";
+    const dest = [trip.destination_city, trip.destination_country].filter(Boolean).join(", ");
+    doc.setFont("helvetica","bold"); doc.setFontSize(20); doc.setTextColor(...C.primary);
+    doc.text(tripTitle, M + 7, y + 12);
+    doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(...C.muted);
+    const dateStr = [
+      trip.start_date ? new Date(trip.start_date).toLocaleDateString("en-GB") : null,
+      trip.end_date   ? new Date(trip.end_date).toLocaleDateString("en-GB")   : null,
+    ].filter(Boolean).join("  →  ");
+    doc.text([dest, dateStr].filter(Boolean).join("     |     "), M + 7, y + 22);
+    const statusLabel = trip.status ? trip.status.charAt(0).toUpperCase() + trip.status.slice(1) : "";
+    if (statusLabel) {
+      doc.setFillColor(...C.green); doc.roundedRect(PW - M - 28, y + 6, 22, 8, 2, 2, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...C.white);
+      doc.text(statusLabel, PW - M - 17, y + 11.5, { align:"center" });
+    }
+    y += 38;
+
+    // ── Saved spots ─────────────────────────────────────────────────────────────
+    const restaurants = savedRest.filter(s => slugVenueType(s.restaurant_id) === "restaurant");
+    const bars        = savedRest.filter(s => slugVenueType(s.restaurant_id) === "bar");
+    const pharmacies  = savedRest.filter(s => slugVenueType(s.restaurant_id) === "pharmacy");
+    const shops       = savedRest.filter(s => slugVenueType(s.restaurant_id) === "shop");
+
+    const venueGroup = (list: typeof savedRest, title: string, col: [number,number,number]) => {
+      if (!list.length) return;
+      section(title, col);
+      list.forEach(s => {
+        const info = decodeAISlug(s.restaurant_id);
+        if (!info) return;
+        venueRow(info.name, [info.city, info.country].filter(Boolean).join(", "));
+      });
+      y += 4;
+    };
+
+    venueGroup(restaurants, "Restaurants",  C.green);
+    venueGroup(bars,        "Bars",         C.amber);
+    venueGroup(pharmacies,  "Pharmacies",   C.blue);
+    venueGroup(shops,       "Shops",        C.teal);
+
+    // ── Checklist ───────────────────────────────────────────────────────────────
+    if (items.length) {
+      section("Travel Checklist", C.primary);
+      const done = items.filter(i => i.is_completed).length;
+      doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...C.muted);
+      doc.text(`${done} of ${items.length} items completed`, M + 6, y - 5);
+      items.forEach(item => {
+        guard(9);
+        if (item.is_completed) {
+          doc.setFillColor(...C.green);
+          doc.roundedRect(M + 5, y - 3.5, 4.5, 4.5, 0.8, 0.8, "F");
+          doc.setFont("helvetica","bold"); doc.setFontSize(7.5); doc.setTextColor(...C.white);
+          doc.text("v", M + 6.6, y + 0.3);
+        } else {
+          doc.setDrawColor(190,190,190); doc.setLineWidth(0.35);
+          doc.roundedRect(M + 5, y - 3.5, 4.5, 4.5, 0.8, 0.8, "S");
+        }
+        doc.setFont("helvetica","normal"); doc.setFontSize(10);
+        doc.setTextColor(item.is_completed ? 130 : 30, item.is_completed ? 130 : 30, item.is_completed ? 130 : 30);
+        doc.text(item.label, M + 12, y, { maxWidth: CW - 16 });
+        y += 7;
+      });
+      y += 5;
+    }
+
+    // ── Notes ───────────────────────────────────────────────────────────────────
+    if (notes?.trim()) {
+      section("Notes", C.primary);
+      doc.setFont("helvetica","italic"); doc.setFontSize(10); doc.setTextColor(...C.body);
+      const lines = doc.splitTextToSize(notes.trim(), CW - 10);
+      lines.forEach((line: string) => { guard(7); doc.text(line, M + 6, y); y += 6; });
+      y += 5;
+    }
+
+    // ── Safety reminder ─────────────────────────────────────────────────────────
+    guard(30);
+    y += 4;
+    doc.setFillColor(...C.amberBg); doc.roundedRect(M, y, CW, 26, 3, 3, "F");
+    doc.setDrawColor(...C.amberBdr); doc.setLineWidth(0.5); doc.roundedRect(M, y, CW, 26, 3, 3, "S");
+    doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(146, 64, 14);
+    doc.text("! Safety reminder", M + 6, y + 8);
+    doc.setFont("helvetica","normal"); doc.setFontSize(9);
+    doc.text("Always confirm gluten-free preparation with staff on arrival. Show your translation card.", M + 6, y + 15, { maxWidth: CW - 10 });
+    doc.text("AI research helps shortlist venues — it does not replace direct confirmation.", M + 6, y + 21, { maxWidth: CW - 10 });
+
+    footer();
+
+    const fname = `glutengo-${(tripTitle).toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
+    doc.save(fname);
   };
 
   if (loadError) {
