@@ -22,8 +22,40 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
+const CONTACT_EMAIL = "info.deconinckdigital@gmail.com";
+
+const CATEGORY_LABELS: Record<string, string> = {
+  tech: "Technical issue",
+  billing: "Billing question",
+  translation: "Report a translation error",
+  restaurant: "Report a restaurant error",
+  partnership: "Partnership",
+  question: "Other question",
+};
+
 function ContactPage() {
   const [submitting, setSubmitting] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [category, setCategory] = useState("question");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    const subject = encodeURIComponent(`[GlutenGo] ${CATEGORY_LABELS[category]} — from ${name}`);
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\nCategory: ${CATEGORY_LABELS[category]}\n\n${message}`
+    );
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+
+    setTimeout(() => {
+      setSubmitting(false);
+      setName(""); setEmail(""); setCategory("question"); setMessage("");
+      toast.success("Your email client should open — just hit Send to reach us.");
+    }, 800);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -37,29 +69,21 @@ function ContactPage() {
 
       <div className="mx-auto grid max-w-5xl gap-10 px-5 py-12 md:grid-cols-[1fr_320px]">
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSubmitting(true);
-            setTimeout(() => {
-              setSubmitting(false);
-              (e.target as HTMLFormElement).reset();
-              toast.success("Thanks — we'll be in touch within 24 hours.");
-            }, 600);
-          }}
+          onSubmit={handleSubmit}
           className="rounded-3xl border border-border/60 bg-card p-7 shadow-soft"
         >
           <div className="grid gap-4">
             <div>
               <Label htmlFor="name">Name</Label>
-              <Input id="name" required className="mt-1.5" />
+              <Input id="name" required value={name} onChange={e => setName(e.target.value)} className="mt-1.5" />
             </div>
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required className="mt-1.5" />
+              <Input id="email" type="email" required value={email} onChange={e => setEmail(e.target.value)} className="mt-1.5" />
             </div>
             <div>
               <Label htmlFor="cat">Category</Label>
-              <Select defaultValue="question">
+              <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger id="cat" className="mt-1.5"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="tech">Technical issue</SelectItem>
@@ -73,9 +97,9 @@ function ContactPage() {
             </div>
             <div>
               <Label htmlFor="msg">Message</Label>
-              <Textarea id="msg" required rows={6} className="mt-1.5" />
+              <Textarea id="msg" required rows={6} value={message} onChange={e => setMessage(e.target.value)} className="mt-1.5" />
             </div>
-            <Button type="submit" disabled={submitting} className="w-full">{submitting ? "Sending…" : "Send message"}</Button>
+            <Button type="submit" disabled={submitting} className="w-full">{submitting ? "Opening email…" : "Send message"}</Button>
           </div>
         </form>
 
