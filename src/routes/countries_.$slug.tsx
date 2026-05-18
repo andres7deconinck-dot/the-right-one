@@ -349,6 +349,8 @@ function CountryDetail() {
           </div>
         </div>
       </div>
+        </PaywallGate>
+      </div>
 
       {/* Related countries */}
       <div className="mx-auto max-w-5xl px-5 pb-16">
