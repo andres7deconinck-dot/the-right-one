@@ -7,10 +7,12 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth";
 import { LanguageProvider } from "@/lib/i18n";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { InstallPrompt } from "@/components/InstallPrompt";
 
 import appCss from "../styles.css?url";
 
@@ -77,7 +79,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "apple-mobile-web-app-title", content: "GlutenGo" },
+      { name: "application-name", content: "GlutenGo" },
+      { name: "msapplication-TileColor", content: "#16a34a" },
       { title: "GlutenGo — Gluten-Free Travel App for Celiac Travelers" },
       { name: "description", content: "Find gluten-free restaurants worldwide, generate celiac translation cards in 30+ languages, explore country guides and get AI travel help. Free to start." },
       { name: "keywords", content: "gluten-free travel, celiac travel app, gluten-free restaurants, celiac translation card, gluten intolerant travel, gluten-free country guide, coeliac travel" },
@@ -135,6 +143,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -142,6 +157,7 @@ function RootComponent() {
           <PaymentTestModeBanner />
           <Outlet />
           <Toaster richColors position="top-center" />
+          <InstallPrompt />
         </LanguageProvider>
       </AuthProvider>
     </QueryClientProvider>

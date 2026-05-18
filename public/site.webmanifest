@@ -1,19 +1,76 @@
 {
-  "name": "Site",
-  "short_name": "Site",
+  "name": "GlutenGo — Gluten-Free Travel",
+  "short_name": "GlutenGo",
+  "description": "AI-powered gluten-free travel toolkit for celiac and gluten-intolerant travelers. Find safe restaurants, generate translation cards, and explore country guides.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["health", "travel", "food"],
   "icons": [
+    {
+      "src": "/favicon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/favicon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/favicon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
-  "theme_color": "#0f5132",
-  "background_color": "#0f5132",
-  "display": "standalone"
+  "shortcuts": [
+    {
+      "name": "Emergency Phrases",
+      "short_name": "Emergency",
+      "description": "Celiac emergency phrases in 10+ languages",
+      "url": "/emergency",
+      "icons": [{ "src": "/favicon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Country Guides",
+      "short_name": "Guides",
+      "description": "Gluten-free travel guides for 26 countries",
+      "url": "/countries",
+      "icons": [{ "src": "/favicon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Translation Cards",
+      "short_name": "Cards",
+      "description": "Generate a gluten-free translation card",
+      "url": "/cards",
+      "icons": [{ "src": "/favicon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Find Restaurants",
+      "short_name": "Restaurants",
+      "description": "AI-powered gluten-free restaurant finder",
+      "url": "/restaurants",
+      "icons": [{ "src": "/favicon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
 }
