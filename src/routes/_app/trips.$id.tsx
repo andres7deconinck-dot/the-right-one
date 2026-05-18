@@ -330,10 +330,7 @@ function TripDetail() {
       "Cross-contamination quick reference",
       "Translation cards & private notes",
     ];
-    inside.forEach((t, i) => {
-      doc.setFillColor(...C.primary);
-      doc.circle(M + 9, 167 + i * 0,0).circle?.(0,0,0);
-    });
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...C.sub);
     // Render bullets cleanly
     inside.forEach((t, i) => {
       const row = 168 + i * 4.6;
