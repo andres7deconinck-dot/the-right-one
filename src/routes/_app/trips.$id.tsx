@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { COUNTRIES } from "@/data/countries";
+import { EMERGENCY_COUNTRIES, EMERGENCY_NUMBERS } from "@/data/emergencyPhrases";
 import { toast } from "sonner";
 
 function decodeAISlug(slug: string): { name: string; city: string; country: string } | null {
