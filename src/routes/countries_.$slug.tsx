@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { COUNTRIES } from "@/data/countries";
 import { getLanguageInfo } from "@/data/languageInfo";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { PaywallGate } from "@/components/PaywallGate";
 
 export const Route = createFileRoute("/countries_/$slug")({
   loader: ({ params }) => {
