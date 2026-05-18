@@ -257,7 +257,7 @@ export const addComment = createServerFn({ method: "POST" })
 export const likePost = createServerFn({ method: "POST" })
   .inputValidator((input) => z.object({ post_id: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
-    const { error } = await supabaseAdmin.rpc("increment_post_likes", { pid: data.post_id });
+    const { error } = await (supabaseAdmin.rpc as any)("increment_post_likes", { pid: data.post_id });
     if (error) {
       // fallback: manual increment if RPC not available
       const { data: post } = await supabaseAdmin
@@ -276,9 +276,9 @@ export const deleteComment = createServerFn({ method: "POST" })
     const { data: row } = await supabaseAdmin
       .from("blog_comments").select("author_id").eq("id", data.comment_id).single();
     if (!row) throw new Error("Comment not found");
-    const { data: profile } = await supabaseAdmin
-      .from("profiles").select("role").eq("id", context.userId).single();
-    if (row.author_id !== context.userId && profile?.role !== "admin")
+    const { data: adminRow } = await supabaseAdmin
+      .from("user_roles").select("role").eq("user_id", context.userId).eq("role", "admin").maybeSingle();
+    if (row.author_id !== context.userId && !adminRow)
       throw new Error("Not authorized");
     const { error } = await supabaseAdmin.from("blog_comments").delete().eq("id", data.comment_id);
     if (error) throw new Error(error.message);

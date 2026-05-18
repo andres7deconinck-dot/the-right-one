@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { COUNTRIES } from "@/data/countries";
 import { getLanguageInfo } from "@/data/languageInfo";
 import { SiteHeader, SiteFooter } from "@/components/site-header";
+import { PaywallGate } from "@/components/PaywallGate";
 
 export const Route = createFileRoute("/countries_/$slug")({
   loader: ({ params }) => {
@@ -154,6 +155,21 @@ function CountryDetail() {
           </ul>
         </Section>
 
+        {/* Free preview ends here. Paid sections below. */}
+      </div>
+
+      <div className="mx-auto max-w-5xl px-5">
+        <PaywallGate
+          title={`Unlock the full ${c.name} guide`}
+          description={`You're seeing the free preview. Upgrade to Traveler to read the complete ${c.name} guide — and every other country — with brands, label words, restaurant phrases, cross-contamination flags, packing checklist and the emergency phrase card.`}
+          perks={[
+            "Trusted GF brands in supermarkets",
+            "Label words in the local language",
+            "Restaurant phrases & cross-contamination flags",
+            "Emergency phrase card + packing checklist",
+          ]}
+        >
+        <div className="grid gap-6 md:grid-cols-2 pb-6">
         <Section icon={ShoppingBag} title="Trusted GF brands in stores" accent="text-primary">
           <ul className="grid grid-cols-2 gap-2">
             {c.brands.map((b) => (
@@ -332,6 +348,8 @@ function CountryDetail() {
             </div>
           </div>
         </div>
+      </div>
+        </PaywallGate>
       </div>
 
       {/* Related countries */}
