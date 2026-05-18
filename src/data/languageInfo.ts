@@ -153,6 +153,22 @@ export const LANGUAGE_INFO: Record<string, LanguageInfo> = {
     thankYou: "धन्यवाद (Dhanyavaad)",
     emergencyNumber: "112 / 102 (ambulance)",
   },
+  Hungarian: {
+    avoidWords: ["búza (wheat)", "búzaliszt (wheat flour)", "árpa (barley)", "rozs (rye)", "zab (oats)", "maláta (malt)", "búzakeményítő (wheat starch)"],
+    gfClaim: ["gluténmentes", "áthúzott kalász (MCA logo)"],
+    askGF: "Ez gluténmentes? / Van gluténmentes menüjük?",
+    askCrossContamination: "El tudják kerülni a keresztszennyeződést? Tiszta edények, külön serpenyő.",
+    thankYou: "Köszönöm szépen!",
+    emergencyNumber: EU_EMERGENCY,
+  },
+  Turkish: {
+    avoidWords: ["buğday (wheat)", "buğday unu (wheat flour)", "arpa (barley)", "çavdar (rye)", "yulaf (oats)", "malt", "irmik (semolina)", "nişasta (starch — check source)"],
+    gfClaim: ["glutensiz", "glutén içermez", "çizgili başak (TCD logo)"],
+    askGF: "Bu glutensiz mi? / Glutensiz menünüz var mı?",
+    askCrossContamination: "Çapraz bulaşmayı önleyebilir misiniz? Temiz aletler, ayrı tava.",
+    thankYou: "Çok teşekkür ederim!",
+    emergencyNumber: "112",
+  },
 };
 
 export function getLanguageInfo(lang: string): LanguageInfo {
