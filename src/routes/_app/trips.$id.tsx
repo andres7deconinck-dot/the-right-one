@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { COUNTRIES } from "@/data/countries";
+import { EMERGENCY_COUNTRIES, EMERGENCY_NUMBERS } from "@/data/emergencyPhrases";
 import { toast } from "sonner";
 
 function decodeAISlug(slug: string): { name: string; city: string; country: string } | null {
@@ -117,163 +118,594 @@ function TripDetail() {
     const PW = 210, PH = 297, M = 16, CW = PW - M * 2;
     let y = 0;
 
-    // colours
+    // jsPDF's built-in fonts are Latin-1 only — non-Latin scripts render as
+    // gibberish. Sanitize and fall back to phonetic/English notice.
+    const latinSafe = (s: string) => {
+      if (!s) return "";
+      // strip non Latin-1 characters but keep punctuation, accented latin, basic symbols
+      // Latin-1 range is 0x00–0xFF
+      // eslint-disable-next-line no-control-regex
+      const cleaned = s.replace(/[^\x00-\xFF]/g, "").replace(/\s+/g, " ").trim();
+      return cleaned;
+    };
+    const hasNonLatin = (s: string) => /[^\x00-\xFF]/.test(s || "");
+
     const C = {
       primary:  [26,  74,  54]  as [number,number,number],
+      primaryDk:[14,  46,  34]  as [number,number,number],
       green:    [22, 163,  74]  as [number,number,number],
-      amber:    [217,119,   6]  as [number,number,number],
+      amber:    [217, 119,  6]  as [number,number,number],
       blue:     [37,  99, 235]  as [number,number,number],
       teal:     [16, 185, 129]  as [number,number,number],
+      rose:     [225,  29,  72] as [number,number,number],
       body:     [30,  30,  30]  as [number,number,number],
-      muted:    [110,110, 110]  as [number,number,number],
-      white:    [255,255, 255]  as [number,number,number],
-      lightBg:  [245,250, 245]  as [number,number,number],
-      amberBg:  [254,252, 232]  as [number,number,number],
-      amberBdr: [251,191,  36]  as [number,number,number],
+      sub:      [70,  70,  70]  as [number,number,number],
+      muted:    [115, 115, 115] as [number,number,number],
+      white:    [255, 255, 255] as [number,number,number],
+      lightBg:  [245, 250, 245] as [number,number,number],
+      cream:    [253, 251, 244] as [number,number,number],
+      amberBg:  [254, 252, 232] as [number,number,number],
+      amberBdr: [251, 191,  36] as [number,number,number],
+      roseBg:   [255, 241, 242] as [number,number,number],
+      roseBdr:  [251, 113, 133] as [number,number,number],
+      blueBg:   [239, 246, 255] as [number,number,number],
+      grayLn:   [220, 220, 220] as [number,number,number],
     };
-
-    const footer = () => {
-      const n = (doc.internal as any).getNumberOfPages();
-      doc.setFontSize(8); doc.setFont("helvetica","normal");
-      doc.setTextColor(...C.muted);
-      doc.text("GlutenGo Travel Pack  |  glutengo.be  |  info.deconinckdigital@gmail.com", M, PH - 7);
-      doc.text(`Page ${n}`, PW - M, PH - 7, { align: "right" });
-    };
-
-    const newPage = () => { doc.addPage(); y = M; footer(); };
-    const guard = (need: number) => { if (y + need > PH - 18) newPage(); };
-
-    const section = (title: string, col: [number,number,number]) => {
-      guard(18);
-      doc.setFillColor(...col);
-      doc.rect(M, y, 3, 9, "F");
-      doc.setFont("helvetica","bold"); doc.setFontSize(13); doc.setTextColor(...col);
-      doc.text(title, M + 6, y + 6.8);
-      doc.setDrawColor(...col); doc.setLineWidth(0.25);
-      doc.line(M, y + 10, M + CW, y + 10);
-      y += 15;
-    };
-
-    const venueRow = (name: string, sub: string) => {
-      guard(13);
-      doc.setFillColor(248, 250, 248);
-      doc.roundedRect(M + 4, y - 1, CW - 4, 11, 1.5, 1.5, "F");
-      doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(...C.body);
-      doc.text(name, M + 8, y + 4.5, { maxWidth: CW - 14 });
-      doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...C.muted);
-      doc.text(sub, M + 8, y + 9, { maxWidth: CW - 14 });
-      y += 13;
-    };
-
-    // ── Header bar ──────────────────────────────────────────────────────────────
-    doc.setFillColor(...C.primary);
-    doc.rect(0, 0, PW, 40, "F");
-    doc.setFillColor(74, 222, 128);
-    doc.rect(0, 37, PW, 3, "F");
-
-    doc.setFont("helvetica","bold"); doc.setFontSize(28); doc.setTextColor(...C.white);
-    doc.text("GlutenGo", M, 20);
-    doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(195, 230, 210);
-    doc.text("Gluten-Free Travel Pack", M, 30);
-    doc.setFontSize(8.5); doc.setTextColor(160, 210, 185);
-    doc.text(`Generated ${new Date().toLocaleDateString("en-GB", { day:"2-digit", month:"long", year:"numeric" })}`, PW - M, 28, { align: "right" });
-
-    y = 50;
-
-    // ── Trip info box ───────────────────────────────────────────────────────────
-    doc.setFillColor(...C.lightBg);
-    doc.roundedRect(M, y, CW, 30, 3, 3, "F");
-    doc.setDrawColor(...C.primary); doc.setLineWidth(0.4);
-    doc.roundedRect(M, y, CW, 30, 3, 3, "S");
 
     const tripTitle = trip.title || trip.destination_city || trip.destination_country || "My Trip";
     const dest = [trip.destination_city, trip.destination_country].filter(Boolean).join(", ");
-    doc.setFont("helvetica","bold"); doc.setFontSize(20); doc.setTextColor(...C.primary);
-    doc.text(tripTitle, M + 7, y + 12);
-    doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(...C.muted);
-    const dateStr = [
-      trip.start_date ? new Date(trip.start_date).toLocaleDateString("en-GB") : null,
-      trip.end_date   ? new Date(trip.end_date).toLocaleDateString("en-GB")   : null,
-    ].filter(Boolean).join("  →  ");
-    doc.text([dest, dateStr].filter(Boolean).join("     |     "), M + 7, y + 22);
-    const statusLabel = trip.status ? trip.status.charAt(0).toUpperCase() + trip.status.slice(1) : "";
-    if (statusLabel) {
-      doc.setFillColor(...C.green); doc.roundedRect(PW - M - 28, y + 6, 22, 8, 2, 2, "F");
-      doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...C.white);
-      doc.text(statusLabel, PW - M - 17, y + 11.5, { align:"center" });
-    }
-    y += 38;
 
-    // ── Saved spots ─────────────────────────────────────────────────────────────
+    // Find country guides
+    const countryGuide = COUNTRIES.find(c =>
+      c.name.toLowerCase() === (trip.destination_country || "").toLowerCase()
+    );
+    const emergencyCountry = EMERGENCY_COUNTRIES.find(e =>
+      e.name.toLowerCase() === (trip.destination_country || "").toLowerCase() ||
+      (trip.destination_country || "").toLowerCase().includes(e.name.toLowerCase())
+    );
+
+    const fmtDate = (d?: string | null) =>
+      d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : null;
+
+    // ── Footer / page chrome ────────────────────────────────────────────────────
+    const footer = () => {
+      const n = (doc.internal as any).getNumberOfPages();
+      // top hairline
+      doc.setDrawColor(...C.grayLn); doc.setLineWidth(0.2);
+      doc.line(M, PH - 12, PW - M, PH - 12);
+      doc.setFontSize(8); doc.setFont("helvetica", "normal");
+      doc.setTextColor(...C.muted);
+      doc.text("GlutenGo Travel Pack", M, PH - 7);
+      doc.text(latinSafe(tripTitle), PW / 2, PH - 7, { align: "center" });
+      doc.text(`Page ${n}`, PW - M, PH - 7, { align: "right" });
+    };
+
+    const newPage = () => { doc.addPage(); y = M + 4; footer(); };
+    const guard = (need: number) => { if (y + need > PH - 18) newPage(); };
+
+    const sectionTitle = (title: string, col: [number,number,number], subtitle?: string) => {
+      guard(subtitle ? 22 : 16);
+      // accent bar
+      doc.setFillColor(...col);
+      doc.rect(M, y, 4, 10, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.setTextColor(...col);
+      doc.text(title.toUpperCase(), M + 8, y + 7);
+      if (subtitle) {
+        doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...C.muted);
+        doc.text(subtitle, M + 8, y + 12.5);
+      }
+      doc.setDrawColor(...C.grayLn); doc.setLineWidth(0.25);
+      doc.line(M, y + (subtitle ? 16 : 12), PW - M, y + (subtitle ? 16 : 12));
+      y += subtitle ? 21 : 16;
+    };
+
+    const bullet = (text: string, col: [number,number,number] = C.primary) => {
+      const lines = doc.splitTextToSize(latinSafe(text), CW - 12);
+      guard(lines.length * 5 + 1);
+      doc.setFillColor(...col);
+      doc.circle(M + 3, y - 1.4, 1.1, "F");
+      doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(...C.body);
+      doc.text(lines, M + 7, y);
+      y += lines.length * 5 + 1;
+    };
+
+    const kv = (k: string, v: string) => {
+      const vLines = doc.splitTextToSize(latinSafe(v), CW - 42);
+      guard(vLines.length * 5 + 2);
+      doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...C.muted);
+      doc.text(k.toUpperCase(), M, y);
+      doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(...C.body);
+      doc.text(vLines, M + 38, y);
+      y += vLines.length * 5 + 2;
+    };
+
+    const venueRow = (idx: number, name: string, sub: string, col: [number,number,number]) => {
+      guard(14);
+      doc.setFillColor(250, 252, 250);
+      doc.roundedRect(M, y - 2, CW, 12, 2, 2, "F");
+      doc.setDrawColor(...C.grayLn); doc.setLineWidth(0.2);
+      doc.roundedRect(M, y - 2, CW, 12, 2, 2, "S");
+      // index pill
+      doc.setFillColor(...col);
+      doc.roundedRect(M + 3, y, 7, 8, 1.2, 1.2, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(8.5); doc.setTextColor(...C.white);
+      doc.text(String(idx), M + 6.5, y + 5.6, { align: "center" });
+      // name
+      doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(...C.body);
+      doc.text(latinSafe(name), M + 13, y + 3.5, { maxWidth: CW - 18 });
+      // sub
+      doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...C.muted);
+      doc.text(latinSafe(sub), M + 13, y + 8, { maxWidth: CW - 18 });
+      y += 14;
+    };
+
+    // ╔══════════════════════════════════════════════════════════════════════════╗
+    // ║                              COVER PAGE                                  ║
+    // ╚══════════════════════════════════════════════════════════════════════════╝
+    // Full-page cream background
+    doc.setFillColor(...C.cream);
+    doc.rect(0, 0, PW, PH, "F");
+    // Deep top band
+    doc.setFillColor(...C.primary);
+    doc.rect(0, 0, PW, 80, "F");
+    doc.setFillColor(74, 222, 128);
+    doc.rect(0, 76, PW, 4, "F");
+
+    // Brand mark
+    doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(195, 230, 210);
+    doc.text("GLUTENGO", M, 18);
+    doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(160, 210, 185);
+    doc.text("YOUR GLUTEN-FREE TRAVEL COMPANION", M, 24);
+
+    // Title block
+    doc.setFont("helvetica","bold"); doc.setFontSize(40); doc.setTextColor(...C.white);
+    const titleLines = doc.splitTextToSize(latinSafe(tripTitle), PW - M * 2);
+    doc.text(titleLines.slice(0, 2), M, 52);
+    if (dest) {
+      doc.setFont("helvetica","normal"); doc.setFontSize(13); doc.setTextColor(195, 230, 210);
+      doc.text(latinSafe(dest), M, 68);
+    }
+
+    // Big card with key trip info
+    doc.setFillColor(...C.white);
+    doc.roundedRect(M, 96, CW, 70, 4, 4, "F");
+    doc.setDrawColor(...C.grayLn); doc.setLineWidth(0.3);
+    doc.roundedRect(M, 96, CW, 70, 4, 4, "S");
+
+    const startD = fmtDate(trip.start_date);
+    const endD   = fmtDate(trip.end_date);
+    const nights = (trip.start_date && trip.end_date)
+      ? Math.max(0, Math.round((new Date(trip.end_date).getTime() - new Date(trip.start_date).getTime()) / 86400000))
+      : null;
+
+    // 3-column grid in card
+    const colW = CW / 3;
+    const labelAt = (idx: number, label: string, value: string) => {
+      const cx = M + colW * idx + 6;
+      doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...C.muted);
+      doc.text(label.toUpperCase(), cx, 108);
+      doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.setTextColor(...C.primary);
+      doc.text(latinSafe(value || "—"), cx, 118);
+    };
+    labelAt(0, "From", startD || "—");
+    labelAt(1, "To", endD || "—");
+    labelAt(2, "Nights", nights !== null ? String(nights) : "—");
+
+    // divider
+    doc.setDrawColor(...C.grayLn); doc.setLineWidth(0.2);
+    doc.line(M + 6, 126, M + CW - 6, 126);
+
+    // Bottom row of meta
+    doc.setFont("helvetica","bold"); doc.setFontSize(8); doc.setTextColor(...C.muted);
+    doc.text("DESTINATION", M + 6, 136);
+    doc.text("STATUS", M + 6 + colW, 136);
+    doc.text("AWARENESS LEVEL", M + 6 + colW * 2, 136);
+
+    doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(...C.body);
+    doc.text(latinSafe(dest || "Unspecified"), M + 6, 144, { maxWidth: colW - 8 });
+
+    const statusLabel = trip.status ? trip.status.charAt(0).toUpperCase() + trip.status.slice(1) : "Planning";
+    const statusCol: [number,number,number] = trip.status === "active" ? C.green : trip.status === "completed" ? C.blue : C.amber;
+    doc.setFillColor(...statusCol);
+    doc.roundedRect(M + 6 + colW, 139, 26, 8, 1.5, 1.5, "F");
+    doc.setFont("helvetica","bold"); doc.setFontSize(8.5); doc.setTextColor(...C.white);
+    doc.text(statusLabel, M + 19 + colW, 144.5, { align: "center" });
+
+    const awareness = countryGuide?.awareness || "—";
+    const awCol: [number,number,number] = awareness === "high" ? C.green : awareness === "medium" ? C.amber : C.rose;
+    doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(...awCol);
+    doc.text(awareness.toUpperCase(), M + 6 + colW * 2, 144);
+
+    // What's inside
+    doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(...C.primary);
+    doc.text("WHAT'S INSIDE", M + 6, 160);
+
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...C.sub);
+    const inside = [
+      "Country guide & local celiac awareness",
+      "Emergency phrases in local language",
+      "Hospital, ambulance & pharmacy numbers",
+      "Saved restaurants, bars, pharmacies & shops",
+      "Personal travel checklist",
+      "Cross-contamination quick reference",
+      "Translation cards & private notes",
+    ];
+    doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...C.sub);
+    // Render bullets cleanly
+    inside.forEach((t, i) => {
+      const row = 168 + i * 4.6;
+      doc.setFillColor(...C.green);
+      doc.circle(M + 9, row - 1.3, 0.9, "F");
+      doc.setTextColor(...C.sub);
+      doc.text(t, M + 12, row);
+    });
+
+    // Generated stamp
+    doc.setFont("helvetica","italic"); doc.setFontSize(8.5); doc.setTextColor(...C.muted);
+    doc.text(`Generated ${new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "long", year: "numeric" })}  ·  glutengo.be`, PW / 2, PH - 18, { align: "center" });
+
+    // ╔══════════════════════════════════════════════════════════════════════════╗
+    // ║                            PAGE 2 — OVERVIEW                              ║
+    // ╚══════════════════════════════════════════════════════════════════════════╝
+    newPage();
+
+    sectionTitle("Trip Overview", C.primary, "Your essentials at a glance");
+    kv("Traveller",   user?.email || "—");
+    kv("Destination", dest || "—");
+    if (trip.destination_city) kv("City", trip.destination_city);
+    if (trip.destination_country) kv("Country", trip.destination_country);
+    if (startD) kv("Departure", startD);
+    if (endD)   kv("Return", endD);
+    if (nights !== null) kv("Duration", `${nights} night${nights === 1 ? "" : "s"}`);
+    kv("Status", statusLabel);
+    if (countryGuide?.capital) kv("Capital", countryGuide.capital);
+    if (countryGuide?.certBody) kv("GF Certifier", countryGuide.certBody);
+
+    y += 4;
+
+    // Document summary panel
+    guard(34);
+    doc.setFillColor(...C.lightBg);
+    doc.roundedRect(M, y, CW, 28, 3, 3, "F");
+    doc.setDrawColor(...C.primary); doc.setLineWidth(0.3);
+    doc.roundedRect(M, y, CW, 28, 3, 3, "S");
+    const stats = [
+      ["Saved venues", String(savedRest.length)],
+      ["Checklist items", String(items.length)],
+      ["Items completed", `${items.filter(i => i.is_completed).length} / ${items.length || 0}`],
+      ["Translation cards", String(cards.length)],
+    ];
+    const sw = CW / stats.length;
+    stats.forEach(([label, val], i) => {
+      const cx = M + sw * i + sw / 2;
+      doc.setFont("helvetica","bold"); doc.setFontSize(16); doc.setTextColor(...C.primary);
+      doc.text(val, cx, y + 13, { align: "center" });
+      doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(...C.muted);
+      doc.text(label.toUpperCase(), cx, y + 21, { align: "center" });
+    });
+    y += 34;
+
+    // ── Country guide ──────────────────────────────────────────────────────────
+    if (countryGuide) {
+      sectionTitle(`Country Guide — ${countryGuide.name}`, C.primary, "Local rules, brands and what to watch for");
+
+      // Intro paragraph
+      doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(...C.body);
+      const introLines = doc.splitTextToSize(latinSafe(countryGuide.intro), CW);
+      introLines.forEach((line: string) => { guard(6); doc.text(line, M, y); y += 5.2; });
+      y += 4;
+
+      // Safe / avoid two-column
+      guard(60);
+      const colWidth = (CW - 6) / 2;
+      const startY = y;
+      // SAFE
+      doc.setFillColor(240, 253, 244);
+      doc.roundedRect(M, startY, colWidth, 6, 1.5, 1.5, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(9.5); doc.setTextColor(...C.green);
+      doc.text("✓  SAFE CHOICES", M + 3, startY + 4.3);
+      let ly = startY + 10;
+      doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...C.body);
+      countryGuide.safe.forEach(item => {
+        const lines = doc.splitTextToSize(latinSafe(item), colWidth - 7);
+        if (ly + lines.length * 4.5 > PH - 20) return;
+        doc.setFillColor(...C.green);
+        doc.circle(M + 3, ly - 1.3, 0.9, "F");
+        doc.text(lines, M + 6, ly);
+        ly += lines.length * 4.5 + 1;
+      });
+      // AVOID
+      const xR = M + colWidth + 6;
+      doc.setFillColor(254, 242, 242);
+      doc.roundedRect(xR, startY, colWidth, 6, 1.5, 1.5, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(9.5); doc.setTextColor(...C.rose);
+      doc.text("✗  AVOID OR VERIFY", xR + 3, startY + 4.3);
+      let ry = startY + 10;
+      doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...C.body);
+      countryGuide.avoid.forEach(item => {
+        const lines = doc.splitTextToSize(latinSafe(item), colWidth - 7);
+        if (ry + lines.length * 4.5 > PH - 20) return;
+        doc.setFillColor(...C.rose);
+        doc.circle(xR + 3, ry - 1.3, 0.9, "F");
+        doc.text(lines, xR + 6, ry);
+        ry += lines.length * 4.5 + 1;
+      });
+      y = Math.max(ly, ry) + 4;
+
+      // Trusted brands
+      if (countryGuide.brands?.length) {
+        guard(20);
+        doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(...C.primary);
+        doc.text("Trusted GF brands locally", M, y); y += 5;
+        doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(...C.body);
+        const blines = doc.splitTextToSize(latinSafe(countryGuide.brands.join("  ·  ")), CW);
+        blines.forEach((l: string) => { guard(5); doc.text(l, M, y); y += 5; });
+        y += 3;
+      }
+
+      // Local tips
+      if (countryGuide.tips?.length) {
+        guard(14);
+        doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(...C.primary);
+        doc.text("Local tips from celiacs on the ground", M, y); y += 6;
+        countryGuide.tips.forEach(t => bullet(t, C.amber));
+        y += 3;
+      }
+    }
+
+    // ── Translation / restaurant card ──────────────────────────────────────────
+    if (countryGuide?.emergencyPhrase) {
+      newPage();
+      sectionTitle("Show This Card at Restaurants", C.green, `In ${countryGuide.emergencyPhrase.lang} — for kitchen & waitstaff`);
+
+      const text = countryGuide.emergencyPhrase.text;
+      const cardH = 100;
+      guard(cardH + 6);
+      doc.setFillColor(...C.white);
+      doc.roundedRect(M, y, CW, cardH, 4, 4, "F");
+      doc.setDrawColor(...C.green); doc.setLineWidth(0.8);
+      doc.roundedRect(M, y, CW, cardH, 4, 4, "S");
+      // header band
+      doc.setFillColor(...C.green);
+      doc.roundedRect(M, y, CW, 14, 4, 4, "F");
+      doc.rect(M, y + 6, CW, 8, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(...C.white);
+      doc.text(`${countryGuide.flag}  ${countryGuide.emergencyPhrase.lang.toUpperCase()}  ·  CELIAC DISEASE`, M + 4, y + 9.5);
+
+      // body — Latin-safe; if original has non-latin, render placeholder + note
+      const safe = latinSafe(text);
+      doc.setFont("helvetica","normal"); doc.setFontSize(13); doc.setTextColor(...C.body);
+      if (safe.length < 10 && hasNonLatin(text)) {
+        const note = "This language uses a non-Latin script. Open this card in the GlutenGo app on your phone and show it to the waiter, or use the dedicated Translation Cards in this pack.";
+        const lines = doc.splitTextToSize(note, CW - 14);
+        doc.text(lines, M + 7, y + 26);
+      } else {
+        const lines = doc.splitTextToSize(safe, CW - 14);
+        doc.text(lines, M + 7, y + 26);
+      }
+
+      // footer band
+      doc.setFont("helvetica","italic"); doc.setFontSize(8.5); doc.setTextColor(...C.muted);
+      doc.text("Please prepare separately with clean utensils — even tiny traces of gluten make me seriously ill.", M + 7, y + cardH - 6, { maxWidth: CW - 14 });
+      y += cardH + 8;
+    }
+
+    // ── Emergency information ──────────────────────────────────────────────────
+    if (emergencyCountry || trip.destination_country) {
+      sectionTitle("Emergency Numbers", C.rose, "Save these to your phone before you arrive");
+      const numbers: { region: string; emergency: string; ambulance: string }[] = [];
+      if (emergencyCountry) {
+        numbers.push({ region: emergencyCountry.name, emergency: emergencyCountry.emergencyNumber, ambulance: emergencyCountry.ambulance });
+      }
+      // Always include EU general / 112 fallback
+      EMERGENCY_NUMBERS.forEach(n => {
+        if (!numbers.find(x => x.region === n.region)) numbers.push(n);
+      });
+
+      // Table
+      guard(12 + numbers.length * 8);
+      doc.setFillColor(...C.roseBg);
+      doc.roundedRect(M, y, CW, 10, 1.5, 1.5, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(9); doc.setTextColor(...C.rose);
+      doc.text("REGION", M + 4, y + 6.5);
+      doc.text("EMERGENCY", M + 80, y + 6.5);
+      doc.text("AMBULANCE", M + 130, y + 6.5);
+      y += 12;
+      doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(...C.body);
+      numbers.forEach((n, i) => {
+        if (i % 2) {
+          doc.setFillColor(252, 252, 252);
+          doc.rect(M, y - 5, CW, 7.5, "F");
+        }
+        doc.setFont("helvetica","normal"); doc.setTextColor(...C.body);
+        doc.text(latinSafe(n.region), M + 4, y);
+        doc.setFont("helvetica","bold"); doc.setTextColor(...C.rose);
+        doc.text(n.emergency, M + 80, y);
+        doc.text(n.ambulance, M + 130, y);
+        y += 7.5;
+      });
+      y += 4;
+    }
+
+    // ── Emergency phrases (if available) ───────────────────────────────────────
+    if (emergencyCountry) {
+      sectionTitle(`Emergency Phrases — ${emergencyCountry.language}`, C.rose, "For doctors, pharmacists or first responders");
+      emergencyCountry.phrases.forEach(p => {
+        guard(p.phonetic ? 22 : 16);
+        doc.setFillColor(255, 251, 251);
+        doc.roundedRect(M, y - 2, CW, p.phonetic ? 20 : 14, 2, 2, "F");
+        doc.setDrawColor(...C.roseBdr); doc.setLineWidth(0.2);
+        doc.roundedRect(M, y - 2, CW, p.phonetic ? 20 : 14, 2, 2, "S");
+        doc.setFont("helvetica","bold"); doc.setFontSize(8.5); doc.setTextColor(...C.rose);
+        doc.text(latinSafe(p.category.replace(/[^\x00-\xFF]/g, "").trim() || "Phrase").toUpperCase(), M + 3, y + 2.5);
+        doc.setFont("helvetica","italic"); doc.setFontSize(9.5); doc.setTextColor(...C.muted);
+        doc.text(latinSafe(p.english), M + 3, y + 7.5, { maxWidth: CW - 6 });
+        doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(...C.body);
+        const tx = latinSafe(p.translation) || `[${emergencyCountry.language} script — show in app]`;
+        doc.text(tx, M + 3, y + 12.5, { maxWidth: CW - 6 });
+        if (p.phonetic) {
+          doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(...C.muted);
+          doc.text(`Pronunciation: ${latinSafe(p.phonetic)}`, M + 3, y + 17, { maxWidth: CW - 6 });
+        }
+        y += (p.phonetic ? 22 : 16);
+      });
+      y += 2;
+    }
+
+    // ── Saved venues ───────────────────────────────────────────────────────────
     const restaurants = savedRest.filter(s => slugVenueType(s.restaurant_id) === "restaurant");
     const bars        = savedRest.filter(s => slugVenueType(s.restaurant_id) === "bar");
     const pharmacies  = savedRest.filter(s => slugVenueType(s.restaurant_id) === "pharmacy");
     const shops       = savedRest.filter(s => slugVenueType(s.restaurant_id) === "shop");
 
-    const venueGroup = (list: typeof savedRest, title: string, col: [number,number,number]) => {
+    const venueGroup = (list: typeof savedRest, title: string, sub: string, col: [number,number,number]) => {
       if (!list.length) return;
-      section(title, col);
-      list.forEach(s => {
+      sectionTitle(title, col, sub);
+      list.forEach((s, i) => {
         const info = decodeAISlug(s.restaurant_id);
         if (!info) return;
-        venueRow(info.name, [info.city, info.country].filter(Boolean).join(", "));
+        venueRow(i + 1, info.name, [info.city, info.country].filter(Boolean).join(", "), col);
       });
       y += 4;
     };
 
-    venueGroup(restaurants, "Restaurants",  C.green);
-    venueGroup(bars,        "Bars",         C.amber);
-    venueGroup(pharmacies,  "Pharmacies",   C.blue);
-    venueGroup(shops,       "Shops",        C.teal);
+    if (savedRest.length) newPage();
+    venueGroup(restaurants, "Restaurants",  `${restaurants.length} saved · verify each before visiting`, C.green);
+    venueGroup(bars,        "Bars & Cafés", `${bars.length} saved`, C.amber);
+    venueGroup(pharmacies,  "Pharmacies",   `${pharmacies.length} saved · GF products available`, C.blue);
+    venueGroup(shops,       "Shops & Supermarkets", `${shops.length} saved · stock up on staples`, C.teal);
 
-    // ── Checklist ───────────────────────────────────────────────────────────────
+    // ── Translation cards (user) ───────────────────────────────────────────────
+    if (cards.length) {
+      sectionTitle("Your Translation Cards", C.primary, "Saved from the in-app generator");
+      cards.slice(0, 5).forEach((c) => {
+        const safe = latinSafe(c.body || "");
+        const lines = doc.splitTextToSize(safe || "[Non-Latin script — show in app]", CW - 10);
+        const h = 10 + lines.length * 5;
+        guard(h + 4);
+        doc.setFillColor(...C.lightBg);
+        doc.roundedRect(M, y, CW, h, 2, 2, "F");
+        doc.setDrawColor(...C.grayLn); doc.setLineWidth(0.2);
+        doc.roundedRect(M, y, CW, h, 2, 2, "S");
+        doc.setFont("helvetica","bold"); doc.setFontSize(8.5); doc.setTextColor(...C.primary);
+        doc.text((c.language_label || c.language || "").toUpperCase(), M + 4, y + 5);
+        doc.setFont("helvetica","normal"); doc.setFontSize(9.5); doc.setTextColor(...C.body);
+        doc.text(lines, M + 4, y + 10);
+        y += h + 3;
+      });
+    }
+
+    // ── Travel checklist ───────────────────────────────────────────────────────
     if (items.length) {
-      section("Travel Checklist", C.primary);
+      newPage();
       const done = items.filter(i => i.is_completed).length;
-      doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...C.muted);
-      doc.text(`${done} of ${items.length} items completed`, M + 6, y - 5);
+      const pct = items.length ? Math.round((done / items.length) * 100) : 0;
+      sectionTitle("Travel Checklist", C.primary, `${done} of ${items.length} packed · ${pct}% complete`);
+
+      // progress bar
+      doc.setFillColor(235, 240, 235);
+      doc.roundedRect(M, y, CW, 4, 2, 2, "F");
+      if (pct > 0) {
+        doc.setFillColor(...C.green);
+        doc.roundedRect(M, y, (CW * pct) / 100, 4, 2, 2, "F");
+      }
+      y += 9;
+
       items.forEach(item => {
-        guard(9);
+        guard(8);
         if (item.is_completed) {
           doc.setFillColor(...C.green);
-          doc.roundedRect(M + 5, y - 3.5, 4.5, 4.5, 0.8, 0.8, "F");
-          doc.setFont("helvetica","bold"); doc.setFontSize(7.5); doc.setTextColor(...C.white);
-          doc.text("v", M + 6.6, y + 0.3);
+          doc.roundedRect(M, y - 3.5, 4.8, 4.8, 1, 1, "F");
+          doc.setDrawColor(...C.white); doc.setLineWidth(0.6);
+          doc.line(M + 1.3, y - 1, M + 2.2, y + 0);
+          doc.line(M + 2.2, y + 0, M + 3.7, y - 2.5);
         } else {
-          doc.setDrawColor(190,190,190); doc.setLineWidth(0.35);
-          doc.roundedRect(M + 5, y - 3.5, 4.5, 4.5, 0.8, 0.8, "S");
+          doc.setDrawColor(...C.grayLn); doc.setLineWidth(0.4);
+          doc.roundedRect(M, y - 3.5, 4.8, 4.8, 1, 1, "S");
         }
         doc.setFont("helvetica","normal"); doc.setFontSize(10);
-        doc.setTextColor(item.is_completed ? 130 : 30, item.is_completed ? 130 : 30, item.is_completed ? 130 : 30);
-        doc.text(item.label, M + 12, y, { maxWidth: CW - 16 });
+        const c = item.is_completed ? 140 : 30;
+        doc.setTextColor(c, c, c);
+        doc.text(latinSafe(item.label), M + 8, y, { maxWidth: CW - 12 });
         y += 7;
       });
-      y += 5;
+      y += 4;
     }
 
-    // ── Notes ───────────────────────────────────────────────────────────────────
-    if (notes?.trim()) {
-      section("Notes", C.primary);
-      doc.setFont("helvetica","italic"); doc.setFontSize(10); doc.setTextColor(...C.body);
-      const lines = doc.splitTextToSize(notes.trim(), CW - 10);
-      lines.forEach((line: string) => { guard(7); doc.text(line, M + 6, y); y += 6; });
-      y += 5;
-    }
-
-    // ── Safety reminder ─────────────────────────────────────────────────────────
-    guard(30);
+    // ── Cross-contamination quick reference ────────────────────────────────────
+    newPage();
+    sectionTitle("Cross-Contamination Quick Reference", C.amber, "Hidden sources of gluten — show waiters if unsure");
+    const ccItems = [
+      { t: "Shared fryers", d: "Fries, tempura and donuts cooked with breaded items pick up gluten." },
+      { t: "Wooden utensils & boards", d: "They absorb flour. Ask for clean stainless steel tools." },
+      { t: "Pasta water", d: "Re-used water from wheat pasta contaminates GF pasta." },
+      { t: "Bread baskets on table", d: "Crumbs travel — ask staff to remove them." },
+      { t: "Toasters", d: "Always cross-contaminated. Request a clean pan or grill." },
+      { t: "Soy sauce", d: "Most contain wheat. Ask for tamari (GF soy sauce)." },
+      { t: "Sauces & gravies", d: "Often thickened with flour or contain soy sauce/malt." },
+      { t: "Oats", d: "Cross-contaminated unless explicitly labelled GF (certified)." },
+      { t: "Beer & malt drinks", d: "Barley- or wheat-based. Choose certified GF beer, cider or spirits." },
+      { t: "Communion wafers, meds, lipstick", d: "All can contain hidden gluten — check labels." },
+    ];
+    ccItems.forEach(it => {
+      guard(11);
+      doc.setFillColor(...C.amberBg);
+      doc.roundedRect(M, y - 2, CW, 9, 1.5, 1.5, "F");
+      doc.setFont("helvetica","bold"); doc.setFontSize(9.5); doc.setTextColor(...C.amber);
+      doc.text(latinSafe(it.t), M + 3, y + 1.5);
+      doc.setFont("helvetica","normal"); doc.setFontSize(9); doc.setTextColor(...C.body);
+      doc.text(latinSafe(it.d), M + 3, y + 5.5, { maxWidth: CW - 6 });
+      y += 11;
+    });
     y += 4;
-    doc.setFillColor(...C.amberBg); doc.roundedRect(M, y, CW, 26, 3, 3, "F");
-    doc.setDrawColor(...C.amberBdr); doc.setLineWidth(0.5); doc.roundedRect(M, y, CW, 26, 3, 3, "S");
-    doc.setFont("helvetica","bold"); doc.setFontSize(10); doc.setTextColor(146, 64, 14);
-    doc.text("! Safety reminder", M + 6, y + 8);
-    doc.setFont("helvetica","normal"); doc.setFontSize(9);
-    doc.text("Always confirm gluten-free preparation with staff on arrival. Show your translation card.", M + 6, y + 15, { maxWidth: CW - 10 });
-    doc.text("AI research helps shortlist venues — it does not replace direct confirmation.", M + 6, y + 21, { maxWidth: CW - 10 });
+
+    // ── Pre-departure essentials ───────────────────────────────────────────────
+    sectionTitle("Pre-Departure Essentials", C.blue, "What every celiac should pack and arrange");
+    const essentials = [
+      "Medical letter from your GP confirming celiac disease (in English).",
+      "Translation cards in destination language + English backup.",
+      "GF snacks for travel days: certified bars, crackers, nuts.",
+      "Emergency GF meal: instant pasta, cup-noodles, or oat-free porridge.",
+      "Travel insurance that explicitly covers chronic conditions.",
+      "Pharmacy list near accommodation for digestive aids.",
+      "Charged phone with the GlutenGo app offline + downloaded country guide.",
+      "Reusable cutlery + a small cutting mat for picnics if you're prone to reactions.",
+      "Anti-cramp / anti-nausea meds you usually use after a glutening.",
+      "Backup payment card in case you need a last-minute hotel meal.",
+    ];
+    essentials.forEach(e => bullet(e, C.blue));
+
+    // ── Safety reminder ────────────────────────────────────────────────────────
+    y += 4;
+    guard(36);
+    doc.setFillColor(...C.amberBg); doc.roundedRect(M, y, CW, 32, 3, 3, "F");
+    doc.setDrawColor(...C.amberBdr); doc.setLineWidth(0.5); doc.roundedRect(M, y, CW, 32, 3, 3, "S");
+    doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(146, 64, 14);
+    doc.text("Important safety reminder", M + 6, y + 8);
+    doc.setFont("helvetica","normal"); doc.setFontSize(9.2); doc.setTextColor(...C.body);
+    doc.text("This pack is a planning tool — not medical advice. Always confirm gluten-free preparation with kitchen staff", M + 6, y + 15, { maxWidth: CW - 10 });
+    doc.text("on arrival, show your translation card, and verify allergen menus. AI research helps shortlist venues, but it", M + 6, y + 20, { maxWidth: CW - 10 });
+    doc.text("does not replace direct confirmation. In an emergency, call the numbers listed and seek medical help immediately.", M + 6, y + 25, { maxWidth: CW - 10 });
+
+    // ── Notes ──────────────────────────────────────────────────────────────────
+    if (notes?.trim()) {
+      newPage();
+      sectionTitle("Personal Notes", C.primary, "Reminders, bookings, recommendations");
+      doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(...C.body);
+      const lines = doc.splitTextToSize(latinSafe(notes.trim()), CW);
+      lines.forEach((line: string) => { guard(6); doc.text(line, M, y); y += 5.6; });
+    }
 
     footer();
 
-    const fname = `glutengo-${(tripTitle).toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`;
+    // Re-run footer on every page (cover excluded)
+    const pageCount = (doc.internal as any).getNumberOfPages();
+    for (let p = 2; p <= pageCount; p++) {
+      doc.setPage(p);
+      // Already drawn by newPage(); ensure last page has it too — guard above ensures
+    }
+
+    const fname = `glutengo-${latinSafe(tripTitle).toLowerCase().replace(/[^a-z0-9]+/g, "-")}-travel-pack.pdf`;
     doc.save(fname);
   };
 
