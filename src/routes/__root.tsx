@@ -49,7 +49,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-const SITE_URL = "https://glutengo.app";
+const SITE_URL = "https://glutengo.be";
 const OG_IMAGE = "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/a6706554-d91b-4275-975f-d2711314496e/id-preview-1d6b7013--67dc511f-998f-4c49-8788-6950d0e7222a.lovable.app-1778154395131.png";
 
 const ORG_SCHEMA = JSON.stringify({

@@ -18,4 +18,4 @@ Allow: /about
 Allow: /pricing
 Allow: /blog
 
-Sitemap: https://glutengo.app/sitemap.xml
+Sitemap: https://glutengo.be/sitemap.xml
