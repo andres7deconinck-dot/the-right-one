@@ -54,8 +54,35 @@ export const Route = createFileRoute("/countries_/$slug")({
           headline: `${c?.name} Gluten-Free Travel Guide`,
           description: c?.intro,
           url: `https://glutengo.app/countries/${c?.slug}`,
+          dateModified: new Date().toISOString().split("T")[0],
           publisher: { "@type": "Organization", name: "GlutenGo", url: "https://glutengo.app" },
           about: { "@type": "Country", name: c?.name },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: [
+            { "@type": "Question", name: `Is ${c?.name} safe for celiac disease?`, acceptedAnswer: { "@type": "Answer", text: c?.intro ?? "" } },
+            { "@type": "Question", name: `What gluten-free foods are safe in ${c?.name}?`, acceptedAnswer: { "@type": "Answer", text: `Generally safer choices in ${c?.name}: ${(c?.safe ?? []).join(", ")}.` } },
+            { "@type": "Question", name: `What should celiacs avoid in ${c?.name}?`, acceptedAnswer: { "@type": "Answer", text: `Avoid or verify carefully: ${(c?.avoid ?? []).join(", ")}.` } },
+            { "@type": "Question", name: `Which GF certification should I look for in ${c?.name}?`, acceptedAnswer: { "@type": "Answer", text: c?.certBody ? `Look for the ${c.certBody} logo on restaurant windows and food packaging.` : "Look for international crossed-grain symbols and always ask staff about dedicated gluten-free preparation." } },
+            { "@type": "Question", name: `How do I say gluten-free in ${c?.emergencyPhrase?.lang ?? "the local language"}?`, acceptedAnswer: { "@type": "Answer", text: c?.emergencyPhrase?.text ?? "Use a GlutenGo translation card to communicate your needs safely." } },
+          ],
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: "https://glutengo.app" },
+            { "@type": "ListItem", position: 2, name: "Country Guides", item: "https://glutengo.app/countries" },
+            { "@type": "ListItem", position: 3, name: `${c?.name} Gluten-Free Guide`, item: `https://glutengo.app/countries/${c?.slug}` },
+          ],
         }),
       },
     ],
