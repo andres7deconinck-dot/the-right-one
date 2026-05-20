@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Image as ImageIcon, Upload } from "lucide-react";
-import { createPost, updateMyProfile } from "@/lib/blog.functions";
+import { createPost } from "@/lib/blog.functions";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { COUNTRIES } from "@/data/countries";
@@ -21,7 +21,6 @@ function NewPostPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const submit = useServerFn(createPost);
-  const updateProfile = useServerFn(updateMyProfile);
 
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
@@ -47,7 +46,6 @@ function NewPostPage() {
 
   const mut = useMutation({
     mutationFn: async () => {
-      await updateProfile({ data: { full_name: publishedAs.trim() } });
       const country = COUNTRIES.find((c) => c.slug === countryCode);
       return submit({
         data: {
@@ -107,7 +105,7 @@ function NewPostPage() {
           <div>
             <Label>Published as *</Label>
             <Input value={publishedAs} onChange={(e) => setPublishedAs(e.target.value)} placeholder="Your name or brand" maxLength={120} />
-            <p className="mt-1 text-xs text-muted-foreground">This is the author name shown on the article. It also updates your profile name.</p>
+            <p className="mt-1 text-xs text-muted-foreground">The author name shown on this article only.</p>
           </div>
 
           <div>
