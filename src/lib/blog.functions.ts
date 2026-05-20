@@ -100,7 +100,7 @@ const PostInput = z.object({
   city: z.string().max(80).optional().nullable(),
   hotel_name: z.string().max(120).optional().nullable(),
   restaurant_name: z.string().max(120).optional().nullable(),
-  tags: z.array(z.string().min(1).max(30)).max(8).default([]),
+  tags: z.array(z.string().min(1).transform((t) => t.slice(0, 30))).max(8).default([]),
 });
 
 export const createPost = createServerFn({ method: "POST" })
@@ -176,7 +176,7 @@ const UpdatePostInput = z.object({
   city: z.string().max(80).optional().nullable(),
   hotel_name: z.string().max(120).optional().nullable(),
   restaurant_name: z.string().max(120).optional().nullable(),
-  tags: z.array(z.string().min(1).max(30)).max(8).default([]),
+  tags: z.array(z.string().min(1).transform((t) => t.slice(0, 30))).max(8).default([]),
   status: z.enum(["draft", "pending", "published", "rejected"]).optional(),
   is_featured: z.boolean().optional(),
   verified_by_admin: z.boolean().optional(),

@@ -167,8 +167,20 @@ function NewPostPage() {
           </div>
 
           <div>
-            <Label>Tags (comma separated, max 8)</Label>
-            <Input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="rome, pizza, family-friendly" />
+            <Label>Tags (comma separated, max 8 · each max 30 characters)</Label>
+            <Input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="turkey, family hotel, waterpark" />
+            {tags.trim() && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {tags.split(",").map((t) => t.trim()).filter(Boolean).slice(0, 8).map((t, i) => (
+                  <span
+                    key={i}
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${t.length > 30 ? "bg-destructive/10 text-destructive border border-destructive/30" : "bg-primary/10 text-primary"}`}
+                  >
+                    {t.length > 30 ? `⚠ ${t.slice(0, 30)}… (${t.length} tekens)` : t}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-end gap-2 pt-2">
