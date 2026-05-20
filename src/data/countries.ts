@@ -28,7 +28,7 @@ export const COUNTRIES: CountryGuide[] = [
     avoid: ["Pasta unless specifically 'senza glutine'", "Pizza unless AIC-certified kitchen", "Fritters & fried items (shared oil)", "Bruschetta", "Stuffed meats (often breaded)", "Soups with pasta"],
     brands: ["Schär", "Nutrifree", "Massimo Zero", "DS Gluten Free", "Le Veneziane"],
     emergencyPhrase: { lang: "Italian", text: "Sono celiaco/a. Anche piccole tracce di glutine mi fanno stare male. Vi chiedo di preparare il mio piatto separatamente, con utensili puliti e superfici non contaminate dal glutine." },
-    tips: ["Download the free AIC app to find certified restaurants — look for the AIC sticker on the window, not handmade signs (common in tourist traps near major attractions).", "Pharmacies sell certified GF bread and pasta.", "Even train dining cars stock GF snack baskets — ask the attendant.", "Restaurants must legally provide allergen info on request."],
+    tips: ["Download the free AIC app to find certified restaurants — look for the AIC sticker on the window, not handmade signs (common in tourist traps near major attractions).", "In Rome: Mama Eat (AIC-certified, dual kitchen, near Campo de' Fiori), Pandali bakery (steps from the Pantheon, 100% GF), and Celiachiamo Lab (fully GF supermarket + hot food takeaway) are celiac bucket-list stops.", "In Florence: Grom gelato is 100% GF across all flavours. In Milan: Mama Eat has expanded here too.", "Pharmacies sell certified GF bread and pasta. Even train dining cars stock GF snack baskets — ask the attendant."],
   },
   {
     slug: "belgium",
@@ -58,7 +58,7 @@ export const COUNTRIES: CountryGuide[] = [
     avoid: ["Regular baguettes & croissants", "Soufflés (usually contain flour)", "Cassoulet (often thickened)", "French onion soup (crouton)", "Quiche (pastry base)", "Steak tartare (sometimes breadcrumbs)"],
     brands: ["Schär", "Gerblé Sans Gluten", "Bjorg", "Valpiform", "Ma Vie Sans Gluten"],
     emergencyPhrase: { lang: "French", text: "Je suis cœliaque. Même de très petites quantités de gluten me rendent gravement malade. Pouvez-vous préparer mon plat séparément avec des ustensiles propres, sans contamination croisée?" },
-    tips: ["Paris has dedicated GF bakeries like Helmut Newcake and NoGlu.", "Naturalia and Biocoop supermarkets have large GF sections.", "Always ask: 'Est-ce que c'est sans gluten et sans contamination croisée?'", "France now requires allergen menus in all restaurants."],
+    tips: ["In Paris: Helmut Newcake (fully GF bakery & café, two locations) is the gold standard — everything is celiac-safe. NoGlu near the Louvre is another 100% dedicated option.", "Naturalia and Biocoop supermarkets have excellent GF sections — easy to spot on the high street.", "Always ask: 'Est-ce que c'est sans gluten et sans contamination croisée?' France legally requires allergen menus in all restaurants.", "Outside Paris, Bordeaux and Lyon have a small but growing GF restaurant scene — research ahead."],
   },
   {
     slug: "germany",
@@ -73,7 +73,7 @@ export const COUNTRIES: CountryGuide[] = [
     avoid: ["Beer (nearly all German beer contains gluten)", "Brezel & Brot", "Schnitzel (breadcrumbs)", "Sauerkraut in juices with wheat", "Most Wurst (may contain wheat fillers)", "Spätzle"],
     brands: ["Schär", "Werz", "Hammermühle", "Schnitzer", "Ko & Ko Glutenfrei"],
     emergencyPhrase: { lang: "German", text: "Ich habe Zöliakie. Selbst kleinste Mengen Gluten machen mich sehr krank. Können Sie mein Essen bitte getrennt mit sauberen Utensilien und ohne Kreuzkontamination zubereiten?" },
-    tips: ["DZG website has a certified restaurant finder.", "Reformhäuser and Bioläden stock excellent GF ranges.", "Sorgfalt Glutenfrei symbol = produced in dedicated GF facility.", "Most Aldi and Lidl now carry basic GF staples."],
+    tips: ["In Berlin: the Mitte and Prenzlauer Berg neighbourhoods have the most GF-friendly cafés and restaurants. Search 'glutenfreies Restaurant Berlin' on DZG's finder.", "In Munich: Eataly Munich has a solid GF section; traditional Bavarian restaurants are trickier — stick to DZG-certified venues.", "Reformhäuser and Bioläden stock excellent GF ranges. Aldi and Lidl carry GF staples nationwide.", "Sorgfalt Glutenfrei symbol = produced in a dedicated GF facility — the safest certification for packaged goods."],
   },
   {
     slug: "netherlands",
@@ -118,7 +118,7 @@ export const COUNTRIES: CountryGuide[] = [
     avoid: ["Croquetas (bechamel base)", "Empanadas", "Fried calamari (battered)", "Migas", "Most beer (cider is safer)", "Pan con tomate (bread)"],
     brands: ["Schär", "Adpan", "Mercadona Sin Gluten", "Beiker", "Soria Natural"],
     emergencyPhrase: { lang: "Spanish", text: "Soy celíaco/a. Incluso pequeñas cantidades de gluten me hacen enfermar gravemente. ¿Pueden preparar mi plato por separado, sin contaminación cruzada, con utensilios limpios?" },
-    tips: ["Look for the FACE crossed-grain logo on restaurant windows.", "Visit Cangas del Narcea in Asturias — a village where the majority of residents are celiac, with its own annual GF festival.", "Barcelona has a thriving GF bakery and restaurant scene — and even small bars in southern Spain stock sin gluten beer.", "Mercadona has a huge dedicated 'sin gluten' section — one of the best GF supermarket aisles in Europe."],
+    tips: ["Look for the FACE crossed-grain logo on restaurant windows.", "In Barcelona: Gula Sana (dedicated GF kitchen, excellent tapas) and Copasetic (celiac-safe brunch spot) are the top picks. The Gràcia neighbourhood has the highest density of GF restaurants.", "In Madrid: the Malasaña neighbourhood has a growing GF café scene. Visit Cangas del Narcea in Asturias — a village where the majority are celiac, with its own annual GF festival.", "Mercadona has the best GF supermarket aisle in Europe — even small bars across Andalucía now stock sin gluten beer."],
   },
   {
     slug: "portugal",
@@ -148,7 +148,7 @@ export const COUNTRIES: CountryGuide[] = [
     avoid: ["Pitta bread", "Spanakopita & tiropita (filo pastry)", "Regular gyros pitta", "Breaded kalamari", "Pastries & baklava", "Ouzo (may contain additives — check)"],
     brands: ["Schär (in large supermarkets)", "AB Vassilopoulos Free From", "Sklavenitis GF range"],
     emergencyPhrase: { lang: "Greek", text: "Έχω κοιλιοκάκη. Ακόμα και μικρές ποσότητες γλουτένης με κάνουν πολύ άρρωστο/η. Παρακαλώ ετοιμάστε το φαγητό μου χωριστά, με καθαρά σκεύη, χωρίς διασταυρούμενη μόλυνση." },
-    tips: ["Greeks take their fry oil very seriously — fryers are kept separate and staff are proud of it. Ask about the fryer and enjoy safe fries everywhere.", "Ask 'Είναι χωρίς γλουτένη;' (Is it gluten-free?).", "Athens, Mykonos and Santorini have dedicated GF restaurants.", "Supermarkets in tourist areas stock Schär."],
+    tips: ["Greeks take their fry oil very seriously — fryers are kept separate and staff are proud of it. Ask about the fryer and enjoy safe fries everywhere.", "In Athens: the Kolonaki and Monastiraki neighbourhoods have GF-aware restaurants. In Mykonos and Santorini: several restaurants specifically cater to celiacs — research ahead via the Hellenic Coeliac Society.", "Ask 'Είναι χωρίς γλουτένη;' (Is it gluten-free?). Staff in tourist areas on the islands often speak English and understand the request.", "Supermarkets in tourist areas stock Schär — AB Vassilopoulos in Athens has the best GF selection."],
   },
   {
     slug: "sweden",
@@ -178,7 +178,7 @@ export const COUNTRIES: CountryGuide[] = [
     avoid: ["Shared fryers (most restaurant fries)", "Diner pancake griddles", "Standard soy sauce", "Most beer (unless labeled GF)", "Imitation seafood"],
     brands: ["Schär", "Canyon Bakehouse", "Bob's Red Mill", "Udi's", "Glutino", "Simple Mills"],
     emergencyPhrase: { lang: "English", text: "I have celiac disease. Even tiny amounts of gluten make me very sick. Please prepare my food on a clean surface with clean utensils, and avoid any shared fryers or cross-contamination." },
-    tips: ["Use the Find Me Gluten Free app — widely reviewed.", "Whole Foods and Trader Joe's label GF products clearly.", "Confirm 'GF menu' = dedicated prep area, not just GF ingredients.", "Many chains have a dedicated 'celiac protocol' — ask the manager."],
+    tips: ["In New York: dedicated GF restaurants are concentrated in the West Village and Lower East Side. Senza Gluten (fully GF Italian) is a celiac highlight.", "In Chicago: Spacca Napoli has a dedicated GF pizza oven; Little Goat Diner is well-known for celiac safety. In LA: True Food Kitchen has strong GF protocols.", "Confirm 'GF menu' = dedicated prep area, not just GF ingredients. Ask managers specifically about shared fryers and prep surfaces.", "Whole Foods and Trader Joe's label clearly. Many chains (Chipotle, Five Guys, P.F. Chang's) have official celiac protocols — ask for the manager on shift."],
   },
   {
     slug: "japan",
@@ -323,7 +323,7 @@ export const COUNTRIES: CountryGuide[] = [
     avoid: ["Standard empanadas (wheat pastry)", "Facturas & medialunas (wheat pastry)", "Choripán (bread roll)", "Most beer", "Milanesa (breaded cutlet)", "Locro stew (check thickener)"],
     brands: ["Sin TACC certified range (green logo)", "Georgalos GF biscuits", "La Salamandra GF", "Dia % GF range", "Arcor GF snacks"],
     emergencyPhrase: { lang: "Spanish", text: "Soy celíaco/a. Incluso pequeñas cantidades de gluten me hacen enfermar gravemente. ¿Pueden preparar mi plato por separado con utensilios limpios y sin contaminación cruzada?" },
-    tips: ["Look for the 'Sin TACC' (sin trigo, avena, cebada, centeno) logo on all packaged foods — it's everywhere.", "The government mandates restaurants to offer GF bread alternatives — ask confidently, it's your legal right.", "Even shops in remote national parks like Patagonia stock certified Sin TACC products.", "Buenos Aires has a world-class GF dining scene — ACA lists certified restaurants city-wide."],
+    tips: ["Look for the 'Sin TACC' (sin trigo, avena, cebada, centeno) logo on all packaged foods — it's everywhere, including in small towns and remote national parks like Patagonia.", "In Buenos Aires: the Palermo and Recoleta neighbourhoods have the highest density of ACA-certified restaurants. The GF dining scene rivals Italy for variety and safety.", "The government legally mandates restaurants to offer GF bread alternatives — ask confidently, it's your right by law.", "ACA's app and website list certified venues city-wide. Argentina is one of the safest GF travel destinations in the world."],
   },
   {
     slug: "ireland",
@@ -338,7 +338,7 @@ export const COUNTRIES: CountryGuide[] = [
     avoid: ["Soda bread and brown bread (wheat)", "Standard sausages (often wheat filler)", "Black and white pudding (check for GF version)", "Battered fish (unless confirmed GF batter)", "Guinness and most Irish ales", "Scones and barmbrack"],
     brands: ["Kelkin Gluten Free", "Schär", "Tesco Free From", "Dunnes Stores GF range", "SuperValu Free From"],
     emergencyPhrase: { lang: "English", text: "I have coeliac disease. Even tiny amounts of gluten make me very unwell. Please prepare my food on a clean surface with clean utensils and avoid all cross-contamination with gluten-containing ingredients." },
-    tips: ["All Irish restaurant menus legally must list allergens — the wheat symbol makes it easy to spot safe dishes.", "GF black and white pudding is widely available — a full Irish breakfast is absolutely doable.", "Even remote rural pubs and restaurants often carry GF options, including GF bread.", "GF fish and chips are common — just confirm the fryer is dedicated."],
+    tips: ["All Irish restaurant menus legally must list allergens — the wheat symbol makes safe dishes easy to spot at a glance.", "In Dublin: the Ranelagh and Rathmines neighbourhoods are the most GF-friendly. The Coeliac Society of Ireland app lists verified venues across the country.", "GF black and white pudding is widely available — a full Irish breakfast (sausages, rashers, pudding, eggs) is entirely doable if you confirm the sausages.", "Even remote rural pubs carry GF bread and GF fish and chips — Ireland's rural coverage is one of the best in Europe."],
   },
   {
     slug: "hungary",

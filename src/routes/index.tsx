@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
       { name: "keywords", content: "gluten-free travel app, celiac disease travel, gluten-free restaurants worldwide, celiac translation card, coeliac travel toolkit, cross-contamination travel, celiac safe restaurants" },
       { property: "og:title", content: "GlutenGo: Gluten-Free Travel App for Celiac Disease" },
       { property: "og:description", content: "Find certified gluten-free restaurants, generate celiac translation cards in 30+ languages, and explore country guides. Built for celiac disease. Free to start." },
-      { property: "og:url", content: "https://glutengo.app/" },
+      { property: "og:url", content: "https://glutengo.be/" },
       { property: "og:type", content: "website" },
     ],
     scripts: [
