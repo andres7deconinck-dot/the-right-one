@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export type VenueCategory = "restaurant" | "coffeebar" | "supermarket" | "pharmacy" | "bar";
 
@@ -245,8 +246,45 @@ async function aiFetchWithRetry(body: unknown): Promise<Response> {
 
 // ─── Internal search helper ───────────────────────────────────────────────────
 
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+async function getCached(cacheKey: string): Promise<AISearchResult | null> {
+  try {
+    const { data } = await supabaseAdmin
+      .from("venue_search_cache")
+      .select("result")
+      .eq("cache_key", cacheKey)
+      .gt("expires_at", new Date().toISOString())
+      .maybeSingle();
+    return (data?.result as AISearchResult) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function setCache(cacheKey: string, result: AISearchResult): Promise<void> {
+  try {
+    await supabaseAdmin.from("venue_search_cache").upsert(
+      {
+        cache_key: cacheKey,
+        result: result as unknown as Record<string, unknown>,
+        expires_at: new Date(Date.now() + CACHE_TTL_MS).toISOString(),
+      },
+      { onConflict: "cache_key" },
+    );
+  } catch {
+    // Cache write failure is non-critical
+  }
+}
+
 async function runSearch(place: string, category: VenueCategory): Promise<AISearchResult | null> {
   if (!place) return null;
+
+  const cacheKey = `${category}:${place.toLowerCase().trim()}`;
+
+  // Return cached result instantly if available
+  const cached = await getCached(cacheKey);
+  if (cached) return cached;
 
   if (!process.env.LOVABLE_API_KEY) {
     await new Promise(r => setTimeout(r, 700));
@@ -309,7 +347,12 @@ async function runSearch(place: string, category: VenueCategory): Promise<AISear
     });
   }
 
-  return { place, category, summary: parsed.summary || "", results };
+  const result: AISearchResult = { place, category, summary: parsed.summary || "", results };
+
+  // Cache for future requests (fire-and-forget)
+  setCache(cacheKey, result);
+
+  return result;
 }
 
 // ─── Exported server functions ────────────────────────────────────────────────
