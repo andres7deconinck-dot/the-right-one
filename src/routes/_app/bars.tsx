@@ -511,8 +511,14 @@ function BarsPage() {
           )}
 
           {isFetching && (
-            <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-64 rounded-3xl" />)}
+            <div className="mt-8">
+              <div className="mb-5 flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary">
+                <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                <span>Our AI is researching the best gluten-free bars for you — first searches take about 15 seconds. Hang tight! 🍺</span>
+              </div>
+              <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-64 rounded-3xl" />)}
+              </div>
             </div>
           )}
 
