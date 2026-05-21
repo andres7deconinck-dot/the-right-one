@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Lock, ShoppingBag, Beer, Store, Sparkles, ArrowRight, CheckCircle2, Crown } from "lucide-react";
+import { Lock, ShoppingBag, Beer, Store, ArrowRight, CheckCircle2, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { SHOPPING_COUNTRIES } from "@/data/shopping";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useAuth } from "@/lib/auth";
@@ -21,9 +20,9 @@ export const Route = createFileRoute("/_app/shopping/")({
 const FREE_SLUGS = new Set(["italy", "belgium", "germany"]);
 
 const CATEGORY_BADGES = [
-  { icon: Store, label: "Supermarkets" },
-  { icon: ShoppingBag, label: "Ecommerce" },
-  { icon: Beer, label: "Beer brands" },
+  { icon: Store, label: "GF Supermarkets" },
+  { icon: ShoppingBag, label: "GF Ecommerce" },
+  { icon: Beer, label: "GF Beer" },
 ];
 
 function ShoppingPage() {
@@ -32,8 +31,6 @@ function ShoppingPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
-
       {/* Hero */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-5 py-20 text-white">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
@@ -51,7 +48,7 @@ function ShoppingPage() {
             <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> {SHOPPING_COUNTRIES.length} countries</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> GF brands & products</span>
             <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Insider tips</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> Beer brands per country</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> GF beer options per country</span>
           </div>
           {!isActive && !loading && (
             <div className="mt-8">
@@ -153,7 +150,7 @@ function ShoppingPage() {
                 Get full access to supermarkets, ecommerce sites, GF brands, beer brands, local specialties and insider tips for every country in our database.
               </p>
               <div className="mt-6 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-                {["Supermarkets", "GF brands", "Beer brands", "Insider tips"].map((f) => (
+                {["GF Supermarkets", "GF Brands", "GF Beer", "Insider tips"].map((f) => (
                   <div key={f} className="rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-white/80">{f}</div>
                 ))}
               </div>
@@ -175,7 +172,6 @@ function ShoppingPage() {
         </section>
       )}
 
-      <SiteFooter />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Lock, ShoppingBag, Beer, Store, Globe, Truck, Star, Lightbulb, Crown, ArrowLeft, CheckCircle2, XCircle, Package } from "lucide-react";
+import { Lock, ShoppingBag, Beer, Store, Globe, Truck, Star, Lightbulb, Crown, ArrowLeft, CheckCircle2, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SiteHeader, SiteFooter } from "@/components/site-header";
 import { SHOPPING_COUNTRIES } from "@/data/shopping";
 import { useSubscription } from "@/hooks/useSubscription";
 
@@ -71,9 +70,12 @@ function ShoppingCountryPage() {
 
   const goUpgrade = () => { window.location.href = "/pricing"; };
 
+  const gfBeers = country.beerBrands.filter((b) => b.gf);
+  const gfBrands = country.brands.filter((b) => b.gf);
+  const gfSpecialties = country.specialties.filter((s) => !s.includes("NOT GF") && !s.includes("not GF"));
+
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
 
       {/* Hero */}
       <section className={`bg-gradient-to-br ${country.hero} border-b border-border px-5 py-12`}>
@@ -183,47 +185,50 @@ function ShoppingCountryPage() {
           )}
         </Section>
 
-        {/* Local brands */}
-        <Section icon={Star} title="Famous local brands" color="text-amber-500">
-          {hasAccess || loading ? (
-            <div className="grid gap-2 sm:grid-cols-2">
-              {country.brands.map((b) => (
-                <div key={b.name} className="flex items-start gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3">
-                  <Star className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-                  <div>
-                    <p className="text-sm font-semibold">{b.name}</p>
-                    <p className="text-xs text-muted-foreground">{b.note}</p>
-                  </div>
-                  {b.gf && <CheckCircle2 className="ml-auto mt-0.5 h-4 w-4 shrink-0 text-success" />}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <PremiumLock onUpgrade={goUpgrade} />
-          )}
-        </Section>
-
-        {/* Beer brands */}
-        <Section icon={Beer} title="Famous beer brands" color="text-amber-600">
-          {hasAccess || loading ? (
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {country.beerBrands.map((b) => (
-                <div key={b.name} className={`flex items-start gap-3 rounded-xl border px-4 py-3 ${b.gf ? "border-success/20 bg-success/5" : "border-border bg-muted/30"}`}>
-                  <Beer className={`mt-0.5 h-4 w-4 shrink-0 ${b.gf ? "text-success" : "text-amber-600"}`} />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-sm font-semibold truncate">{b.name}</p>
-                      {b.gf ? (
-                        <span className="shrink-0 rounded-full bg-success/10 px-1.5 py-0.5 text-[10px] font-medium text-success">GF</span>
-                      ) : (
-                        <XCircle className="shrink-0 h-3 w-3 text-muted-foreground/50" />
-                      )}
+        {/* GF brands only */}
+        {gfBrands.length > 0 && (
+          <Section icon={Star} title="Trusted gluten-free local brands" color="text-success">
+            {hasAccess || loading ? (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {gfBrands.map((b) => (
+                  <div key={b.name} className="flex items-start gap-3 rounded-xl border border-success/20 bg-success/5 px-4 py-3">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                    <div>
+                      <p className="text-sm font-semibold">{b.name}</p>
+                      <p className="text-xs text-muted-foreground">{b.note}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground">{b.type}</p>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <PremiumLock onUpgrade={goUpgrade} />
+            )}
+          </Section>
+        )}
+
+        {/* GF Beer only */}
+        <Section icon={Beer} title="Gluten-free beer options" color="text-success">
+          {hasAccess || loading ? (
+            gfBeers.length > 0 ? (
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {gfBeers.map((b) => (
+                  <div key={b.name} className="flex items-start gap-3 rounded-xl border border-success/20 bg-success/5 px-4 py-3">
+                    <Beer className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-semibold truncate">{b.name}</p>
+                        <span className="shrink-0 rounded-full bg-success/10 px-1.5 py-0.5 text-[10px] font-medium text-success">GF</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{b.type}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="rounded-xl border border-border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+                No dedicated GF beer available in {country.name} — look for local ciders or GF imports.
+              </p>
+            )
           ) : (
             <PremiumLock onUpgrade={goUpgrade} />
           )}
@@ -244,13 +249,13 @@ function ShoppingCountryPage() {
           )}
         </Section>
 
-        {/* Local specialties */}
-        <Section icon={Star} title="Local specialties to try" color="text-rose-500">
+        {/* GF specialties only */}
+        <Section icon={Star} title="Local specialties safe for celiacs" color="text-rose-500">
           {hasAccess || loading ? (
             <div className="flex flex-wrap gap-2">
-              {country.specialties.map((s) => (
-                <span key={s} className={`rounded-full border px-4 py-2 text-sm font-medium ${s.includes("GF") ? "border-success/30 bg-success/10 text-success" : s.includes("NOT GF") ? "border-destructive/30 bg-destructive/10 text-destructive" : "border-border bg-muted/50 text-foreground"}`}>
-                  {s}
+              {gfSpecialties.map((s) => (
+                <span key={s} className="rounded-full border border-success/30 bg-success/10 px-4 py-2 text-sm font-medium text-success">
+                  {s.replace(" (GF)", "").replace(" (GF!)", "")}
                 </span>
               ))}
             </div>
@@ -306,8 +311,6 @@ function ShoppingCountryPage() {
           </div>
         </div>
       </div>
-
-      <SiteFooter />
     </div>
   );
 }
