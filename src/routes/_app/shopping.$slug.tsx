@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Lock, ShoppingBag, Beer, Store, Globe, Truck, Star, Lightbulb, Crown, ArrowLeft, CheckCircle2, Package } from "lucide-react";
+import { Lock, ShoppingBag, Beer, Store, Globe, Truck, Star, Lightbulb, Crown, ArrowLeft, CheckCircle2, Package, ExternalLink, Building2, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SHOPPING_COUNTRIES } from "@/data/shopping";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -61,6 +61,13 @@ function Section({ icon: Icon, title, color = "text-primary", children }: {
   );
 }
 
+const RESOURCE_COLORS: Record<string, { bg: string; text: string; icon: React.ElementType }> = {
+  "celiac-org": { bg: "bg-blue-50 border-blue-200/60", text: "text-blue-700", icon: Building2 },
+  "gf-shop": { bg: "bg-success/5 border-success/20", text: "text-success", icon: ShoppingBag },
+  "app": { bg: "bg-purple-50 border-purple-200/60", text: "text-purple-700", icon: Star },
+  "certification": { bg: "bg-yellow-50 border-yellow-200/60", text: "text-yellow-700", icon: Award },
+};
+
 function ShoppingCountryPage() {
   const { country } = Route.useLoaderData();
   const { isActive, loading } = useSubscription();
@@ -117,14 +124,54 @@ function ShoppingCountryPage() {
 
       <div className="mx-auto max-w-5xl space-y-5 px-5 py-10">
 
+        {/* Useful Resources — always visible for free countries, locked for premium */}
+        {country.resources.length > 0 && (
+          <Section icon={Building2} title="Useful resources & celiac organisations" color="text-blue-600">
+            {hasAccess || loading ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {country.resources.map((r) => {
+                  const style = RESOURCE_COLORS[r.type] ?? RESOURCE_COLORS["gf-shop"];
+                  const Icon = style.icon;
+                  return (
+                    <a
+                      key={r.name}
+                      href={r.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex items-start gap-3 rounded-xl border ${style.bg} px-4 py-3 transition-opacity hover:opacity-80`}
+                    >
+                      <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${style.text}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <p className={`text-sm font-semibold ${style.text} truncate`}>{r.name}</p>
+                          <ExternalLink className={`h-3 w-3 shrink-0 ${style.text}`} />
+                        </div>
+                        <p className="text-xs text-muted-foreground">{r.note}</p>
+                      </div>
+                    </a>
+                  );
+                })}
+              </div>
+            ) : (
+              <PremiumLock onUpgrade={goUpgrade} />
+            )}
+          </Section>
+        )}
+
         {/* Ecommerce — always visible teaser */}
         <Section icon={Globe} title="Top ecommerce websites">
           <div className="space-y-2">
             {country.ecommerce.slice(0, hasAccess ? undefined : 2).map((site) => (
               <div key={site.name} className="flex items-start gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3">
                 <ShoppingBag className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <div>
-                  <p className="text-sm font-semibold">{site.name}</p>
+                <div className="flex-1 min-w-0">
+                  {site.url ? (
+                    <a href={site.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-semibold hover:underline">
+                      {site.name} <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                    </a>
+                  ) : (
+                    <p className="text-sm font-semibold">{site.name}</p>
+                  )}
                   <p className="text-xs text-muted-foreground">{site.note}</p>
                 </div>
                 {site.gf && <span className="ml-auto shrink-0 rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-medium text-success">GF filter</span>}
@@ -154,7 +201,13 @@ function ShoppingCountryPage() {
                 <div key={s.name} className="flex items-start gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3">
                   <Store className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                   <div className="flex-1">
-                    <p className="text-sm font-semibold">{s.name}</p>
+                    {s.url ? (
+                      <a href={s.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm font-semibold hover:underline">
+                        {s.name} <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                      </a>
+                    ) : (
+                      <p className="text-sm font-semibold">{s.name}</p>
+                    )}
                     <p className="text-xs text-muted-foreground">{s.note}</p>
                   </div>
                   {s.gf && <span className="shrink-0 rounded-full bg-success/10 px-2 py-0.5 text-[10px] font-medium text-success">GF friendly</span>}
