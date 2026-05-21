@@ -17,7 +17,7 @@ export const Route = createFileRoute("/pricing")({
       { name: "keywords", content: "GlutenGo pricing, gluten-free travel app price, celiac app subscription, gluten-free travel toolkit cost" },
       { property: "og:title", content: "GlutenGo Pricing — Free to Start, Upgrade Anytime" },
       { property: "og:description", content: "Free forever plan. Traveler from €12.99/month. Family from €24.99/month. Cancel anytime, 30-day money-back guarantee." },
-      { property: "og:url", content: "https://glutengo.app/pricing" },
+      { property: "og:url", content: "https://glutengo.be/pricing" },
     ],
   }),
   component: PricingPage,

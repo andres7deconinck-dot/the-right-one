@@ -100,6 +100,7 @@ export function SiteHeader() {
 
   const staticLinks = [
     { to: "/countries", label: t.nav.countries },
+    { to: "/shopping", label: "🛒 Shopping" },
     { to: "/blog", label: "Blog" },
     { to: "/pricing", label: t.nav.pricing },
     ...(adminMeta?.isAdmin ? [{ to: "/admin", label: "Admin" }] : []),
